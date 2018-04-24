@@ -1,17 +1,17 @@
 rticonnextdds-connector: Python
 ========
 
-### Installation and Platform support
+### Installation and platform support
 Check [here](https://github.com/rticommunity/rticonnextdds-connector#getting-started-with-python) and [here](https://github.com/rticommunity/rticonnextdds-connector#platform-support).
-If you still have trouble write on the [RTI Community Forum](https://community.rti.com/forums/technical-questions)
+If you still have trouble, write on the [RTI Community forum](https://community.rti.com/forums/technical-questions).
 
 ### Available examples
-In this directory you can find 1 set of examples
+In this directory, you can find one set of examples:
 
- * **simple**: shows how to write samples and how to read/take
+ * **simple**: shows how to write samples and how to read/take.
 
-### Protecting calls to the connector library
-As we already explained in the main README [here](https://github.com/rticommunity/rticonnextdds-connector#threading-model), the user is responsible for protecting calls to the connector. There are many options in python to do so; one is to use the ```threading``` package:
+### Protecting calls to the Connector library
+As we already explained in the main [README] (https://github.com/rticommunity/rticonnextdds-connector#threading-model), the user is responsible for protecting calls to Connector. There are many options in Python to do so; one is to use the ```threading``` package:
 
 ```py
 ...
@@ -34,26 +34,26 @@ sem.release();
 
 ```
 
-If you want to have more information on the threading python packages, check out the documentation [here](https://docs.python.org/2/library/threading.html)
+For more information on the threading Python packages, see the documentation [here](https://docs.python.org/2/library/threading.html).
 
-### API Overview:
+### API overview
 #### require the connector library
-If you want to use the `rticonnextdds_connector` you have to import it.
+If you want to use the `rticonnextdds_connector`, you have to import it:
 
 ```py
 import rticonnextdds_connector as rti
 ```
 
 #### instantiate a new connector
-To create a new connector you have to pass an xml file and a configuration name. For more information on
-the XML format check the [XML App Creation guide](https://community.rti.com/rti-doc/510/ndds.5.1.0/doc/pdf/RTI_CoreLibrariesAndUtilities_XML_AppCreation_GettingStarted.pdf) or
-have a look to the [ShapeExample.xml](ShapeExample.xml) file included in this directory.  
+To create a new connector you have to pass an XML file and a configuration name. For more information on
+the XML format, see the [XML App Creation guide](https://community.rti.com/rti-doc/510/ndds.5.1.0/doc/pdf/RTI_CoreLibrariesAndUtilities_XML_AppCreation_GettingStarted.pdf) or
+have a look at the [ShapeExample.xml](ShapeExample.xml) file included in this directory.  
 
 ```py
 connector = rti.Connector("MyParticipantLibrary::Zero","./ShapeExample.xml");
 ```
 #### delete a connector
-To destroy all the DDS entities that belong to a connector previously create, you can call the ```delete``` function.
+To destroy all the DDS entities that belong to a connector previously created, call the ```delete``` function.
 
 ```py
 connector = rti.Connector("MyParticipantLibrary::Zero","./ShapeExample.xml");
@@ -63,13 +63,13 @@ connector.delete();
 ```
 
 #### write a sample
-To write a sample first we have to get a reference to the output port:
+To write a sample, first get a reference to the output port:
 
 ```py
 output = connector.getOutput("MyPublisher::MySquareWriter")
 ```
 
-then we have to set the instance's fields:
+Then set the instance's fields:
 
 ```py
 output.instance.setNumber("x", 1);
@@ -78,14 +78,14 @@ output.instance.setNumber("shapesize", 30);
 output.instance.setString("color", "BLUE");
 ```
 
-and then we can write:
+Then write:
 
 ```py
 output.write();
 ```
 
 #### setting the instance's fields:
-The content of an instance can be set using a dictionary that matches the original type, or field by field:
+The content of an instance can be set by using a dictionary that matches the original type, or field by field.
 
 * **Using a dictionary**:
 
@@ -102,21 +102,21 @@ output.instance.setDictionary(sample);
 output.instance.setNumber("y", 2);
 ```
 
-The APIs to do that are only 3: `setNumber(fieldName, number);` `setBoolean(fieldName, boolean);` and `setString(fieldName, string);`.
+The APIs to set an instance field by field are just three: `setNumber(fieldName, number);` `setBoolean(fieldName, boolean);` and `setString(fieldName, string);`.
 
-Nested fields can be accessed with the dot notation: `"x.y.z"`, and array or sequences with square brakets: `"x.y[1].z"`. For more info on how to access
-fields, check Section 6.4 'Data Access API' of the
-[RTI Prototyper Getting Started Guide](https://community.rti.com/rti-doc/510/ndds.5.1.0/doc/pdf/RTI_CoreLibrariesAndUtilities_Prototyper_GettingStarted.pdf)
+Nested fields can be accessed with the dot notation, `"x.y.z"`;  arrays or sequences with square brakets: `"x.y[1].z"`. For more information on how to access
+fields, see Section 6.4 'Data Access API' of the
+[RTI Prototyper Getting Started Guide](https://community.rti.com/rti-doc/510/ndds.5.1.0/doc/pdf/RTI_CoreLibrariesAndUtilities_Prototyper_GettingStarted.pdf).
 
 
 #### reading/taking data
-To read/take samples first we have to get a reference to the input port:
+To read/take samples, first get a reference to the input port:
 
 ```py
 input = connector.getInput("MySubscriber::MySquareReader");
 ```
 
-then we can call the `read()` or `take()` API:
+Then call the `read()` or `take()` API:
 
 ```py
 input.read();
@@ -128,7 +128,7 @@ input.read();
  input.take();
 ```
 
-The read/take operation can return multiple samples. So we have to iterate on an array:
+The read/take operation can return multiple samples. So, we have to iterate on an array:
 
 ```py
     input.take();
@@ -144,10 +144,10 @@ The read/take operation can return multiple samples. So we have to iterate on an
 }
 ```
 
-#### accessing samples fields after a read/take
-A `read()` or `take()` operation can return multiple samples. They are stored in an array. Every time you try to access a specific sample you have to specify an index (j in the example below).
+#### accessing sample fields after a read/take
+A `read()` or `take()` operation can return multiple samples. They are stored in an array. Every time you try to access a specific sample, you have to specify an index (j in the example below).
 
-You can access the date by getting a copy in a dictionary object or you can access each field individually:
+You can access the data by getting a copy in a dictionary object, or you can access each field individually:
 
  * **Using a dictionary**:
 
@@ -178,4 +178,4 @@ You can access the date by getting a copy in a dictionary object or you can acce
  }
 ```
 
-The APIs to do that are only 3: `getNumber(indexm fieldName);` `getBoolean(index, fieldName);` and `getString(index, fieldName);`.
+The APIs to access each field individually are just three: `getNumber(indexm fieldName);` `getBoolean(index, fieldName);` and `getString(index, fieldName);`.
