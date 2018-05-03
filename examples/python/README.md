@@ -3,7 +3,7 @@ rticonnextdds-connector: Python
 
 ### Installation and platform support
 Check [installation instructions](https://github.com/rticommunity/rticonnextdds-connector#getting-started-with-python) and [platform support](https://github.com/rticommunity/rticonnextdds-connector#platform-support).
-If you still have trouble, write on the [RTI Community forum](https://community.rti.com/forums/technical-questions) or contact [RTI Support](https://support.rti.com).
+If you still have trouble, write on the [RTI Community forum](https://community.rti.com/forums/technical-questions).
 
 ### Available examples
 In this directory, you can find one set of examples:
@@ -104,7 +104,7 @@ output.instance.setNumber("y", 2);
 
 The APIs to set an instance field by field are three: `setNumber(fieldName, number);` `setBoolean(fieldName, boolean);` and `setString(fieldName, string);`.
 
-Nested fields can be accessed with the dot notation, `"x.y.z"`,  arrays or sequences with square brakets: `"x.y[1].z"`. For more information on how to access
+Nested fields can be accessed with the dot notation: `"x.y.z"`. Arrays or sequences can be accessed with square brakets: `"x.y[1].z"`. For more information on how to access
 fields, see Section 6.4 *Data Access API* of the
 [RTI Prototyper Getting Started Guide](https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/prototyper/RTI_ConnextDDS_CoreLibraries_Prototyper_GettingStarted.pdf).
 
