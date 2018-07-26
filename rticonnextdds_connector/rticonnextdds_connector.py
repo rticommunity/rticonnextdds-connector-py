@@ -129,6 +129,10 @@ rtin_RTIDDSConnector_getBooleanFromInfos = rti.RTIDDSConnector_getBooleanFromInf
 rtin_RTIDDSConnector_getBooleanFromInfos.restype  = ctypes.c_int
 rtin_RTIDDSConnector_getBooleanFromInfos.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
 
+rtin_RTIDDSConnector_getJSONFromInfos = rti.RTIDDSConnector_getJSONFromInfos
+rtin_RTIDDSConnector_getJSONFromInfos.restype  = ctypes.c_char_p
+rtin_RTIDDSConnector_getJSONFromInfos.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+
 rtin_RTIDDSConnector_getSamplesLength = rti.RTIDDSConnector_getInfosLength
 rtin_RTIDDSConnector_getSamplesLength.restype = ctypes.c_double
 rtin_RTIDDSConnector_getSamplesLength.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
@@ -193,6 +197,14 @@ class Infos:
 	def isValid(self, index):
 		return rtin_RTIDDSConnector_getBooleanFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('valid_data'));
 
+	def getSampleIdentity(self, index):
+		jsonStr = rtin_RTIDDSConnector_getJSONFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('sample_identity'))
+		return json.loads(fromcstring(jsonStr))
+
+	def getRelatedSampleIdentity(self, index):
+		jsonStr = rtin_RTIDDSConnector_getJSONFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('related_sample_identity'))
+		return json.loads(fromcstring(jsonStr))
+
 class Input:
 	def __init__(self, connector, name):
 		self.connector = connector;
@@ -251,8 +263,15 @@ class Output:
 			raise ValueError("Invalid Publication::DataWriter name")
 		self.instance = Instance(self);
 
-	def write(self):
-		return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), None);
+	def write(self, options=None):
+		if options is not None:
+			if isinstance(options, (dict)):
+				jsonStr = json.dumps(options)
+			else:
+				jsonStr = options
+			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), tocstring(jsonStr));
+		else:
+			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), None);
 
 	def clear_members(self):
 		return rtin_RTIDDSConnector_clear(self.connector.native,tocstring(self.name));
