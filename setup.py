@@ -21,7 +21,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 # get list of dds lib binaries to include
 lib_files = []
-for root, dirs, files in walk('lib'):
+for root, dirs, files in walk('rticonnextdds-connector/lib'):
     for file in files:
         lib_files.append(path.abspath(path.join(root, file)))
 

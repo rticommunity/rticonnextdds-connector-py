@@ -78,7 +78,7 @@ else:
 		print("platfrom not yet supported")
 
 path = os.path.dirname(os.path.realpath(__file__))
-path = os.path.join(path, "..", "lib", arch);
+path = os.path.join(path, "..", "rticonnextdds-connector/lib", arch);
 libname = libname + "." + post
 rti = ctypes.CDLL(os.path.join(path, libname), ctypes.RTLD_GLOBAL)
 
