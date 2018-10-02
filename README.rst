@@ -1,5 +1,5 @@
-rticonnextdds-connector
-=======================
+rticonnextdds-connector: Python
+===============================
 
 RTI Connector for Connext DDS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -11,43 +11,12 @@ Application
 Creation <https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf>`__
 and Dynamic Data.
 
-*Connector* was created by the RTI Research Group to quickly and easily
-develop demos and proof of concept. We think that it can be useful for
-anybody who needs a quick way to script tests and interact with DDS
-using different scripting languages.
-
-It can be used to quickly create tests for your distributed system and,
-thanks to the binding with scripting languages and the use of XML, to
-easily integrate with tons of other available technologies.
-
-The *Connector* library is provided in binary form for selected
-architectures. Scripting language bindings and examples are provided in
-source format.
-
 Language Support
 ~~~~~~~~~~~~~~~~
 
--  **Node.js/JavaScript**: we use
-   `libffi <https://github.com/node-ffi/node-ffi>`__ to call our
-   library, but we try to hide that from you using a nice JavaScript
-   wrapper. We tested our Node.js/JavaScript implementation with node
-   v8.7.0; it should work also with lower versions.
--  **Python**: here we use
-   `ctypes <https://docs.python.org/2/library/ctypes.html>`__ to call
-   our native functions; everything is hidden in a nice Python wrapper.
-   We tested our Python implementation with both Python 2.7.14 and
-   Python 3.6.3
--  **Lua**: (Lua version 5.1) we have supported Lua in `RTI
-   Prototyper <https://community.rti.com/downloads/experimental/rti-prototyper-with-lua>`__
-   for a while now. Check more information on our
-   `blog <https://www.rti.com/blog/topic/lua>`__ or in the `Getting
-   Started
-   Guide <https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/prototyper/RTI_ConnextDDS_CoreLibraries_Prototyper_GettingStarted.pdf>`__.
-   Also, stay tuned: a version that can be used directly with the
-   standard Lua interpreter is coming.
--  **C**: for the native code lovers, we have header files so you can
-   call the *Connector* API directly in your C application; that’s how
-   *Prototyper* is implemented. The Lua version used is 5.1.
+This repository is specific to Python, for other languages (python, lua,
+C) refer to the `main repository of
+connector. <https://github.com/rticommunity/rticonnextdds-connector>`__
 
 Platform support
 ~~~~~~~~~~~~~~~~
@@ -56,12 +25,6 @@ We are building our library for a few architectures only. Check them out
 `here <https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib>`__.
 If you need another architecture, please contact your RTI account
 manager or sales@rti.com.
-
-**Windows Note**: We tested the Node.js/JavaScript Connector on Win10 64
-bit. We notice that npm works best with VS Express 2013. Feel free to
-ask questions on the `RTI Community
-forum <https://community.rti.com/forums/technical-questions>`__ for more
-details on Windows and Connector.
 
 If you want to check the version of the libraries, run the following
 command:
@@ -74,27 +37,12 @@ Threading model
 ~~~~~~~~~~~~~~~
 
 The *Connector* Native API does not yet implement any mechanism for
-thread safety. Originally the *Connector* native code was built to work
-with *Prototyper* and Lua. That was a single threaded loop. We then
-introduced support for JavaScript and Python. For now, the
-responsibility of protecting calls to the *Connector* is left to you.
-(In future we may add thread safety in the native layer.) In
-Node.js/JavaScript, threading should not be a problem due to the
-‘callback’ style of the language itself. In Python, you will have to
-protect the calls to the Connector if you are using different threads.
-For an example, see `Protecting calls to the Connector
-library <https://github.com/rticommunity/rticonnextdds-connector/tree/master/examples/python#protecting-calls-to-the-connector-library>`__
-in the Python README.
-
-What is this git repository
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-This git repository is our way to make *Connector* available to you! As
-of today we included Node.js, Python, and Lua (through *Prototyper*) for
-selected architectures.
-
-Also, for Node.js users, we will use this repository for the npm
-registry.
+thread safety. For now, the responsibility of protecting calls to the
+*Connector* is left to you. (In the future we may add thread safety in
+the native layer.) In Python, you will have to protect the calls to the
+Connector if you are using different threads. For an example, see
+`Protecting calls to the Connector
+library <https://github.com/rticommunity/rticonnextdds-connector-py#protecting-calls-to-the-connector-library>`__.
 
 Support
 ~~~~~~~
@@ -103,51 +51,237 @@ This is an experimental RTI product. As such, we offer support through
 the `RTI Community
 forum <https://community.rti.com/forums/technical-questions>`__.
 
-Documentation
-~~~~~~~~~~~~~
+Getting started with Python
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The best way to learn Connector is to look at the examples and their
-corresponding README files:
-
--  For an overview of the Connector API in JavaScript, check this
-   `page <examples/nodejs/README.md>`__.
--  For the Python version, visit this
-   `page <examples/python/README.md>`__.
-
-For information on how to access the data sample fields, see Section 6.4
-*Data Access API* of the `RTI Prototyper Getting Started
-Guide <https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/prototyper/RTI_ConnextDDS_CoreLibraries_Prototyper_GettingStarted.pdf>`__
-
-Getting started with Node.js
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Be sure you have all the tools to work with Node.js. Then invoke:
-
-.. code:: bash
-
-   $ npm install rticonnextdds-connector
-
-When the installation is complete, cd into your node_modules directory
-and have a look at
-`examples/nodejs/README.md <examples/nodejs/README.md>`__. ### Getting
-started with Python Be sure you have Python. Then clone this repository:
-
-.. code:: bash
-
-   $ git clone https://github.com/rticommunity/rticonnextdds-connector.git
-
-You can also use pip:
+Be sure you have Python. Then use pip to install the *Connector*:
 
 .. code:: bash
 
    $ pip install rticonnextdds_connector
 
-Or, you can download the `zip
-file <https://github.com/rticommunity/rticonnextdds-connector/archive/master.zip>`__
-and unzip it.
+You can also clone the repository:
 
-When the installation is complete, cd into your new directory and have a
-look at `examples/python/README.md <examples/python/README.md>`__.
+.. code:: bash
+
+   $ git clone --recursive https://github.com/rticommunity/rticonnextdds-connector-py.git
+
+Available examples
+~~~~~~~~~~~~~~~~~~
+
+You can find several sets of examples in this directory:
+`examples/python <examples/python>`__
+
+-  **simple**: shows how to write samples and how to read/take.
+-  **mixed**: various examples
+
+Protecting calls to the *Connector* library
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As we explained above, you are responsible for protecting calls to
+*Connector*. There are many options in Python to do so; one is to use
+the ``threading`` package:
+
+.. code:: py
+
+   ...
+   ...
+   import threading
+   sem = threading.Semaphore();
+   ...
+   ...
+   #acquire the semaphore
+   sem.acquire(True);
+   #call to connector APissem.acquire(True);
+   input.take();
+   numOfSamples = input.samples.getLength();
+   ...
+   ...
+   #release the semaphore
+   sem.release();
+   ...
+   ...
+
+For more information on the threading Python packages, see the Python
+documentation
+`here <https://docs.python.org/2/library/threading.html>`__.
+
+API overview
+~~~~~~~~~~~~
+
+require the *Connector* library
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you want to use the ``rticonnextdds_connector``, you have to import
+it:
+
+.. code:: py
+
+   import rticonnextdds_connector as rti
+
+instantiate a new *Connector*
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To create a new *Connector* you have to pass an XML file and a
+configuration name. For more information on the XML format, see the `XML
+App Creation
+guide <https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf>`__
+or have a look at the
+`ShapeExample.xml <examples/python/ShapeExample.xml>`__ file included in
+this examples directory.
+
+.. code:: py
+
+   connector = rti.Connector("MyParticipantLibrary::Zero","./ShapeExample.xml");
+
+delete a *Connector*
+^^^^^^^^^^^^^^^^^^^^
+
+To destroy all the DDS entities that belong to a *Connector* previously
+created, call the ``delete`` function.
+
+.. code:: py
+
+   connector = rti.Connector("MyParticipantLibrary::Zero","./ShapeExample.xml");
+   ...
+   ...
+   connector.delete();
+
+write a sample
+^^^^^^^^^^^^^^
+
+To write a sample, first get a reference to the output port:
+
+.. code:: py
+
+   output = connector.getOutput("MyPublisher::MySquareWriter")
+
+Then set the instance’s fields:
+
+.. code:: py
+
+   output.instance.setNumber("x", 1);
+   output.instance.setNumber("y", 2);
+   output.instance.setNumber("shapesize", 30);
+   output.instance.setString("color", "BLUE");
+
+Then write:
+
+.. code:: py
+
+   output.write();
+
+set the instance’s fields:
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The content of an instance can be set by using a dictionary that matches
+the original type, or field by field.
+
+-  **Using a dictionary**:
+
+.. code:: py
+
+   #assuming that sample is a dictionary containing
+   #an object of the same type of the output.instance:
+
+   output.instance.setDictionary(sample);
+
+-  **Field by field**:
+
+.. code:: py
+
+   output.instance.setNumber("y", 2);
+
+The APIs to set an instance field by field are three:
+``setNumber(fieldName, number);`` ``setBoolean(fieldName, boolean);``
+and ``setString(fieldName, string);``.
+
+Nested fields can be accessed with the dot notation: ``"x.y.z"``. Arrays
+or sequences can be accessed with square brakets: ``"x.y[1].z"``. For
+more information on how to access fields, see Section 6.4 *Data Access
+API* of the `RTI Prototyper Getting Started
+Guide <https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/prototyper/RTI_ConnextDDS_CoreLibraries_Prototyper_GettingStarted.pdf>`__.
+
+read/take data
+^^^^^^^^^^^^^^
+
+To read/take samples, first get a reference to the input port:
+
+.. code:: py
+
+   input = connector.getInput("MySubscriber::MySquareReader");
+
+Then call the ``read()`` or ``take()`` API:
+
+.. code:: py
+
+   input.read();
+
+or
+
+.. code:: pu
+
+    input.take();
+
+The read/take operation can return multiple samples. So, we have to
+iterate on an array:
+
+.. code:: py
+
+       input.take();
+       numOfSamples = input.samples.getLength();
+       for j in range (1, numOfSamples+1):
+           if input.infos.isValid(j):
+               x = input.samples.getNumber(j, "x");
+               y = input.samples.getNumber(j, "y");
+               size = input.samples.getNumber(j, "shapesize");
+               color = input.samples.getString(j, "color");
+               toPrint = "Received x: " + repr(x) + " y: " + repr(y) + " size: " + repr(size) + " color: " + repr(color);
+               print(toPrint);
+   }
+
+access sample fields after a read/take
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A ``read()`` or ``take()`` operation can return multiple samples. They
+are stored in an array. Every time you try to access a specific sample,
+you have to specify an index (j in the example below).
+
+You can access the data by getting a copy in a dictionary object, or you
+can access each field individually:
+
+-  **Using a dictionary**:
+
+.. code:: py
+
+    numOfSamples = input.samples.getLength();
+    for j in range (1, numOfSamples+1):
+        if input.infos.isValid(j):
+            sample = input.samples.getDictionary(j);
+            #print the whole sample
+            print(sample);
+            #or print a single element
+            print(sample['x']);
+    }
+
+-  **Field by field**:
+
+.. code:: py
+
+    numOfSamples = input.samples.getLength();
+    for j in range (1, numOfSamples+1):
+        if input.infos.isValid(j):
+            x = input.samples.getNumber(j, "x");
+            y = input.samples.getNumber(j, "y");
+            size = input.samples.getNumber(j, "shapesize");
+            color = input.samples.getString(j, "color");
+            toPrint = "Received x: " + repr(x) + " y: " + repr(y) + " size: " + repr(size) + " color: " + repr(color);
+            print(toPrint);
+    }
+
+The APIs to access each field individually are three:
+``getNumber(indexm fieldName);`` ``getBoolean(index, fieldName);`` and
+``getString(index, fieldName);``.
 
 License
 ~~~~~~~
