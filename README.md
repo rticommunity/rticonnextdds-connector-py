@@ -11,6 +11,8 @@ It is based on [XML Application Creation](https://community.rti.com/static/docum
 
 This repository is specific to Python, for other languages (python, lua, C) refer to the [main repository of connector.](https://github.com/rticommunity/rticonnextdds-connector)
 
+We use ctypes to call our native functions; everything is hidden in a nice Python wrapper. We tested our Python implementation with both Python 2.7.14 and Python 3.6.3.
+
 ### Platform support
 We are building our library for a few architectures only. Check them out [here](https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib). If you need another architecture, please contact your RTI account manager or sales@rti.com.
 
