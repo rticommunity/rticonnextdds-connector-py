@@ -1,17 +1,25 @@
+###############################################################################
+# (c) 2005-2015 Copyright, Real-Time Innovations.  All rights reserved.       #
+# No duplications, whole or partial, manual or electronic, may be made        #
+# without express written permission.  Any such copies, or revisions thereof, #
+# must display this notice unaltered.                                         #
+# This code contains trade secrets of Real-Time Innovations, Inc.             #
+###############################################################################
+
 import pytest,time,sys,os
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
 
 class TestDataflow:
   """
-  This class tests the flow of data between 
+  This class tests the flow of data between
   an :class:`rticonnextdds_connector.Input` and an
   :class:`rticonnextdds_connector.Output` object.
- 
+
   .. todo::
 
-       * No Exception is thrown when a non-existent field is 
-         accessed. ``AttributeError`` must be propagated 
+       * No Exception is thrown when a non-existent field is
+         accessed. ``AttributeError`` must be propagated
          to the user when a non-existent field is accessed with
          :func:`rticonnextdds_connector.Samples.getNumber`,
          :func:`rticonnextdds_connector.Samples.getString`,
@@ -22,24 +30,24 @@ class TestDataflow:
 
        * Behavior on inconsistent type access needs to be addressed:
 
-           * Calling :func:`rticonnextdds_connector.Samples.getString` on Numeric field gives 
-             a string representation of the number and on a Boolean field gives None 
+           * Calling :func:`rticonnextdds_connector.Samples.getString` on Numeric field gives
+             a string representation of the number and on a Boolean field gives None
 
            * Calling :func:`rticonnextdds_connector.Samples.getBoolean` on String or Numeric field
              gives an int with value of 0/1 and on a Boolean filed returns an int value of 0/1
 
-           * Calling :func:`rticonnextdds_connector.Samples.getNumber` on a Boolean field 
-             gives a float value of 0.0 and on String field gives a float value of 0.0 
+           * Calling :func:`rticonnextdds_connector.Samples.getNumber` on a Boolean field
+             gives a float value of 0.0 and on String field gives a float value of 0.0
   """
   @pytest.fixture(scope="class")
   def testMsg(self):
     """
     A class-scoped `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
     which instantiates a test message to test the flow of data between an Input and Output object.
-    
-    :returns: A class scoped test message 
+
+    :returns: A class scoped test message
     :rtype: `Dictionary <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_
-    
+
     """
     return {"x":1,"y":1,"z":True,"color":"BLUE","shapesize":5}
 
@@ -48,19 +56,19 @@ class TestDataflow:
     {"wait":False,"method":"take"}])
   def sendTestMsg(self,request,rtiInputFixture,rtiOutputFixture,testMsg):
     """
-    An `autouse <https://pytest.org/latest/fixture.html#autouse-fixtures-xunit-setup-on-steroids>`_ 
+    An `autouse <https://pytest.org/latest/fixture.html#autouse-fixtures-xunit-setup-on-steroids>`_
     `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
     which is executed before any test function in :class:`TestDataflow` class  is executed.
     This fixture method uses session-scoped Input and Output objects to set-up the dataflow test.
     First any pre-existing messages in the middleware cache are taken and then the Output object
-    sends one test message to the Input object. This fixture is 
-    `parameterized <https://pytest.org/latest/fixture.html#parametrizing-a-fixture>`_, 
+    sends one test message to the Input object. This fixture is
+    `parameterized <https://pytest.org/latest/fixture.html#parametrizing-a-fixture>`_,
     so that each test is executed four times- first, where the Input object waits for 10 seconds
-    for data and uses :func:`rticonnextdds_connector.Input.read` method to obtain the sent test message; 
-    second, where the Input object waits for 10 seconds for data to arrive and 
+    for data and uses :func:`rticonnextdds_connector.Input.read` method to obtain the sent test message;
+    second, where the Input object waits for 10 seconds for data to arrive and
     uses :func:`rticonnextdds_connector.Input.take` method to obtain the sent message; third, where Input
-    object does not wait but uses :func:`rticonnextdds_connector.Input.read` method to obtain the sent message; 
-    and finally, where Input object does not wait and uses 
+    object does not wait but uses :func:`rticonnextdds_connector.Input.read` method to obtain the sent message;
+    and finally, where Input object does not wait and uses
     :func:`rticonnextdds_connector.Input.take` method to obtain the sent message.
 
     :param rtiInputFixture: :func:`conftest.rtiInputFixture`
@@ -69,7 +77,7 @@ class TestDataflow:
     :type rtiOutputFixture: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
     :param testMsg: :func:`testMsg`
     :type testMsg: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
-    
+
     """
     # take any pre-existing samples from cache
     rtiInputFixture.take()
@@ -81,40 +89,40 @@ class TestDataflow:
     if wait:
        rtiInputFixture.wait(10)
        retrieve_func= getattr(rtiInputFixture,method)
-       retrieve_func() 
+       retrieve_func()
     else:
       # loop to allow sometime for discovery of Input and Output objects
       for i in range(1,20):
           time.sleep(.5)
           retrieve_func= getattr(rtiInputFixture,method)
-          retrieve_func() 
+          retrieve_func()
           if rtiInputFixture.samples.getLength() > 0:
             break
 
   def test_samples_getLength(self,rtiInputFixture):
     """
-    This function tests the correct operation of 
-    :func:`rticonnextdds_connector.Samples.getLength` 
+    This function tests the correct operation of
+    :func:`rticonnextdds_connector.Samples.getLength`
 
     :param rtiInputFixture: :func:`conftest.rtiInputFixture`
     :type rtiInputFixture: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
     """
-    assert rtiInputFixture.samples.getLength() == 1 
+    assert rtiInputFixture.samples.getLength() == 1
 
   def test_infos_getLength(self,rtiInputFixture):
     """
-    This function tests the correct operation of 
-    :func:`rticonnextdds_connector.Infos.getLength` 
+    This function tests the correct operation of
+    :func:`rticonnextdds_connector.Infos.getLength`
 
     :param rtiInputFixture: :func:`conftest.rtiInputFixture`
     :type rtiInputFixture: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
     """
-    assert rtiInputFixture.infos.getLength() == 1 
+    assert rtiInputFixture.infos.getLength() == 1
 
   def test_infos_isValid(self,rtiInputFixture):
     """
-    This function tests the correct operation of 
-    :func:`rticonnextdds_connector.Infos.isValid` 
+    This function tests the correct operation of
+    :func:`rticonnextdds_connector.Infos.isValid`
 
     :param rtiInputFixture: :func:`conftest.rtiInputFixture`
     :type rtiInputFixture: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
@@ -123,9 +131,9 @@ class TestDataflow:
 
   def test_getDictionary(self,rtiInputFixture,testMsg):
     """
-    This function tests the correct operation of 
+    This function tests the correct operation of
     :func:`rticonnextdds_connector.Samples.getDictionary`.
-    Received message should be the same as the :func:`testMsg` 
+    Received message should be the same as the :func:`testMsg`
 
     :param rtiInputFixture: :func:`conftest.rtiInputFixture`
     :type rtiInputFixture: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
@@ -137,7 +145,7 @@ class TestDataflow:
 
   def test_getTypes(self,rtiInputFixture,testMsg):
     """
-    This function tests the correct operation of 
+    This function tests the correct operation of
     :func:`rticonnextdds_connector.Samples.getString`,
     :func:`rticonnextdds_connector.Samples.getNumber` and
     :func:`rticonnextdds_connector.Samples.getBoolean`.
@@ -203,7 +211,7 @@ class TestDataflow:
     :type rtiInputFixture: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
     :param testMsg: :func:`testMsg`
     :type testMsg: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
-  
+
     .. note: This test is marked to fail as this case is not handled yet.
     """
     with pytest.raises(AttributeError) as execinfo:

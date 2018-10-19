@@ -1,16 +1,24 @@
+###############################################################################
+# (c) 2005-2015 Copyright, Real-Time Innovations.  All rights reserved.       #
+# No duplications, whole or partial, manual or electronic, may be made        #
+# without express written permission.  Any such copies, or revisions thereof, #
+# must display this notice unaltered.                                         #
+# This code contains trade secrets of Real-Time Innovations, Inc.             #
+###############################################################################
+
 import pytest,sys,os
 sys.path.append(os.path.dirname(os.path.realpath(__file__))+ "/../../")
 import rticonnextdds_connector as rti
 
 class TestInput:
   """
-  This class tests the correct instantiation of 
-  :class:`rticonnextdds_connector.Input` object. 
+  This class tests the correct instantiation of
+  :class:`rticonnextdds_connector.Input` object.
 
-  .. todo:: 
- 
-       * Move :func:`rticonnextdds_connector.Input.wait` to 
-         :class:`rticonnextdds_connector.Connector` 
+  .. todo::
+
+       * Move :func:`rticonnextdds_connector.Input.wait` to
+         :class:`rticonnextdds_connector.Connector`
 
   """
 
@@ -27,10 +35,10 @@ class TestInput:
     invalid_DR = "InvalidDR"
     with pytest.raises(ValueError):
        rtiConnectorFixture.getInput(invalid_DR)
-  
+
   def test_creation_DR(self,rtiInputFixture):
     """
-    This function tests the correct instantiation of 
+    This function tests the correct instantiation of
     Input object.
 
     :param rtiInputFixture: :func:`conftest.rtiInputFixture`
