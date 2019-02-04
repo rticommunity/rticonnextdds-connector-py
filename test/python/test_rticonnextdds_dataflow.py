@@ -127,7 +127,7 @@ class TestDataflow:
     :param rtiInputFixture: :func:`conftest.rtiInputFixture`
     :type rtiInputFixture: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
     """
-    assert rtiInputFixture.infos.isValid(1)== True
+    assert rtiInputFixture.infos.isValid(0)== True
 
   def test_getDictionary(self,rtiInputFixture,testMsg):
     """
@@ -140,7 +140,7 @@ class TestDataflow:
     :param testMsg: :func:`testMsg`
     :type testMsg: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
     """
-    received_msg = rtiInputFixture.samples.getDictionary(1)
+    received_msg = rtiInputFixture.samples.getDictionary(0)
     assert received_msg==testMsg
 
   def test_getTypes(self,rtiInputFixture,testMsg):
@@ -156,11 +156,11 @@ class TestDataflow:
     :param testMsg: :func:`testMsg`
     :type testMsg: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
     """
-    x = rtiInputFixture.samples.getNumber(1,"x")
-    y = rtiInputFixture.samples.getNumber(1,"y")
-    z = rtiInputFixture.samples.getBoolean(1,"z")
-    color  = rtiInputFixture.samples.getString(1,"color")
-    shapesize = rtiInputFixture.samples.getNumber(1,"shapesize")
+    x = rtiInputFixture.samples.getNumber(0,"x")
+    y = rtiInputFixture.samples.getNumber(0,"y")
+    z = rtiInputFixture.samples.getBoolean(0,"z")
+    color  = rtiInputFixture.samples.getString(0,"color")
+    shapesize = rtiInputFixture.samples.getNumber(0,"shapesize")
     assert x == testMsg['x'] and y == testMsg['y'] \
       and z == testMsg['z'] and color == testMsg['color'] \
       and shapesize == testMsg['shapesize']
@@ -179,7 +179,7 @@ class TestDataflow:
     .. note: This test is marked to fail as this case is not handled yet.
     """
     with pytest.raises(AttributeError) as execinfo:
-      x = rtiInputFixture.samples.getNumber(1,"invalid_field")
+      x = rtiInputFixture.samples.getNumber(0,"invalid_field")
     print("\nException of type:"+str(execinfo.type)+\
       "\nvalue:"+str(execinfo.value))
 
@@ -197,7 +197,7 @@ class TestDataflow:
     .. note: This test is marked to fail as this case is not handled yet.
     """
     with pytest.raises(AttributeError) as execinfo:
-      x = rtiInputFixture.samples.getString(1,"invalid_field")
+      x = rtiInputFixture.samples.getString(0,"invalid_field")
     print("\nException of type:"+str(execinfo.type)+\
       "\nvalue:"+str(execinfo.value))
 
@@ -215,6 +215,6 @@ class TestDataflow:
     .. note: This test is marked to fail as this case is not handled yet.
     """
     with pytest.raises(AttributeError) as execinfo:
-      x = rtiInputFixture.samples.getBoolean(1,"invalid_field")
+      x = rtiInputFixture.samples.getBoolean(0,"invalid_field")
     print("\nException of type:"+str(execinfo.type)+\
       "\nvalue:"+str(execinfo.value))

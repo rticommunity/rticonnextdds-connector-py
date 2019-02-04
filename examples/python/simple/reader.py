@@ -25,7 +25,7 @@ inputDDS = connector.getInput("MySubscriber::MySquareReader")
 for i in range(1, 500):
     inputDDS.take()
     numOfSamples = inputDDS.samples.getLength()
-    for j in range(1, numOfSamples+1):
+    for j in range(0, numOfSamples):
         if inputDDS.infos.isValid(j):
             # This gives you a dictionary
             sample = inputDDS.samples.getDictionary(j)

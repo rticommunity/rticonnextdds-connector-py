@@ -164,18 +164,42 @@ class Samples:
 		return int(rtin_RTIDDSConnector_getSamplesLength(self.input.connector.native,tocstring(self.input.name)));
 
 	def getNumber(self, index, fieldName):
+		if type(index) is not int:
+			raise ValueError("index must be an integer")
+		if index < 0:
+			raise ValueError("index must be positive")
+		#Adding 1 to index because the C API was based on Lua where indexes start from 1
+		index = index + 1
 		return rtin_RTIDDSConnector_getNumberFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
 
 	def getBoolean(self, index, fieldName):
+		if type(index) is not int:
+			raise ValueError("index must be an integer")
+		if index < 0:
+			raise ValueError("index must be positive")
+		#Adding 1 to index because the C API was based on Lua where indexes start from 1
+		index = index + 1
 		return rtin_RTIDDSConnector_getBooleanFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
 
 	def getString(self, index, fieldName):
+		if type(index) is not int:
+			raise ValueError("index must be an integer")
+		if index < 0:
+			raise ValueError("index must be positive")
+		#Adding 1 to index because the C API was based on Lua where indexes start from 1
+		index = index + 1
 		theStrPtr = rtin_RTIDDSConnector_getStringFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
 		theStr = fromcstring(cast(theStrPtr, c_char_p).value);
 		rtin_RTIDDSConnector_freeString(theStrPtr);
 		return theStr;
 
 	def getDictionary(self,index):
+		if type(index) is not int:
+			raise ValueError("index must be an integer")
+		if index < 0:
+			raise ValueError("index must be positive")
+		#Adding 1 to index because the C API was based on Lua where indexes start from 1
+		index = index + 1
 		jsonStrPtr = rtin_RTIDDSConnector_getJSONSample(self.input.connector.native,tocstring(self.input.name),index);
 		jsonStr = cast(jsonStrPtr, c_char_p).value
 		myDict = json.loads(fromcstring(jsonStr))
@@ -190,6 +214,12 @@ class Infos:
 		return int(rtin_RTIDDSConnector_getInfosLength(self.input.connector.native,tocstring(self.input.name)));
 
 	def isValid(self, index):
+		if type(index) is not int:
+			raise ValueError("index must be an integer")
+		if index < 0:
+			raise ValueError("index must be positive")
+		#Adding 1 to index because the C API was based on Lua where indexes start from 1
+		index = index + 1
 		return rtin_RTIDDSConnector_getBooleanFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('valid_data'));
 
 	def getSampleIdentity(self, index):

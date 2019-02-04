@@ -27,7 +27,7 @@ for i in range(1, 500):
     print("The wait returned " + repr(ret))
     inputDDS.take()
     numOfSamples = inputDDS.samples.getLength()
-    for j in range(1, numOfSamples+1):
+    for j in range(0, numOfSamples):
         if inputDDS.infos.isValid(j):
             """There are two alternative way to access the sample...
             1) get it as a dictionary and then access the field in the
