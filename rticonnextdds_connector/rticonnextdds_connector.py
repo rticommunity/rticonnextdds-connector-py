@@ -93,6 +93,10 @@ rtin_RTIDDSConnector_getReader= rti.RTIDDSConnector_getReader
 rtin_RTIDDSConnector_getReader.restype= ctypes.c_void_p
 rtin_RTIDDSConnector_getReader.argtypes=[ ctypes.c_void_p,ctypes.c_char_p ]
 
+rtin_RTIDDSConnector_getNativeSample = rti.RTIDDSConnector_getNativeSample
+rtin_RTIDDSConnector_getNativeSample.restype = ctypes.c_void_p
+rtin_RTIDDSConnector_getNativeSample.argtypes=[ ctypes.c_void_p,ctypes.c_char_p, ctypes.c_int]
+
 rtin_RTIDDSConnector_setNumberIntoSamples = rti.RTIDDSConnector_setNumberIntoSamples
 rtin_RTIDDSConnector_setNumberIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_double]
 rtin_RTIDDSConnector_setBooleanIntoSamples = rti.RTIDDSConnector_setBooleanIntoSamples
@@ -151,6 +155,10 @@ rtin_RTIDDSConnector_getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p,
 rtin_RTIDDSConnector_setJSONInstance = rti.RTIDDSConnector_setJSONInstance
 rtin_RTIDDSConnector_setJSONInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
 
+rtin_RTIDDSConnector_getNativeInstance = rti.RTIDDSConnector_getNativeInstance
+rtin_RTIDDSConnector_getNativeInstance.restype = ctypes.c_void_p
+rtin_RTIDDSConnector_getNativeInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+
 rtin_RTIDDSConnector_freeString = rti.RTIDDSConnector_freeString
 rtin_RTIDDSConnector_freeString.argtypes = [POINTER(c_char)]
 
@@ -205,6 +213,10 @@ class Samples:
 		myDict = json.loads(fromcstring(jsonStr))
 		rtin_RTIDDSConnector_freeString((jsonStrPtr))
 		return myDict;
+
+	def getNative(self,index):
+		dynDataPtr = rtin_RTIDDSConnector_getNativeSample(self.input.connector.native,tocstring(self.input.name),index);
+		return dynDataPtr;
 
 class Infos:
 	def __init__(self,input):
@@ -277,6 +289,10 @@ class Instance:
 	def setDictionary(self,dictionary):
 		jsonStr = json.dumps(dictionary)
 		rtin_RTIDDSConnector_setJSONInstance(self.output.connector.native,tocstring(self.output.name),tocstring(jsonStr));
+
+	def getNative(self):
+		dynDataPtr = rtin_RTIDDSConnector_getNativeInstance(self.output.connector.native,tocstring(self.output.name));
+		return dynDataPtr;
 
 
 class Output:
