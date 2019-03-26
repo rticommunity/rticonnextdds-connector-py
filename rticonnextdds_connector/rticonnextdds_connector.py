@@ -215,6 +215,8 @@ class Samples:
 		return myDict;
 
 	def getNative(self,index):
+		#Adding 1 to index because the C API was based on Lua where indexes start from 1
+		index = index + 1
 		dynDataPtr = rtin_RTIDDSConnector_getNativeSample(self.input.connector.native,tocstring(self.input.name),index);
 		return dynDataPtr;
 
