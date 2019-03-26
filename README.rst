@@ -1,33 +1,49 @@
 rticonnextdds-connector: Python
 ===============================
 
+(return to
+`rticonnextdds-connector <https://github.com/rticommunity/rticonnextdds-connector>`__)
+
 RTI Connector for Connext DDS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *RTI Connector* for Connext DDS is a quick and easy way to access the
 power and functionality of `RTI Connext
-DDS <http://www.rti.com/products/index.html>`__. It is based on `XML
-Application
-Creation <https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf>`__
+DDS <http://www.rti.com/products/index.html>`__. It is based on
+`XML-Based Application
+Creation <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf>`__
 and Dynamic Data.
 
 Language Support
 ~~~~~~~~~~~~~~~~
 
-This repository is specific to Python, for other languages (python, lua,
-C) refer to the `main repository of
-connector. <https://github.com/rticommunity/rticonnextdds-connector>`__
+This repository is specific to Python. For other languages (lua, C,
+etc.), refer to the `main Connector
+repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
+
+We use ctypes to call our native functions; these details are hidden in
+a Python wrapper. RTI tested its Python implementation with both Python
+2.7.14 and Python 3.6.3.
 
 Platform support
 ~~~~~~~~~~~~~~~~
 
-We are building our library for a few architectures only. Check them out
-`here <https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib>`__.
+Python *Connector* builds its library for `select
+architectures <https://github.com/rticommunity/rticonnextdds-connector/tree/master/lib>`__.
 If you need another architecture, please contact your RTI account
 manager or sales@rti.com.
 
-If you want to check the version of the libraries, run the following
-command:
+### Testing We tested on: \* For MacOS 64 bit : Darwin 18 clang 10 \*
+For Windows 64 bit: Windows 10 64 bit VS2015 \* For Windows 32 bit:
+Windows 7 32 bit VS2017 \* For Linux 64 bit: CentOS 6.5 gcc 4.8.2 \* For
+Linux 32 bit: Ubuntu 16.04 gcc 5.4.0 \* For ARM: Yocto linux 2.0.3 gcc
+5.2.0
+
+Version of Connext
+~~~~~~~~~~~~~~~~~~
+
+To check the version of the libraries, run the following command. For
+example:
 
 .. code:: bash
 
@@ -38,16 +54,17 @@ Threading model
 
 The *Connector* Native API does not yet implement any mechanism for
 thread safety. For now, the responsibility of protecting calls to the
-*Connector* is left to you. (In the future we may add thread safety in
-the native layer.) In Python, you will have to protect the calls to the
-Connector if you are using different threads. For an example, see
+*Connector* is left to you. (In future, thread safety may be added in
+the native layer.) In Python, you will have to protect the calls to
+*Connector* if you are using different threads. For an example, see
 `Protecting calls to the Connector
-library <https://github.com/rticommunity/rticonnextdds-connector-py#protecting-calls-to-the-connector-library>`__.
+library <https://github.com/rticommunity/rticonnextdds-connector-py#protecting-calls-to-the-connector-library>`__
+below.
 
 Support
 ~~~~~~~
 
-This is an experimental RTI product. As such, we offer support through
+*Connector* is an experimental RTI product. If you have questions, use
 the `RTI Community
 forum <https://community.rti.com/forums/technical-questions>`__.
 
@@ -69,16 +86,16 @@ You can also clone the repository:
 Available examples
 ~~~~~~~~~~~~~~~~~~
 
-You can find several sets of examples in this directory:
-`examples/python <examples/python>`__
+You can find several sets of examples in the
+`examples/python <examples/python>`__ directory.
 
 -  **simple**: shows how to write samples and how to read/take.
--  **mixed**: various examples
+-  **mixed**: contains various examples.
 
 Protecting calls to the *Connector* library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As we explained above, you are responsible for protecting calls to
+As explained above, you are responsible for protecting calls to
 *Connector*. There are many options in Python to do so; one is to use
 the ``threading`` package:
 
@@ -102,9 +119,8 @@ the ``threading`` package:
    ...
    ...
 
-For more information on the threading Python packages, see the Python
-documentation
-`here <https://docs.python.org/2/library/threading.html>`__.
+For more information on the threading Python packages, see the `Python
+documentation <https://docs.python.org/2/library/threading.html>`__.
 
 API overview
 ~~~~~~~~~~~~
@@ -112,8 +128,7 @@ API overview
 require the *Connector* library
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you want to use the ``rticonnextdds_connector``, you have to import
-it:
+To use ``rticonnextdds_connector``, import it:
 
 .. code:: py
 
@@ -122,17 +137,17 @@ it:
 instantiate a new *Connector*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To create a new *Connector* you have to pass an XML file and a
-configuration name. For more information on the XML format, see the `XML
-App Creation
-guide <https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf>`__
-or have a look at the
-`ShapeExample.xml <examples/python/ShapeExample.xml>`__ file included in
-this examples directory.
+To create a new *Connector*, pass an XML file and a configuration name.
 
 .. code:: py
 
    connector = rti.Connector("MyParticipantLibrary::Zero","./ShapeExample.xml");
+
+For more information on the XML format, see the `XML-Based Application
+Creation
+guide <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf>`__
+or look at the `ShapeExample.xml <examples/python/ShapeExample.xml>`__
+file included in this examples directory.
 
 delete a *Connector*
 ^^^^^^^^^^^^^^^^^^^^
@@ -192,15 +207,15 @@ the original type, or field by field.
 
    output.instance.setNumber("y", 2);
 
-The APIs to set an instance field by field are three:
+The following APIs set an instance field by field:
 ``setNumber(fieldName, number);`` ``setBoolean(fieldName, boolean);``
 and ``setString(fieldName, string);``.
 
-Nested fields can be accessed with the dot notation: ``"x.y.z"``. Arrays
+Nested fields can be accessed with the dot notation ``"x.y.z"``. Arrays
 or sequences can be accessed with square brakets: ``"x.y[1].z"``. For
-more information on how to access fields, see Section 6.4 *Data Access
-API* of the `RTI Prototyper Getting Started
-Guide <https://community.rti.com/static/documentation/connext-dds/5.3.1/doc/manuals/connext_dds/prototyper/RTI_ConnextDDS_CoreLibraries_Prototyper_GettingStarted.pdf>`__.
+more information on how to access fields, see the “Data Access API”
+section of the `RTI Prototyper Getting Started
+Guide <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/prototyper/RTI_ConnextDDS_CoreLibraries_Prototyper_GettingStarted.pdf>`__.
 
 read/take data
 ^^^^^^^^^^^^^^
@@ -223,7 +238,7 @@ or
 
     input.take();
 
-The read/take operation can return multiple samples. So, we have to
+The read/take operation can return multiple samples. Therefore, you must
 iterate on an array:
 
 .. code:: py
@@ -279,7 +294,7 @@ can access each field individually:
             print(toPrint);
     }
 
-The APIs to access each field individually are three:
+The following APIs access the samples field by field:
 ``getNumber(indexm fieldName);`` ``getBoolean(index, fieldName);`` and
 ``getString(index, fieldName);``.
 
@@ -297,3 +312,6 @@ any warranty for fitness for any purpose. RTI is under no obligation to
 maintain or support the software. RTI shall not be liable for any
 incidental or consequential damages arising out of the use or inability
 to use the software.
+
+(return to
+`rticonnextdds-connector <https://github.com/rticommunity/rticonnextdds-connector>`__)
