@@ -57,7 +57,7 @@ $ git clone --recursive https://github.com/rticommunity/rticonnextdds-connector-
 ```
 
 ### Available examples
-You can find several sets of examples in the [examples/python](examples/python) directory.
+You can find several sets of examples in the [examples/python](examples/python) directory.  If you used pip to install, you will need to clone the examples from the repository as indicated above.
 
  * **simple**: shows how to write samples and how to read/take.
  * **mixed**: contains various examples.
@@ -187,7 +187,7 @@ The read/take operation can return multiple samples. Therefore, you must iterate
 ```py
     input.take();
     numOfSamples = input.samples.getLength();
-    for j in range (1, numOfSamples+1):
+    for j in range (0, numOfSamples):
         if input.infos.isValid(j):
             x = input.samples.getNumber(j, "x");
             y = input.samples.getNumber(j, "y");
@@ -207,7 +207,7 @@ You can access the data by getting a copy in a dictionary object, or you can acc
 
 ```py
  numOfSamples = input.samples.getLength();
- for j in range (1, numOfSamples+1):
+ for j in range (0, numOfSamples):
      if input.infos.isValid(j):
          sample = input.samples.getDictionary(j);
          #print the whole sample
@@ -221,7 +221,7 @@ You can access the data by getting a copy in a dictionary object, or you can acc
 
 ```py
  numOfSamples = input.samples.getLength();
- for j in range (1, numOfSamples+1):
+ for j in range (0, numOfSamples):
      if input.infos.isValid(j):
          x = input.samples.getNumber(j, "x");
          y = input.samples.getNumber(j, "y");
