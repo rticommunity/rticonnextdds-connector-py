@@ -9,6 +9,14 @@ rticonnextdds-connector: Python
 functionality of [RTI Connext DDS](http://www.rti.com/products/index.html).
 It is based on [XML-Based Application Creation](https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) and Dynamic Data.
 
+
+____
+**Warning**: The Python *Connector* uses 0-based indexing for sequences since
+v0.4.1. Previously sequence started at index 1. See *read/take data* more more
+information.
+____
+
+
 ### Language Support
 
 This repository is specific to Python. For other languages (lua, C, etc.), refer to the [main *Connector* repository](https://github.com/rticommunity/rticonnextdds-connector).
