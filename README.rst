@@ -17,7 +17,7 @@ and Dynamic Data.
 --------------
 
 **Warning**: The Python *Connector* uses 0-based indexing for sequences
-since v0.4.1. Previously sequence started at index 1. See *read/take
+since v0.4.1. Previously sequences started at index 1. See *read/take
 data* more more information. \___\_
 
 Language Support

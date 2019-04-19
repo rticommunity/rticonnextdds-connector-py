@@ -12,7 +12,7 @@ It is based on [XML-Based Application Creation](https://community.rti.com/static
 
 ____
 **Warning**: The Python *Connector* uses 0-based indexing for sequences since
-v0.4.1. Previously sequence started at index 1. See *read/take data* more more
+v0.4.1. Previously sequences started at index 1. See *read/take data* more more
 information.
 ____
 
