@@ -14,6 +14,12 @@ DDS <http://www.rti.com/products/index.html>`__. It is based on
 Creation <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf>`__
 and Dynamic Data.
 
+--------------
+
+**Warning**: The Python *Connector* uses 0-based indexing for sequences
+since v0.4.1. Previously sequences started at index 1. See *read/take
+data* more more information. \___\_
+
 Language Support
 ~~~~~~~~~~~~~~~~
 
@@ -87,7 +93,9 @@ Available examples
 ~~~~~~~~~~~~~~~~~~
 
 You can find several sets of examples in the
-`examples/python <examples/python>`__ directory.
+`examples/python <examples/python>`__ directory. If you used pip to
+install, you will need to clone the examples from the repository as
+indicated above.
 
 -  **simple**: shows how to write samples and how to read/take.
 -  **mixed**: contains various examples.
@@ -245,7 +253,7 @@ iterate on an array:
 
        input.take();
        numOfSamples = input.samples.getLength();
-       for j in range (1, numOfSamples+1):
+       for j in range (0, numOfSamples):
            if input.infos.isValid(j):
                x = input.samples.getNumber(j, "x");
                y = input.samples.getNumber(j, "y");
@@ -270,7 +278,7 @@ can access each field individually:
 .. code:: py
 
     numOfSamples = input.samples.getLength();
-    for j in range (1, numOfSamples+1):
+    for j in range (0, numOfSamples):
         if input.infos.isValid(j):
             sample = input.samples.getDictionary(j);
             #print the whole sample
@@ -284,7 +292,7 @@ can access each field individually:
 .. code:: py
 
     numOfSamples = input.samples.getLength();
-    for j in range (1, numOfSamples+1):
+    for j in range (0, numOfSamples):
         if input.infos.isValid(j):
             x = input.samples.getNumber(j, "x");
             y = input.samples.getNumber(j, "y");
