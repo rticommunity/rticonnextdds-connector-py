@@ -6,6 +6,8 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
+"""This package contains the Connector type and all other supporting types"""
+
 import ctypes
 import os
 import sys
@@ -165,13 +167,19 @@ rtin_RTIDDSConnector_freeString.argtypes = [POINTER(c_char)]
 #Python Class Definition
 
 class Samples:
+	"""A collection of data samples"""
+
 	def __init__(self,input):
 		self.input = input;
 
 	def getLength(self):
+		"""Gets the number of samples"""
+
 		return int(rtin_RTIDDSConnector_getSamplesLength(self.input.connector.native,tocstring(self.input.name)));
 
 	def getNumber(self, index, fieldName):
+		"""Gets the value of a numeric field for a given sample index"""
+
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -181,6 +189,8 @@ class Samples:
 		return rtin_RTIDDSConnector_getNumberFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
 
 	def getBoolean(self, index, fieldName):
+		"""Gets the value of a boolean field for a given sample index"""
+
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -190,6 +200,8 @@ class Samples:
 		return rtin_RTIDDSConnector_getBooleanFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
 
 	def getString(self, index, fieldName):
+		"""Gets the value of a string field for a given sample index"""
+
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -202,6 +214,8 @@ class Samples:
 		return theStr;
 
 	def getDictionary(self,index):
+		"""Gets a dictionary with the values of all the fields for a given sample index"""
+
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -221,13 +235,19 @@ class Samples:
 		return dynDataPtr;
 
 class Infos:
+	"""A collection of meta-data"""
+
 	def __init__(self,input):
 		self.input = input;
 
 	def getLength(self):
+		"""Gets the number of samples"""
+
 		return int(rtin_RTIDDSConnector_getInfosLength(self.input.connector.native,tocstring(self.input.name)));
 
 	def isValid(self, index):
+		"""Returns whether the data for a given sample index is valid"""
+
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -245,6 +265,8 @@ class Infos:
 		return json.loads(fromcstring(jsonStr))
 
 class Input:
+	"""TODO: Input"""
+
 	def __init__(self, connector, name):
 		self.connector = connector;
 		self.name = name;
@@ -255,19 +277,27 @@ class Input:
 		self.infos = Infos(self);
 
 	def read(self):
+		"""TODO: document this function"""
+
 		rtin_RTIDDSConnector_read(self.connector.native,tocstring(self.name));
 
 	def take(self):
+		"""TODO: document this function"""
+
 		rtin_RTIDDSConnector_take(self.connector.native,tocstring(self.name));
 
 	def wait(self,timeout):
 		return rtin_RTIDDSConnector_wait(self.connector.native,timeout);
 
 class Instance:
+	"""TODO: Instance"""
+
 	def __init__(self, output):
 		self.output = output;
 
 	def setNumber(self, fieldName, value):
+		"""TODO: document this function"""
+
 		try:
 			rtin_RTIDDSConnector_setNumberIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value);
 		except ctypes.ArgumentError as e:
@@ -275,6 +305,8 @@ class Instance:
 				.format(fieldName))
 
 	def setBoolean(self,fieldName, value):
+		"""TODO: document this function"""
+
 		try:
 			rtin_RTIDDSConnector_setBooleanIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value);
 		except ctypes.ArgumentError as e:
@@ -282,6 +314,8 @@ class Instance:
 				.format(fieldName))
 
 	def setString(self, fieldName, value):
+		"""TODO: document this function"""
+
 		try:
 			rtin_RTIDDSConnector_setStringIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),tocstring(value));
 		except AttributeError | ctypes.ArgumentError as e:
@@ -289,15 +323,21 @@ class Instance:
 				.format(fieldName))
 
 	def setDictionary(self,dictionary):
+		"""TODO: document this function"""
+
 		jsonStr = json.dumps(dictionary)
 		rtin_RTIDDSConnector_setJSONInstance(self.output.connector.native,tocstring(self.output.name),tocstring(jsonStr));
 
 	def getNative(self):
+		"""TODO: document this function"""
+
 		dynDataPtr = rtin_RTIDDSConnector_getNativeInstance(self.output.connector.native,tocstring(self.output.name));
 		return dynDataPtr;
 
 
 class Output:
+	"""TODO: Output"""
+
 	def __init__(self, connector, name):
 		self.connector = connector;
 		self.name = name;
@@ -307,6 +347,8 @@ class Output:
 		self.instance = Instance(self);
 
 	def write(self, options=None):
+		"""TODO: document this function"""
+
 		if options is not None:
 			if isinstance(options, (dict)):
 				jsonStr = json.dumps(options)
@@ -317,22 +359,37 @@ class Output:
 			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), None);
 
 	def clear_members(self):
+		"""TODO: document this function"""
+
 		return rtin_RTIDDSConnector_clear(self.connector.native,tocstring(self.name));
 
 class Connector:
+	"""The main type that loads the configuration and creates the DomainParticipant
+	and the inputs and outputs"""
+
 	def __init__(self, configName, fileName):
+		"""Creates a Connector with a given configuration URL"""
+
 		self.native = rtin_RTIDDSConnector_new(tocstring(configName), tocstring(fileName),None);
 		if self.native == None:
 			raise ValueError("Invalid participant profile, xml path or xml profile")
 
 	def delete(self):
+		"""Frees all the resources created by this Connector instance"""
+
 		rtin_RTIDDSConnector_delete(self.native);
 
 	def getOutput(self, outputName):
+		"""TODO: document this function"""
+
 		return Output(self,outputName);
 
 	def getInput(self, inputName):
+		"""TODO: document this function"""
+
 		return Input(self, inputName);
 
 	def wait(self,timeout):
+		"""TODO: document this function"""
+
 		return rtin_RTIDDSConnector_wait(self.native,timeout);
