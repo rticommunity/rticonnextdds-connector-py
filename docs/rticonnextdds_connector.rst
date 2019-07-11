@@ -1,4 +1,4 @@
-rticonnextdds\_connector package
+rticonnextdds_connector package
 ================================
 
 Module contents

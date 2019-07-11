@@ -19,11 +19,9 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-Overview
-========
+Getting Started
+===============
 
-This is the API reference of RTI Connext DDS Connector for Python. For an
-introduction and basic examples, see `rticonnextdds-connector-py <https://github.com/rticommunity/rticonnextdds-connector-py>`__.
+To get started with RTI Connector for Python, go to the `rticonnextdds-connector-py <https://github.com/rticommunity/rticonnextdds-connector-py>`__ repository.
 
-Connector provides a simple API to access the RTI Connext DDS DataBus. The entry
-point is the class :py:class:`Connector`.
+The full API reference is here: :ref:`rticonnextdds\_connector package`.
