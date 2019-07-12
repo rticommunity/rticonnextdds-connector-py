@@ -1,10 +1,20 @@
 ###############################################################################
-# (c) 2005-2015 Copyright, Real-Time Innovations.  All rights reserved.       #
-# No duplications, whole or partial, manual or electronic, may be made        #
+# (c) 2005-2015 Copyright, Real-Time Innovations.  All rights reserved.	   #
+# No duplications, whole or partial, manual or electronic, may be made		#
 # without express written permission.  Any such copies, or revisions thereof, #
-# must display this notice unaltered.                                         #
-# This code contains trade secrets of Real-Time Innovations, Inc.             #
+# must display this notice unaltered.										 #
+# This code contains trade secrets of Real-Time Innovations, Inc.			 #
 ###############################################################################
+
+"""This package contains the Connector type and all other supporting types
+
+To use this package, import it as follows::
+
+   import rticonnextdds_connector as rti
+
+The entry point is the class :class:`Connector`, which creates :class:`Input` 
+and :class:`Output` objects.
+"""
 
 import ctypes
 import os
@@ -14,9 +24,9 @@ import platform
 import json
 
 from ctypes import *
-(bits, linkage)  = platform.architecture();
-osname = platform.system();
-isArm = platform.uname()[4].startswith("arm");
+(bits, linkage) = platform.architecture()
+osname = platform.system()
+isArm = platform.uname()[4].startswith("arm")
 
 def fromcstring(s):
 	return s
@@ -73,7 +83,7 @@ else:
 		print("platfrom not yet supported")
 
 path = os.path.dirname(os.path.realpath(__file__))
-path = os.path.join(path, "..", "rticonnextdds-connector/lib", arch);
+path = os.path.join(path, "..", "rticonnextdds-connector/lib", arch)
 libname = libname + "." + post
 rti = ctypes.CDLL(os.path.join(path, libname), ctypes.RTLD_GLOBAL)
 
@@ -165,13 +175,27 @@ rtin_RTIDDSConnector_freeString.argtypes = [POINTER(c_char)]
 #Python Class Definition
 
 class Samples:
+	"""A collection of data samples
+
+	TODO: complete documentation
+	TODO: fieldName format (create new section and link to it)
+
+	Attributes:
+		* ``input`` (:class:`Input`): The ``Input`` that owns this ``Samples``.
+
+	"""
+
 	def __init__(self,input):
 		self.input = input;
 
 	def getLength(self):
+		"""Gets the number of samples"""
+
 		return int(rtin_RTIDDSConnector_getSamplesLength(self.input.connector.native,tocstring(self.input.name)));
 
 	def getNumber(self, index, fieldName):
+		"""Gets the value of a numeric field for a given sample index"""
+
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -181,6 +205,8 @@ class Samples:
 		return rtin_RTIDDSConnector_getNumberFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
 
 	def getBoolean(self, index, fieldName):
+		"""Gets the value of a boolean field for a given sample index"""
+
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -190,6 +216,8 @@ class Samples:
 		return rtin_RTIDDSConnector_getBooleanFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
 
 	def getString(self, index, fieldName):
+		"""Gets the value of a string field for a given sample index"""
+
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -202,6 +230,8 @@ class Samples:
 		return theStr;
 
 	def getDictionary(self,index):
+		"""Gets a dictionary with the values of all the fields for a given sample index"""
+
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -221,13 +251,31 @@ class Samples:
 		return dynDataPtr;
 
 class Infos:
+	"""A collection of meta-data
+
+	TODO: complete documentation
+
+	Attributes:
+		* ``input`` (:class:`Input`): The ``Input`` that owns this ``Infos``.
+	"""
+
 	def __init__(self,input):
 		self.input = input;
 
 	def getLength(self):
+		"""Gets the number of samples"""
+
 		return int(rtin_RTIDDSConnector_getInfosLength(self.input.connector.native,tocstring(self.input.name)));
 
 	def isValid(self, index):
+		"""Returns whether the data for a given sample index is valid
+
+		Given an variable ``input`` of type :class:`Input`, ``input.infos.isValid(index)
+		indicates whether the data of ``input.samples`` in that position is valid.
+		If true, ``input.samples.getDictionary(index)`` (for example) will return 
+		valid data.
+		"""
+
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -245,6 +293,18 @@ class Infos:
 		return json.loads(fromcstring(jsonStr))
 
 class Input:
+	"""Allows reading data for a Topic
+
+	To get an input object, use :meth:`Connector.getInput()`.
+
+	Attributes:
+		* ``samples`` (:class:`Samples`): The samples read after a call to :meth:`read()` or :meth:`take()`.
+		* ``infos`` (:class:`Infos`): The meta-samples read after a call to :meth:`read()` or :meth:`take()`.
+		* ``connector`` (:class:`Connector`): The ``Connector`` that created this ``Input``
+		* ``name`` (str): The name of this ``Output`` (the name used in :meth:`Connector.getOutput`)
+		* ``native``: A native handle that allows accessing additional *Connext DDS* APIs in C.
+	"""
+
 	def __init__(self, connector, name):
 		self.connector = connector;
 		self.name = name;
@@ -255,19 +315,39 @@ class Input:
 		self.infos = Infos(self);
 
 	def read(self):
+		"""TODO: document this function"""
+
 		rtin_RTIDDSConnector_read(self.connector.native,tocstring(self.name));
 
 	def take(self):
+		"""TODO: document this function"""
+
 		rtin_RTIDDSConnector_take(self.connector.native,tocstring(self.name));
 
 	def wait(self,timeout):
 		return rtin_RTIDDSConnector_wait(self.connector.native,timeout);
 
 class Instance:
+	"""A data sample
+
+	Instance is the type of :class:`Output`.instance and is the object that
+	is published.
+
+	An Instance has an associated DDS Type, specified in the XML configuration,
+	and it allows setting the values for the fields of the DDS Type.
+
+	TODO: fieldName format (create new section and link to it)
+
+	Attributes:
+		* ``output`` (:class:`Output`): The ``Output`` that owns this ``Instance``.
+	"""
+
 	def __init__(self, output):
 		self.output = output;
 
 	def setNumber(self, fieldName, value):
+		"""Sets a numeric field"""
+
 		try:
 			rtin_RTIDDSConnector_setNumberIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value);
 		except ctypes.ArgumentError as e:
@@ -275,6 +355,8 @@ class Instance:
 				.format(fieldName))
 
 	def setBoolean(self,fieldName, value):
+		"""Sets a Boolean field"""
+
 		try:
 			rtin_RTIDDSConnector_setBooleanIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value);
 		except ctypes.ArgumentError as e:
@@ -282,6 +364,8 @@ class Instance:
 				.format(fieldName))
 
 	def setString(self, fieldName, value):
+		"""Sets a string field"""
+
 		try:
 			rtin_RTIDDSConnector_setStringIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),tocstring(value));
 		except AttributeError | ctypes.ArgumentError as e:
@@ -289,15 +373,63 @@ class Instance:
 				.format(fieldName))
 
 	def setDictionary(self,dictionary):
+		"""Sets the member values specified in a dictionary"""
+
 		jsonStr = json.dumps(dictionary)
 		rtin_RTIDDSConnector_setJSONInstance(self.output.connector.native,tocstring(self.output.name),tocstring(jsonStr));
 
 	def getNative(self):
+		"""Obtains the native C object
+
+		This allows accessing additional *Connect DDS* APIs in C.
+		"""
+
 		dynDataPtr = rtin_RTIDDSConnector_getNativeInstance(self.output.connector.native,tocstring(self.output.name));
 		return dynDataPtr;
 
 
 class Output:
+	"""Allows writting data for a DDS Topic
+
+	To obtain an Output, use :meth:`Connector.getOutput()`.
+
+	Use the attribute ``instance`` to set the values of the data sample you want
+	to write. For example::
+
+		output.instance.setNumber("x", 1)
+		output.instance.setNumber("y", 2)
+		output.instance.setNumber("shapesize", 30)
+		output.instance.setString("color", "BLUE")
+
+	The members of ``instance`` are pre-defined in the XML configuration. In the previous
+	example, the type is defined as::
+
+		<types>
+		  <struct name="ShapeType" extensibility="extensible">
+		    <member name="color" stringMaxLength="128" id="0" type="string" key="true" default="RED"/>
+			<member name="x" id="1" type="long" />
+			<member name="y" id="2" type="long" />
+			<member name="shapesize" id="3" type="long" default="30"/>
+		   </struct>
+		</types>
+
+	If the name of the member you try to access doesn't exist, TODO: raise exception.
+
+	After that, call :meth:`write()` to publish the instance::
+
+		output.write()
+
+	To publish a new data sample, modify ``instance`` (call :meth:`clear_members()`
+	if you need to start from scratch) and call ``write()`` again.
+
+	Attributes:
+		* ``instance`` (:class:`Instance`): The data that is written when :meth:`write()` is called.
+		* ``connector`` (:class:`Connector`): The Connector that created this Output
+		* ``name`` (str): The name of this ``Output`` (the name used in :meth:`Connector.getOutput`)
+		* ``native``: A native handle that allows accessing additional *Connext DDS* APIs in C.
+
+	"""
+
 	def __init__(self, connector, name):
 		self.connector = connector;
 		self.name = name;
@@ -307,6 +439,14 @@ class Output:
 		self.instance = Instance(self);
 
 	def write(self, options=None):
+		"""Publishes the values of the current``instance``
+
+		Note that after writing the current ``instance``, its values remain
+		unchanged. If for the next write you need to start from scratch, use
+		:meth:`clear_members()`
+
+		"""
+
 		if options is not None:
 			if isinstance(options, (dict)):
 				jsonStr = json.dumps(options)
@@ -317,22 +457,123 @@ class Output:
 			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), None);
 
 	def clear_members(self):
+		"""Resets the values of the members of this ``Output.instance``
+
+		If the member is defined with the ``default`` attribute, it gets that value.
+		Otherwise numbers are set to 0, and strings are set to empty. Sequences
+		are cleared.
+
+		For example, if this ``Output``'s type is `ShapeType` (from the previous 
+		example), then ``clear_members()`` sets `color` to "RED", `shapesize`
+		to 30, and `x` and `y` to 0.
+		"""
+
 		return rtin_RTIDDSConnector_clear(self.connector.native,tocstring(self.name));
 
 class Connector:
-	def __init__(self, configName, fileName):
-		self.native = rtin_RTIDDSConnector_new(tocstring(configName), tocstring(fileName),None);
+	"""Loads a configuration and creates its Inputs and Outputs
+
+	A ``Connector`` instance loads a configuration from an XML document. For example::
+
+		connector = rti.Connector("MyParticipantLibrary::MyParticipant", "MyExample.xml")
+
+	This example loads the domain_participant called Zero defined in the file
+	ShapeExample.xml::
+
+		<domain_participant_library name="MyParticipantLibrary">
+		  <domain_participant name="MyParticipant" domain_ref="MyDomainLibrary::MyDomain">
+		    ...
+		  </domain_participant>
+		</domain_participant_library>
+
+	*Connector* uses The XML format of `RTI's XML-Based Application Creation <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/xml_application_creation/html_files/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted/index.htm#XMLBasedAppCreation/UnderstandingPrototyper/XMLTagsConfigEntities.htm%3FTocPath%3D5.%2520Understanding%2520XML-Based%2520Application%2520Creation%7C5.5%2520XML%2520Tags%2520for%2520Configuring%2520Entities%7C_____0>`__.
+
+	After creating it, the ``Connector``'s Inputs can be used to read data, and
+	the Outputs to write. See :meth:`getInput()` and :meth:`getOutput()`.
+
+	An application can create multiple ``Connector`` instances for the same or
+	different configurations.
+
+	A ``Connector`` instance must be deleted with :meth:`delete()`.
+
+	:param str configName: The configuration to load. 	The ``configName`` format is ``"LibraryName::ParticipantName"``, where ``LibraryName`` is the ``name`` attribute of a ``<domain_participant_library>`` tag, and ``ParticipantName`` is the ``name`` attribute of a ``<domain_participant>`` tag inside the library.
+	:param str url: An URL locating the XML document. The ``url`` can be a file path (for example, ``'/tmp/my_dds_config.xml'``) or a string containing the full XML document with the following format ``'str://"<dds>...</dds>"'``)
+
+	"""
+
+	def __init__(self, configName, url):
+		self.native = rtin_RTIDDSConnector_new(tocstring(configName), tocstring(url), None)
 		if self.native == None:
 			raise ValueError("Invalid participant profile, xml path or xml profile")
 
 	def delete(self):
+		"""Frees all the resources created by this Connector instance"""
+
 		rtin_RTIDDSConnector_delete(self.native);
 
 	def getOutput(self, outputName):
+		"""Returns the :class:`Output` named ``outputName``
+
+		``outputName`` identifies a ``<data_writer>`` tag in the
+		configuration loaded by this ``Connector``. For example, the following code::
+
+			connector = rti.Connector("MyParticipantLibrary::MyParticipant", "MyExample.xml")
+			connector.getOutput("MyPublisher::MyWriter")
+
+
+		Loads the ``Output`` in this example XML::
+
+			<domain_participant_library name="MyParticipantLibrary">
+			  <domain_participant name="MyParticipant" domain_ref="MyDomainLibrary::MyDomain">
+			  	<publisher name="MyPublisher">
+			  	  <data_writer name="MyWriter" topic_ref="MyTopic"/>
+			  	  ...
+			  	</publisher>
+			  	...
+			  </domain_participant>
+			  ...
+			<domain_participant_library>
+
+		:param str outputName: The name of a the ``data_writer`` to load, with the format ``"PublisherName::DataWriterName"``.
+		:return: The Output if it exists, or else it raises ``ValueError``.
+		:rtype: :class:`Output`
+
+		"""
+
 		return Output(self,outputName);
 
 	def getInput(self, inputName):
+		"""Returns the :class:`Input` named ``inputName``
+
+		``inputName`` identifies a ``<data_reader>`` tag in the
+		configuration loaded by this ``Connector``. For example, the following code::
+
+			connector = rti.Connector("MyParticipantLibrary::MyParticipant", "MyExample.xml")
+			connector.getInput("MySubscriber::MyReader")
+
+
+		Loads the ``Output`` in this example XML::
+
+			<domain_participant_library name="MyParticipantLibrary">
+			  <domain_participant name="MyParticipant" domain_ref="MyDomainLibrary::MyDomain">
+			  	<subscriber name="MySubscriber">
+			  	  <data_reader name="MyReader" topic_ref="MyTopic"/>
+			  	  ...
+			  	</subscriber>
+			  	...
+			  </domain_participant>
+			  ...
+			<domain_participant_library>
+
+		:param str inputName: The name of a the ``data_reader`` to load, with the format ``"SubscriberName::DataReaderName"``.
+		:return: The Input if it exists, or else it raises ``ValueError``.
+		:rtype: :class:`Input`
+
+		"""
+
 		return Input(self, inputName);
 
 	def wait(self,timeout):
+		"""TODO: document this function"""
+
 		return rtin_RTIDDSConnector_wait(self.native,timeout);

@@ -77,18 +77,18 @@ As explained above, you are responsible for protecting calls to *Connector*. The
 ...
 ...
 import threading
-sem = threading.Semaphore();
+sem = threading.Semaphore()
 ...
 ...
 #acquire the semaphore
-sem.acquire(True);
-#call to connector APissem.acquire(True);
-input.take();
-numOfSamples = input.samples.getLength();
+sem.acquire(True)
+#call to connector APissem.acquire(True;
+input.take()
+numOfSamples = input.samples.getLength()
 ...
 ...
 #release the semaphore
-sem.release();
+sem.release()
 ...
 ...
 
@@ -105,10 +105,10 @@ import rticonnextdds_connector as rti
 ```
 
 #### instantiate a new *Connector*
-To create a new *Connector*, pass an XML file and a configuration name.   
+To create a new *Connector*, pass an XML file and a configuration name.
 
 ```py
-connector = rti.Connector("MyParticipantLibrary::Zero","./ShapeExample.xml");
+connector = rti.Connector("MyParticipantLibrary::Zero","./ShapeExample.xml")
 ```
 For more information on
 the XML format, see the [XML-Based Application Creation guide](https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) or
@@ -118,10 +118,10 @@ look at the [ShapeExample.xml](examples/python/ShapeExample.xml) file included i
 To destroy all the DDS entities that belong to a *Connector* previously created, call the ```delete``` function.
 
 ```py
-connector = rti.Connector("MyParticipantLibrary::Zero","./ShapeExample.xml");
+connector = rti.Connector("MyParticipantLibrary::Zero","./ShapeExample.xml")
 ...
 ...
-connector.delete();
+connector.delete()
 ```
 
 #### write a sample
@@ -134,16 +134,16 @@ output = connector.getOutput("MyPublisher::MySquareWriter")
 Then set the instance's fields:
 
 ```py
-output.instance.setNumber("x", 1);
-output.instance.setNumber("y", 2);
-output.instance.setNumber("shapesize", 30);
-output.instance.setString("color", "BLUE");
+output.instance.setNumber("x", 1)
+output.instance.setNumber("y", 2)
+output.instance.setNumber("shapesize", 30)
+output.instance.setString("color", "BLUE")
 ```
 
 Then write:
 
 ```py
-output.write();
+output.write()
 ```
 
 #### set the instance's fields:
@@ -155,16 +155,16 @@ The content of an instance can be set by using a dictionary that matches the ori
 #assuming that sample is a dictionary containing
 #an object of the same type of the output.instance:
 
-output.instance.setDictionary(sample);
+output.instance.setDictionary(sample)
 ```
 
  * **Field by field**:
 
 ```py
-output.instance.setNumber("y", 2);
+output.instance.setNumber("y", 2)
 ```
 
-The following APIs set an instance field by field: `setNumber(fieldName, number);` `setBoolean(fieldName, boolean);` and `setString(fieldName, string);`.
+The following APIs set an instance field by field: `setNumber(fieldName, number)` `setBoolean(fieldName, boolean)` and `setString(fieldName, string)`.
 
 Nested fields can be accessed with the dot notation `"x.y.z"`. Arrays or sequences can be accessed with square brakets: `"x.y[1].z"`. For more information on how to access
 fields, see the "Data Access API" section of the
@@ -175,34 +175,34 @@ fields, see the "Data Access API" section of the
 To read/take samples, first get a reference to the input port:
 
 ```py
-input = connector.getInput("MySubscriber::MySquareReader");
+input = connector.getInput("MySubscriber::MySquareReader")
 ```
 
 Then call the `read()` or `take()` API:
 
 ```py
-input.read();
+input.read()
 ```
 
  or
 
 ```pu
- input.take();
+ input.take()
 ```
 
 The read/take operation can return multiple samples. Therefore, you must iterate on an array:
 
 ```py
-    input.take();
-    numOfSamples = input.samples.getLength();
+    input.take()
+    numOfSamples = input.samples.getLength()
     for j in range (0, numOfSamples):
         if input.infos.isValid(j):
-            x = input.samples.getNumber(j, "x");
-            y = input.samples.getNumber(j, "y");
-            size = input.samples.getNumber(j, "shapesize");
-            color = input.samples.getString(j, "color");
-            toPrint = "Received x: " + repr(x) + " y: " + repr(y) + " size: " + repr(size) + " color: " + repr(color);
-            print(toPrint);
+            x = input.samples.getNumber(j, "x")
+            y = input.samples.getNumber(j, "y")
+            size = input.samples.getNumber(j, "shapesize")
+            color = input.samples.getString(j, "color")
+            toPrint = "Received x: " + repr(x) + " y: " + repr(y) + " size: " + repr(size) + " color: " + repr(color)
+            print(toPrint)
 }
 ```
 
@@ -214,33 +214,33 @@ You can access the data by getting a copy in a dictionary object, or you can acc
  * **Using a dictionary**:
 
 ```py
- numOfSamples = input.samples.getLength();
+ numOfSamples = input.samples.getLength()
  for j in range (0, numOfSamples):
      if input.infos.isValid(j):
-         sample = input.samples.getDictionary(j);
+         sample = input.samples.getDictionary(j)
          #print the whole sample
-         print(sample);
+         print(sample)
          #or print a single element
-         print(sample['x']);
+         print(sample['x'])
  }
 ```
 
  * **Field by field**:
 
 ```py
- numOfSamples = input.samples.getLength();
+ numOfSamples = input.samples.getLength()
  for j in range (0, numOfSamples):
      if input.infos.isValid(j):
-         x = input.samples.getNumber(j, "x");
-         y = input.samples.getNumber(j, "y");
-         size = input.samples.getNumber(j, "shapesize");
-         color = input.samples.getString(j, "color");
-         toPrint = "Received x: " + repr(x) + " y: " + repr(y) + " size: " + repr(size) + " color: " + repr(color);
-         print(toPrint);
+         x = input.samples.getNumber(j, "x")
+         y = input.samples.getNumber(j, "y")
+         size = input.samples.getNumber(j, "shapesize")
+         color = input.samples.getString(j, "color")
+         toPrint = "Received x: " + repr(x) + " y: " + repr(y) + " size: " + repr(size) + " color: " + repr(color)
+         print(toPrint)
  }
 ```
 
-The following APIs access the samples field by field: `getNumber(indexm fieldName);` `getBoolean(index, fieldName);` and `getString(index, fieldName);`.
+The following APIs access the samples field by field: `getNumber(indexm fieldName)` `getBoolean(index, fieldName)` and `getString(index, fieldName)`.
 
 ### License
 With the sole exception of the contents of the "examples" subdirectory, all use of this product is subject to the RTI Software License Agreement included at the top level of this repository. Files within the "examples" subdirectory are licensed as marked within the file.
