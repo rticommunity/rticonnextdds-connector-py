@@ -8,12 +8,12 @@
 
 """This package contains the Connector type and all other supporting types
 
-To use this package, import it as follows:
-
-.. code:: py
+To use this package, import it as follows::
 
    import rticonnextdds_connector as rti
 
+The entry point is the class :class:`Connector`, which creates :class:`Input` 
+and :class:`Output` objects.
 """
 
 import ctypes
@@ -175,7 +175,15 @@ rtin_RTIDDSConnector_freeString.argtypes = [POINTER(c_char)]
 #Python Class Definition
 
 class Samples:
-	"""A collection of data samples"""
+	"""A collection of data samples
+
+	TODO: complete documentation
+	TODO: fieldName format (create new section and link to it)
+
+	Attributes:
+		* ``input`` (:class:`Input`): The ``Input`` that owns this ``Samples``.
+
+	"""
 
 	def __init__(self,input):
 		self.input = input;
@@ -243,7 +251,13 @@ class Samples:
 		return dynDataPtr;
 
 class Infos:
-	"""A collection of meta-data"""
+	"""A collection of meta-data
+
+	TODO: complete documentation
+
+	Attributes:
+		* ``input`` (:class:`Input`): The ``Input`` that owns this ``Infos``.
+	"""
 
 	def __init__(self,input):
 		self.input = input;
@@ -254,7 +268,13 @@ class Infos:
 		return int(rtin_RTIDDSConnector_getInfosLength(self.input.connector.native,tocstring(self.input.name)));
 
 	def isValid(self, index):
-		"""Returns whether the data for a given sample index is valid"""
+		"""Returns whether the data for a given sample index is valid
+
+		Given an variable ``input`` of type :class:`Input`, ``input.infos.isValid(index)
+		indicates whether the data of ``input.samples`` in that position is valid.
+		If true, ``input.samples.getDictionary(index)`` (for example) will return 
+		valid data.
+		"""
 
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
@@ -276,6 +296,13 @@ class Input:
 	"""Allows reading data for a Topic
 
 	To get an input object, use :meth:`Connector.getInput()`.
+
+	Attributes:
+		* ``samples`` (:class:`Samples`): The samples read after a call to :meth:`read()` or :meth:`take()`.
+		* ``infos`` (:class:`Infos`): The meta-samples read after a call to :meth:`read()` or :meth:`take()`.
+		* ``connector`` (:class:`Connector`): The ``Connector`` that created this ``Input``
+		* ``name`` (str): The name of this ``Output`` (the name used in :meth:`Connector.getOutput`)
+		* ``native``: A native handle that allows accessing additional *Connext DDS* APIs in C.
 	"""
 
 	def __init__(self, connector, name):
@@ -301,13 +328,25 @@ class Input:
 		return rtin_RTIDDSConnector_wait(self.connector.native,timeout);
 
 class Instance:
-	"""TODO: Instance"""
+	"""A data sample
+
+	Instance is the type of :class:`Output`.instance and is the object that
+	is published.
+
+	An Instance has an associated DDS Type, specified in the XML configuration,
+	and it allows setting the values for the fields of the DDS Type.
+
+	TODO: fieldName format (create new section and link to it)
+
+	Attributes:
+		* ``output`` (:class:`Output`): The ``Output`` that owns this ``Instance``.
+	"""
 
 	def __init__(self, output):
 		self.output = output;
 
 	def setNumber(self, fieldName, value):
-		"""TODO: document this function"""
+		"""Sets a numeric field"""
 
 		try:
 			rtin_RTIDDSConnector_setNumberIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value);
@@ -316,7 +355,7 @@ class Instance:
 				.format(fieldName))
 
 	def setBoolean(self,fieldName, value):
-		"""TODO: document this function"""
+		"""Sets a Boolean field"""
 
 		try:
 			rtin_RTIDDSConnector_setBooleanIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value);
@@ -325,7 +364,7 @@ class Instance:
 				.format(fieldName))
 
 	def setString(self, fieldName, value):
-		"""TODO: document this function"""
+		"""Sets a string field"""
 
 		try:
 			rtin_RTIDDSConnector_setStringIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),tocstring(value));
@@ -334,13 +373,16 @@ class Instance:
 				.format(fieldName))
 
 	def setDictionary(self,dictionary):
-		"""TODO: document this function"""
+		"""Sets the member values specified in a dictionary"""
 
 		jsonStr = json.dumps(dictionary)
 		rtin_RTIDDSConnector_setJSONInstance(self.output.connector.native,tocstring(self.output.name),tocstring(jsonStr));
 
 	def getNative(self):
-		"""TODO: document this function"""
+		"""Obtains the native C object
+
+		This allows accessing additional *Connect DDS* APIs in C.
+		"""
 
 		dynDataPtr = rtin_RTIDDSConnector_getNativeInstance(self.output.connector.native,tocstring(self.output.name));
 		return dynDataPtr;
@@ -382,8 +424,9 @@ class Output:
 
 	Attributes:
 		* ``instance`` (:class:`Instance`): The data that is written when :meth:`write()` is called.
-		* ``native``: A native handle that allows accessing additional *Connext DDS* APIs in C.
+		* ``connector`` (:class:`Connector`): The Connector that created this Output
 		* ``name`` (str): The name of this ``Output`` (the name used in :meth:`Connector.getOutput`)
+		* ``native``: A native handle that allows accessing additional *Connext DDS* APIs in C.
 
 	"""
 
