@@ -63,10 +63,10 @@ This code contains trade secrets of Real-Time Innovations, Inc.
     <types>
 
 	   	<struct name="ShapeType" extensibility="extensible">
-			<member name="color" stringMaxLength="128" id="0" type="string" key="true" default="RED"/>
-			<member name="x" id="1" type="long" default="100"/>
-			<member name="yx" id="2" type="long" default="100"/>
-			<member name="shapesize" id="3" type="long" default="50"/>
+			<member name="color" stringMaxLength="128" id="0" type="string" key="true"/>
+			<member name="x" id="1" type="long"/>
+			<member name="y" id="2" type="long"/>
+			<member name="shapesize" id="3" type="long"/>
 			<member name="z" id="4" type="boolean"/>
 		</struct>
 		<enum name="ShapeFillKind" extensibility="extensible">
