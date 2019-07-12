@@ -6,4 +6,4 @@ Module contents
 
 .. automodule:: rticonnextdds_connector
    :members:
-   :show-inheritance:
+
