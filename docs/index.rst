@@ -10,7 +10,10 @@ RTI Connext DDS Connector for Python - API Reference
 .. toctree::
    :maxdepth: 2
 
-   modules
+   connector
+   output
+   input
+   data
 
 Indices and tables
 ==================
@@ -25,4 +28,3 @@ Getting Started
 To get started with *RTI Connext DDS Connector for Python*, 
 go to the `rticonnextdds-connector-py <https://github.com/rticommunity/rticonnextdds-connector-py>`__ repository.
 
-The full API reference is here: :ref:`rticonnextdds\_connector package`.

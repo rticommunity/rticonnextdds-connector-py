@@ -330,23 +330,27 @@ class Input:
 class Instance:
 	"""A data sample
 
-	Instance is the type of :class:`Output`.instance and is the object that
-	is published.
+		Instance is the type of :class:`Output`.instance and is the object that
+		is published.
 
-	An Instance has an associated DDS Type, specified in the XML configuration,
-	and it allows setting the values for the fields of the DDS Type.
+		An Instance has an associated DDS Type, specified in the XML configuration,
+		and it allows setting the values for the fields of the DDS Type.
 
-	TODO: fieldName format (create new section and link to it)
+		TODO: fieldName format (create new section and link to it)
 
-	Attributes:
-		* ``output`` (:class:`Output`): The ``Output`` that owns this ``Instance``.
+		Attributes:
+			* ``output`` (:class:`Output`): The ``Output`` that owns this ``Instance``.
 	"""
 
 	def __init__(self, output):
 		self.output = output;
 
 	def setNumber(self, fieldName, value):
-		"""Sets a numeric field"""
+		"""Sets a numeric field
+
+		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
+		:param number value: A numeric value
+		"""
 
 		try:
 			rtin_RTIDDSConnector_setNumberIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value);
@@ -355,7 +359,11 @@ class Instance:
 				.format(fieldName))
 
 	def setBoolean(self,fieldName, value):
-		"""Sets a Boolean field"""
+		"""Sets a Boolean field
+
+		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
+		:param number value: ``TRUE`` or ``FALSE``.
+		"""
 
 		try:
 			rtin_RTIDDSConnector_setBooleanIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value);
@@ -364,7 +372,11 @@ class Instance:
 				.format(fieldName))
 
 	def setString(self, fieldName, value):
-		"""Sets a string field"""
+		"""Sets a string field
+
+		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
+		:param number value: ``TRUE`` or ``FALSE``.
+		"""
 
 		try:
 			rtin_RTIDDSConnector_setStringIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),tocstring(value));
@@ -373,7 +385,16 @@ class Instance:
 				.format(fieldName))
 
 	def setDictionary(self,dictionary):
-		"""Sets the member values specified in a dictionary"""
+		"""Sets the member values specified in a dictionary
+
+		The keys in the dictionary may be a subset of the members of this
+		``Instance``'s type. If any key is missing, that field retains its old
+		value. You can use :meth:`Output.clear_members()` before setting a
+		dictionary with a subset of the keys if you want the missing members to
+		have a default value.
+
+		:param dict dictionary: The dictionary containing the kys
+		"""
 
 		jsonStr = json.dumps(dictionary)
 		rtin_RTIDDSConnector_setJSONInstance(self.output.connector.native,tocstring(self.output.name),tocstring(jsonStr));
@@ -394,24 +415,7 @@ class Output:
 	To obtain an Output, use :meth:`Connector.getOutput()`.
 
 	Use the attribute ``instance`` to set the values of the data sample you want
-	to write. For example::
-
-		output.instance.setNumber("x", 1)
-		output.instance.setNumber("y", 2)
-		output.instance.setNumber("shapesize", 30)
-		output.instance.setString("color", "BLUE")
-
-	The members of ``instance`` are pre-defined in the XML configuration. In the previous
-	example, the type is defined as::
-
-		<types>
-		  <struct name="ShapeType" extensibility="extensible">
-		    <member name="color" stringMaxLength="128" id="0" type="string" key="true" default="RED"/>
-			<member name="x" id="1" type="long" />
-			<member name="y" id="2" type="long" />
-			<member name="shapesize" id="3" type="long" default="30"/>
-		   </struct>
-		</types>
+	to write.
 
 	If the name of the member you try to access doesn't exist, TODO: raise exception.
 
