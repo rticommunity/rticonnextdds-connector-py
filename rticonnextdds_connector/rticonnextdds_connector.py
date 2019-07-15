@@ -194,7 +194,12 @@ class Samples:
 		return int(rtin_RTIDDSConnector_getSamplesLength(self.input.connector.native,tocstring(self.input.name)));
 
 	def getNumber(self, index, fieldName):
-		"""Gets the value of a numeric field for a given sample index"""
+		"""Gets the value of a numeric field for a given sample index
+
+		:param number index: The index of the sample to access
+		:param str fieldName: The name of the field in that sample. See :ref:`Accessing the data`.
+		:return: The numeric value for the field ``fieldName`` in the sample in position ``index``.
+		"""
 
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
@@ -205,7 +210,12 @@ class Samples:
 		return rtin_RTIDDSConnector_getNumberFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
 
 	def getBoolean(self, index, fieldName):
-		"""Gets the value of a boolean field for a given sample index"""
+		"""Gets the value of a boolean field for a given sample index
+
+		:param number index: The index of the sample to access
+		:param str fieldName: The name of the field in that sample. See :ref:`Accessing the data`.
+		:return: The boolean value for the field ``fieldName`` in the sample in position ``index``.
+		"""
 
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
@@ -216,7 +226,12 @@ class Samples:
 		return rtin_RTIDDSConnector_getBooleanFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
 
 	def getString(self, index, fieldName):
-		"""Gets the value of a string field for a given sample index"""
+		"""Gets the value of a string field for a given sample index
+
+		:param number index: The index of the sample to access
+		:param str fieldName: The name of the field in that sample. See :ref:`Accessing the data`.
+		:return: The string value for the field ``fieldName`` in the sample in position ``index``.
+		"""
 
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
@@ -229,8 +244,16 @@ class Samples:
 		rtin_RTIDDSConnector_freeString(theStrPtr);
 		return theStr;
 
-	def getDictionary(self,index):
-		"""Gets a dictionary with the values of all the fields for a given sample index"""
+	def getDictionary(self, index):
+		"""Gets a dictionary with the values of all the fields for a given sample index
+
+		The dictionary keys are the field names and the dictionary values correspond
+		to each field value. To see how nested types, sequences, and arrays are
+		represented, see :ref:`Accessing the data`.
+
+		:param number index: The index of the sample to access
+		:return: A dictionary containing all the fields of the sample in position ``index``.
+		"""
 
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
@@ -253,7 +276,7 @@ class Samples:
 class Infos:
 	"""A collection of meta-data
 
-	TODO: complete documentation
+	Contains meta-data about each data sample in ``Input.
 
 	Attributes:
 		* ``input`` (:class:`Input`): The ``Input`` that owns this ``Infos``.
@@ -270,10 +293,10 @@ class Infos:
 	def isValid(self, index):
 		"""Returns whether the data for a given sample index is valid
 
-		Given an variable ``input`` of type :class:`Input`, ``input.infos.isValid(index)
+		Given an variable ``input`` of type :class:`Input`, ``input.infos.isValid(index)``
 		indicates whether the data of ``input.samples`` in that position is valid.
-		If true, ``input.samples.getDictionary(index)`` (for example) will return 
-		valid data.
+		If true, ``input.sample``'s getters (such as ``input.samples.getDictionary(index)``)
+		will return valid data.
 		"""
 
 		if type(index) is not int:
@@ -393,7 +416,7 @@ class Instance:
 		dictionary with a subset of the keys if you want the missing members to
 		have a default value.
 
-		:param dict dictionary: The dictionary containing the kys
+		:param dict dictionary: The dictionary containing the keys
 		"""
 
 		jsonStr = json.dumps(dictionary)
