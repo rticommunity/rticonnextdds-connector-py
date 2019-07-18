@@ -15,14 +15,14 @@ To read/take samples, first get a reference to the :class:`Input`::
 Reading or taking the data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Then call :meth:`Input.take()` to access and remove the samples:
+Then call :meth:`Input.take()` to access and remove the samples::
 
    input.take()
 
 or :meth:`Input.read()` to access the samples but leaving them available for
 a future ``read()`` or ``take()``::
 
-   input.take()
+   input.read()
 
 Accessing the data samples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
