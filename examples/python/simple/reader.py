@@ -24,19 +24,16 @@ inputDDS = connector.getInput("MySubscriber::MySquareReader")
 
 for i in range(1, 500):
     inputDDS.take()
-    numOfSamples = inputDDS.samples.getLength()
-    for j in range(0, numOfSamples):
-        if inputDDS.infos.isValid(j):
-            # This gives you a dictionary
-            sample = inputDDS.samples.getDictionary(j)
-            x = sample['x']
-            y = sample['y']
+    for sample in inputDDS.getValidDataIterator():
+        # You can get all the fields in a dictionary
+        data = sample.getDictionary()
+        x = data['x']
+        y = data['y']
 
-            # Or you can just access the field directly
-            size = inputDDS.samples.getNumber(j, "shapesize")
-            color = inputDDS.samples.getString(j, "color")
-            toPrint = "Received x: " + repr(x) + " y: " + repr(y) + \
-                      " size: " + repr(size) + " color: " + repr(color)
+        # Or you can access the field individually
+        size = sample.getNumber("shapesize")
+        color = sample.getString("color")
+        print("Received x: " + repr(x) + " y: " + repr(y) + \
+                " size: " + repr(size) + " color: " + repr(color))
 
-            print(toPrint)
     sleep(2)

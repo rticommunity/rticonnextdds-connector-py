@@ -27,44 +27,54 @@ a future ``read()`` or ``take()``::
 Accessing the data samples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The read/take operations populate ``Input.samples`` with the data samples that
-are available, and ``Input.infos`` with the corresponding meta-samples. The
-following example shows how to iterate over the data::
+After calling the read/take operations there are several ways to access the
+data samples. The simplest uses :meth:`Input.getValidDataIterator()` to iterate
+through all the samples with valid data and calls :meth:`SampleIterator.getDictionary()`
+to retrieve all the fields in the sample::
 
-   input.take()
-   sampleCount = input.samples.getLength()
-   for j in range (0, sampleCount):
-      if input.infos.isValid(j):
-         x = input.samples.getNumber(j, "x")
-         y = input.samples.getNumber(j, "y")
-         size = input.samples.getNumber(j, "shapesize")
-         color = input.samples.getString(j, "color")
-         print("Received x: " + repr(x) + " y: " + repr(y) + " size: " + repr(size) + " color: " + color)
+   for sample in input.getValidDataIterator():
+      print(sample.getDictionary())
 
-You can also use a dictionary to access a full data sample at once::
-
-   sampleCount = input.samples.getLength();
-   for j in range (0, sampleCount):
-      if input.infos.isValid(j)
-         sample = input.samples.getDictionary(j)
-
-         # print the whole sample
-         print(sample)
-
-         # or print a single element
-         print(sample['x'])
-   }
-
-*Connect DDS* can produce samples with invalid data, and applications should
-check for that with :meth:`Infos.isValid()`. For more information about this
-see `Valid Data Flag <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#receiving_2076951295_727613>`__
+*Connect DDS* can produce samples with invalid data, which contain meta-data only.
+For more information about this see `Valid Data Flag <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#receiving_2076951295_727613>`__
 in the *Connect DDS Core Libraries* User's Manual.
+
+Use :meth:`Input.getDataIterator()` to also access samples that contain 
+meta-data only::
+
+   for sample in input.getDataIterator():
+      print(sample.getInfo())
+      if sample.isValid():
+         print(sample.getDictionary())
+
+It is possible to access an individual sample too::
+
+   if input.getSampleCount() > 0:
+      if input.getSample(0).isValid():
+         print(input.getSample(0).getDictionary())
+
+TODO: explain use-cases for getInfo() (not yet implemented)
+
+Important: calling read/take again invalidates all iterators currently in
+use. For that reason, it is not recommended to store the result of
+``getSample()``.
+
+In addition to ``getDictionary``, you can get the values of specific fields
+using :meth:`SampleIterator.getNumber()`, :meth:`SampleIterator.getBoolean()` and
+:meth:`SampleIterator.getString()`, for example::
+
+   for sample in input.getValidDataIterator():
+      x = sample.getNumber("x")
+      y = sample.getNumber("y")
+      size = sample.getNumber("shapesize")
+      color = sample.getString("color")
+      print("Received x: " + repr(x) + " y: " + repr(y) + " size: " + repr(size) + " color: " + color)
 
 The previous example shows how to access simple fields. For more complicated types,
 see :ref:`Accessing the data`.
 
-Class reference: Input, Samples, Infos
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Class reference: Input, SampleIterator, ValidSampleIterator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Input class
 ^^^^^^^^^^^
@@ -73,15 +83,15 @@ Input class
    :members:
 
 
-Samples class
-^^^^^^^^^^^^^
+SampleIterator class
+^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: rticonnextdds_connector.Samples
+.. autoclass:: rticonnextdds_connector.SampleIterator
    :members:
 
 
-Infos class
-^^^^^^^^^^^
+ValidSampleIterator class
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: rticonnextdds_connector.Infos
+.. autoclass:: rticonnextdds_connector.ValidSampleIterator
    :members:

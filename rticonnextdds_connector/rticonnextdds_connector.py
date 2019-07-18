@@ -276,7 +276,7 @@ class Samples:
 class Infos:
 	"""A collection of meta-data
 
-	Contains meta-data about each data sample in ``Input.
+	Contains meta-data about each data sample in ``Input.samples``.
 
 	Attributes:
 		* ``input`` (:class:`Input`): The ``Input`` that owns this ``Infos``.
@@ -315,40 +315,184 @@ class Infos:
 		jsonStr = rtin_RTIDDSConnector_getJSONFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('related_sample_identity'))
 		return json.loads(fromcstring(jsonStr))
 
+class SampleIterator:
+	"""Iterates and provides access to a data sample
+
+	See :meth:`Input.getDataIterator()` and :meth:`Input.getSample()`.
+	"""
+
+	def __init__(self, input, index = -1):
+		self.input = input
+		self.index = index
+		self.length = input.samples.getLength()
+
+	def isValid(self):
+		"""Returns whether this sample contains valid data
+
+		If this returns ``False``, the data getters (``getDictionary()``, ``getNumber()``...)
+		cannot be called.
+		"""
+
+		return self.input.infos.isValid(self.index)
+
+	def getDictionary(self):
+		"""Gets a dictionary with the values of all the fields of this sample
+
+		The dictionary keys are the field names and the dictionary values correspond
+		to each field value. To see how nested types, sequences, and arrays are
+		represented, see :ref:`Accessing the data`.
+
+		:return: A dictionary containing all the fields of the sample.
+		"""
+
+		return self.input.samples.getDictionary(self.index)
+
+	def getNumber(self, fieldName):
+		"""Gets the value of a numeric field in this sample
+
+		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
+		:return: The numeric value for the field ``fieldName``.
+		"""
+
+		return self.input.samples.getNumber(self.index, fieldName)
+
+	def getBoolean(self, fieldName):
+		"""Gets the value of a boolean field in this sample
+
+		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
+		:return: The boolean value for the field ``fieldName``.
+		"""
+
+		return self.input.samples.getBoolean(self.index, fieldName)
+
+	def getString(self, fieldName):
+		"""Gets the value of a string field in this sample
+
+		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
+		:return: The string value for the field ``fieldName``.
+		"""
+
+		return self.input.samples.getString(self.index, fieldName)
+
+	def __iter__(self):
+		"""Enables iteration"""
+
+		self.index = -1
+		return self
+
+	def __next__(self):
+		"""Moves to the next sample"""
+
+		if self.index + 1 < self.length:
+			self.index = self.index + 1
+			return self
+		else:
+			raise StopIteration
+
+class ValidSampleIterator(SampleIterator):
+	"""Iterates and provides access to data samples with valid data
+
+	This iterator provides the same methods as :class:`SampleIterator`.
+
+	See :meth:`Input.getValidDataIterator()`.
+	"""
+
+	def __next__(self):
+		while self.index + 1 < self.length and not self.input.infos.isValid(self.index + 1):
+			self.index = self.index + 1
+
+		return SampleIterator.__next__(self)
 class Input:
 	"""Allows reading data for a Topic
 
 	To get an input object, use :meth:`Connector.getInput()`.
 
 	Attributes:
-		* ``samples`` (:class:`Samples`): The samples read after a call to :meth:`read()` or :meth:`take()`.
-		* ``infos`` (:class:`Infos`): The meta-samples read after a call to :meth:`read()` or :meth:`take()`.
 		* ``connector`` (:class:`Connector`): The ``Connector`` that created this ``Input``
 		* ``name`` (str): The name of this ``Output`` (the name used in :meth:`Connector.getOutput`)
 		* ``native``: A native handle that allows accessing additional *Connext DDS* APIs in C.
 	"""
 
 	def __init__(self, connector, name):
-		self.connector = connector;
-		self.name = name;
+		self.connector = connector
+		self.name = name
 		self.native= rtin_RTIDDSConnector_getReader(self.connector.native,tocstring(self.name))
 		if self.native == None:
 			raise ValueError("Invalid Subscription::DataReader name")
-		self.samples = Samples(self);
-		self.infos = Infos(self);
+		self.samples = Samples(self)
+		self.infos = Infos(self)
 
 	def read(self):
 		"""TODO: document this function"""
 
-		rtin_RTIDDSConnector_read(self.connector.native,tocstring(self.name));
+		rtin_RTIDDSConnector_read(self.connector.native,tocstring(self.name))
 
 	def take(self):
 		"""TODO: document this function"""
 
-		rtin_RTIDDSConnector_take(self.connector.native,tocstring(self.name));
+		rtin_RTIDDSConnector_take(self.connector.native,tocstring(self.name))
 
 	def wait(self,timeout):
-		return rtin_RTIDDSConnector_wait(self.connector.native,timeout);
+		return rtin_RTIDDSConnector_wait(self.connector.native,timeout)
+
+	def __getitem__(self, index):
+		return SampleIterator(self, index)
+
+	def getSampleCount(self):
+		"""Returns the number of samples available
+
+		:return: The number of samples available since the last time read/take was called
+		"""
+
+		return self.samples.getLength()
+
+	def getSample(self, index):
+		"""Returns an iterator to the sample in a given index
+
+		Important: Calling :meth`Input.read()` or :meth`Input.take()` invalidates
+		all iterators previously returned.
+
+		:param number index: A zero-based index, less than :meth:`getSampleCount()`.
+
+		:return: An iterator that accesses the sample in the position indicated by ``index``.
+		:rtype: :class:`SampleIterator`
+		"""
+		return SampleIterator(self, index)
+
+	def __iter__(self):
+		return SampleIterator(self)
+
+	def getDataIterator(self):
+		"""Returns an iterator to the data samples
+
+		The iterator provides access to all the data samples retrieved by the
+		most-recent call to :meth:`read()` or :meth:`take()`.
+
+		This iterator may return samples with invalid data. Use :meth:`getValidDataIterator()`
+		to access only samples with valid data.
+
+		:return: An iterator to the samples
+		:rtype: :class:`SampleIterator`
+		"""
+		return SampleIterator(self)
+
+	def getValidDataIterator(self):
+		"""Returns an iterator to the data samples with valid data
+
+		The iterator provides access to the data samples retrieved by the
+		most-recent call to :meth:`read()` or :meth:`take()`, and skips samples
+		with invalid data (meta-data only).
+
+		To access all samples, including those with meta-data only,
+		use :meth:`getDataIterator()`
+
+		By using this iterator, it is not necessary to check if each sample
+		contains valid data.
+
+		:return: An iterator to the data samples with valid
+		:rtype: :class:`ValidSampleIterator`
+		"""
+		return ValidSampleIterator(self)
 
 class Instance:
 	"""A data sample
