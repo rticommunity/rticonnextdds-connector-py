@@ -14,26 +14,10 @@ This code contains trade secrets of Real-Time Innovations, Inc.
     <!-- Qos Library -->
     <qos_library name="QosLibrary">
         <qos_profile name="DefaultProfile" is_default_qos="true">
-            <participant_qos>
-				<participant_name>
-					<name>Connector ShapeExample</name>
-				</participant_name>
-
-                <!-- Turn on monitoring -->
-                <!-- Begin Monitoring
-                <property>
-                    <value>
-                        <element>
-                            <name>rti.monitor.library</name>
-                            <value>rtimonitoring</value>
-                        </element>
-                        <element>
-                            <name>rti.monitor.create_function_ptr</name>
-                            <value>$(NDDS_MONITOR)</value>
-                        </element>
-                    </value>
-                </property>
-                 End Monitoring -->
+        	<participant_qos>
+                <transport_builtin>
+                    <mask>UDPV4 | SHMEM</mask>
+                </transport_builtin>
             </participant_qos>
             <datawriter_qos>
                 <reliability>
@@ -98,7 +82,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
 
             <subscriber name="MySubscriber">
                 <data_reader name="MySquareReader" topic_ref="Square" />
-			</subscriber>
+            </subscriber>
         </domain_participant>
     </domain_participant_library>
 </dds>
