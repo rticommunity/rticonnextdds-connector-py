@@ -13,7 +13,7 @@ RTI Connector for Python - API Reference
    connector
    output
    input
-   data
+   advanced
 
 Indices and tables
 ==================
