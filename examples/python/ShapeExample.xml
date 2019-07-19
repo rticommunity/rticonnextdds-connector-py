@@ -71,7 +71,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
 
     <!-- Participant library -->
     <domain_participant_library name="MyParticipantLibrary">
-        <domain_participant name="Zero" domain_ref="MyDomainLibrary::MyDomain">
+        <domain_participant name="MyParticipant" domain_ref="MyDomainLibrary::MyDomain">
             <publisher name="MyPublisher">
                 <data_writer name="MySquareWriter" topic_ref="Square" />
             </publisher>
