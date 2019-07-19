@@ -28,7 +28,7 @@ class TestOutput:
     """
     invalid_DW = "InvalidDW"
     with pytest.raises(ValueError) as execinfo:
-      op= rtiConnectorFixture.getOutput(invalid_DW)
+      op= rtiConnectorFixture.get_output(invalid_DW)
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
 
@@ -116,7 +116,7 @@ class TestInstance:
     """
     non_existent_field="invalid_field"
     with pytest.raises(AttributeError) as execinfo:
-      rtiOutputFixture.instance.setString(non_existent_field,"1")
+      rtiOutputFixture.instance.set_string(non_existent_field,"1")
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
 
@@ -135,7 +135,7 @@ class TestInstance:
     """
     non_existent_field="invalid_field"
     with pytest.raises(AttributeError) as execinfo:
-      rtiOutputFixture.instance.setBoolean(non_existent_field,True)
+      rtiOutputFixture.instance.set_boolean(non_existent_field,True)
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
 
@@ -154,7 +154,7 @@ class TestInstance:
     """
     invalid_dictionary= {"non_existent_field":"value"}
     with pytest.raises(KeyError) as execinfo:
-      rtiOutputFixture.instance.setDictionary(invalid_dictionary)
+      rtiOutputFixture.instance.set_dictionary(invalid_dictionary)
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
 
@@ -175,7 +175,7 @@ class TestInstance:
     """
     number_field="x"
     with pytest.raises(TypeError) as execinfo:
-      rtiOutputFixture.instance.setNumber(number_field,True)
+      rtiOutputFixture.instance.set_number(number_field,True)
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
 
@@ -191,7 +191,7 @@ class TestInstance:
     """
     number_field="x"
     with pytest.raises(TypeError) as execinfo:
-      rtiOutputFixture.instance.setNumber(number_field,"str")
+      rtiOutputFixture.instance.set_number(number_field,"str")
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
 
@@ -207,7 +207,7 @@ class TestInstance:
     """
     number_field="x"
     with pytest.raises(TypeError) as execinfo:
-      rtiOutputFixture.instance.setNumber(number_field,{"x":1})
+      rtiOutputFixture.instance.set_number(number_field,{"x":1})
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
 
@@ -223,7 +223,7 @@ class TestInstance:
     """
     string_field="color"
     with pytest.raises(TypeError) as execinfo:
-      rtiOutputFixture.instance.setString(string_field,True)
+      rtiOutputFixture.instance.set_string(string_field,True)
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
 
@@ -255,7 +255,7 @@ class TestInstance:
     """
     string_field="color"
     with pytest.raises(TypeError) as execinfo:
-      rtiOutputFixture.instance.setString(string_field,{"color":1})
+      rtiOutputFixture.instance.set_string(string_field,{"color":1})
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
 
@@ -272,7 +272,7 @@ class TestInstance:
     """
     boolean_field="z"
     with pytest.raises(TypeError) as execinfo:
-      rtiOutputFixture.instance.setBoolean(boolean_field,"str")
+      rtiOutputFixture.instance.set_boolean(boolean_field,"str")
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
 
@@ -308,7 +308,7 @@ class TestInstance:
     """
     boolean_field="z"
     with pytest.raises(TypeError) as execinfo:
-      rtiOutputFixture.instance.setBoolean(boolean_field,{"color":1})
+      rtiOutputFixture.instance.set_boolean(boolean_field,{"color":1})
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
 

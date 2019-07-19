@@ -68,7 +68,7 @@ def rtiInputFixture(rtiConnectorFixture):
 
   """
   DR="MySubscriber::MySquareReader"
-  return rtiConnectorFixture.getInput(DR)
+  return rtiConnectorFixture.get_input(DR)
 
 @pytest.fixture(scope="session")
 def rtiOutputFixture(rtiConnectorFixture):

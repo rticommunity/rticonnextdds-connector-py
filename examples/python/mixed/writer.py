@@ -16,9 +16,9 @@ filepath = osPath.dirname(osPath.realpath(__file__))
 sysPath.append(filepath + "/../../../")
 import rticonnextdds_connector as rti
 
-connector = rti.Connector("MyParticipantLibrary::Zero",
+connector = rti.Connector("MyParticipantLibrary::MyParticipant",
                           filepath + "/../Mixed.xml")
-outputDDS = connector.getOutput("MyPublisher::MySquareWriter")
+outputDDS = connector.get_output("MyPublisher::MySquareWriter")
 
 for i in range(1, 500):
     """We clear the instance associated to this output
@@ -27,14 +27,14 @@ for i in range(1, 500):
     outputDDS.clear_members()
 
     # Here an example on how to set the members of a sequence of complex types
-    outputDDS.instance.setNumber("innerStruct[1].x", i)
-    outputDDS.instance.setNumber("innerStruct[2].x", i+1)
+    outputDDS.instance.set_number("innerStruct[1].x", i)
+    outputDDS.instance.set_number("innerStruct[2].x", i+1)
 
     # Here an example on how to set a string
-    outputDDS.instance.setString("color", "BLUE")
+    outputDDS.instance.set_string("color", "BLUE")
 
     # Here an example on how to set a number
-    outputDDS.instance.setNumber("x", i)
+    outputDDS.instance.set_number("x", i)
 
     """Here we are going to set the elements of a sequence.
     - the sequence was declared with maxSize 30
@@ -43,11 +43,11 @@ for i in range(1, 500):
 
     If you open rtiddsspy you will see that the length is
     automatically set to the right value."""
-    outputDDS.instance.setNumber("aOctetSeq[1]", 42)
-    outputDDS.instance.setNumber("aOctetSeq[2]", 43)
+    outputDDS.instance.set_number("aOctetSeq[1]", 42)
+    outputDDS.instance.set_number("aOctetSeq[2]", 43)
 
     if i % 2 == 0:
-        outputDDS.instance.setNumber("aOctetSeq[3]", 44)
+        outputDDS.instance.set_number("aOctetSeq[3]", 44)
     # Now we write the sample
     outputDDS.write()
     sleep(2)

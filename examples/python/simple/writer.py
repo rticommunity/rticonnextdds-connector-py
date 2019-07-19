@@ -15,14 +15,14 @@ filepath = osPath.dirname(osPath.realpath(__file__))
 sysPath.append(filepath + "/../../../")
 import rticonnextdds_connector as rti
 
-connector = rti.Connector("MyParticipantLibrary::Zero",
+connector = rti.Connector("MyParticipantLibrary::MyParticipant",
                           filepath + "/../ShapeExample.xml")
-outputDDS = connector.getOutput("MyPublisher::MySquareWriter")
+outputDDS = connector.get_output("MyPublisher::MySquareWriter")
 
 for i in range(1, 500):
-    outputDDS.instance.setNumber("x", i)
-    outputDDS.instance.setNumber("y", i*2)
-    outputDDS.instance.setNumber("shapesize", 30)
-    outputDDS.instance.setString("color", "BLUE")
+    outputDDS.instance.set_number("x", i)
+    outputDDS.instance.set_number("y", i*2)
+    outputDDS.instance.set_number("shapesize", 30)
+    outputDDS.instance.set_string("color", "BLUE")
     outputDDS.write()
     sleep(2)

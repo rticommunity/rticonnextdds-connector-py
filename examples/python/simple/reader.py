@@ -12,28 +12,27 @@ from __future__ import print_function
 from sys import path as sysPath
 from os import path as osPath
 from time import sleep
-filepath = osPath.dirname(osPath.realpath(__file__))
-sysPath.append(filepath + "/../../../")
 import rticonnextdds_connector as rti
 
+filepath = osPath.dirname(osPath.realpath(__file__))
+sysPath.append(filepath + "/../../../")
 
+with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../ShapeExample.xml") as connector:
 
-connector = rti.Connector("MyParticipantLibrary::Zero",
-                          filepath + "/../ShapeExample.xml")
-inputDDS = connector.getInput("MySubscriber::MySquareReader")
+    dds_input = connector.get_input("MySubscriber::MySquareReader")
 
-for i in range(1, 500):
-    inputDDS.take()
-    for sample in inputDDS.getValidDataIterator():
-        # You can get all the fields in a dictionary
-        data = sample.getDictionary()
-        x = data['x']
-        y = data['y']
+    for i in range(1, 500):
+        dds_input.take()
+        for sample in dds_input.valid_data_iterator:
+                # You can get all the fields in a dictionary
+                data = sample.dictionary
+                x = data['x']
+                y = data['y']
 
-        # Or you can access the field individually
-        size = sample.getNumber("shapesize")
-        color = sample.getString("color")
-        print("Received x: " + repr(x) + " y: " + repr(y) + \
-                " size: " + repr(size) + " color: " + repr(color))
+                # Or you can access the field individually
+                size = sample.get_number("shapesize")
+                color = sample.get_string("color")
+                print("Received x: " + repr(x) + " y: " + repr(y) + \
+                        " size: " + repr(size) + " color: " + repr(color))
 
-    sleep(2)
+        sleep(2)

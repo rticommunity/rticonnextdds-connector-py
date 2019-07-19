@@ -81,7 +81,7 @@ class TestDataflow:
     """
     # take any pre-existing samples from cache
     rtiInputFixture.take()
-    rtiOutputFixture.instance.setDictionary(testMsg)
+    rtiOutputFixture.instance.set_dictionary(testMsg)
     rtiOutputFixture.write()
     wait=request.param.get('wait')
     method=request.param.get('method')
@@ -164,6 +164,15 @@ class TestDataflow:
     assert x == testMsg['x'] and y == testMsg['y'] \
       and z == testMsg['z'] and color == testMsg['color'] \
       and shapesize == testMsg['shapesize']
+
+    x = rtiInputFixture.get_sample(0).get_number("x")
+    y = rtiInputFixture.get_sample(0).get_number("y")
+    z = rtiInputFixture.get_sample(0).get_boolean("z")
+    color  = rtiInputFixture[0].get_string("color")
+    shapesize = rtiInputFixture[0].get_number("shapesize")
+    assert x == testMsg['x'] and y == testMsg['y'] \
+      and z == testMsg['z'] and color == testMsg['color'] \
+      and shapesize == testMsg['shapesize']    
 
   @pytest.mark.xfail
   def test_getNumber_for_nonexistent_field(self,rtiInputFixture,testMsg):

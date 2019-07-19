@@ -16,9 +16,9 @@ filepath = osPath.dirname(osPath.realpath(__file__))
 sysPath.append(filepath + "/../../../")
 import rticonnextdds_connector as rti
 
-connector = rti.Connector("MyParticipantLibrary::Zero",
+connector = rti.Connector("MyParticipantLibrary::MyParticipant",
                           filepath + "/../Mixed.xml")
-inputDDS = connector.getInput("MySubscriber::MySquareReader")
+inputDDS = connector.get_input("MySubscriber::MySquareReader")
 
 for i in range(1, 500):
     timeout = -1
@@ -42,7 +42,7 @@ for i in range(1, 500):
 
             # This is how you get the size of a seqence:
             seqLength = inputDDS.samples.getNumber(j, "aOctetSeq#")
-            print("I received a seqence with " + repr(seqLength) + " elements")
+            print("Received a sequence with " + repr(seqLength) + " elements")
 
             # Print the sample
             print(sample)

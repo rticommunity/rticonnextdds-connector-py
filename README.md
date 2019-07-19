@@ -108,7 +108,7 @@ import rticonnextdds_connector as rti
 To create a new *Connector*, pass an XML file and a configuration name.
 
 ```py
-connector = rti.Connector("MyParticipantLibrary::Zero","./ShapeExample.xml")
+connector = rti.Connector("MyParticipantLibrary::MyParticipant","./ShapeExample.xml")
 ```
 For more information on
 the XML format, see the [XML-Based Application Creation guide](https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/xml_application_creation/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted.pdf) or
@@ -118,7 +118,7 @@ look at the [ShapeExample.xml](examples/python/ShapeExample.xml) file included i
 To destroy all the DDS entities that belong to a *Connector* previously created, call the ```delete``` function.
 
 ```py
-connector = rti.Connector("MyParticipantLibrary::Zero","./ShapeExample.xml")
+connector = rti.Connector("MyParticipantLibrary::MyParticipant","./ShapeExample.xml")
 ...
 ...
 connector.delete()
@@ -128,16 +128,16 @@ connector.delete()
 To write a sample, first get a reference to the output port:
 
 ```py
-output = connector.getOutput("MyPublisher::MySquareWriter")
+output = connector.get_output("MyPublisher::MySquareWriter")
 ```
 
 Then set the instance's fields:
 
 ```py
-output.instance.setNumber("x", 1)
-output.instance.setNumber("y", 2)
-output.instance.setNumber("shapesize", 30)
-output.instance.setString("color", "BLUE")
+output.instance.set_number("x", 1)
+output.instance.set_number("y", 2)
+output.instance.set_number("shapesize", 30)
+output.instance.set_string("color", "BLUE")
 ```
 
 Then write:
@@ -155,16 +155,16 @@ The content of an instance can be set by using a dictionary that matches the ori
 #assuming that sample is a dictionary containing
 #an object of the same type of the output.instance:
 
-output.instance.setDictionary(sample)
+output.instance.set_dictionary(sample)
 ```
 
  * **Field by field**:
 
 ```py
-output.instance.setNumber("y", 2)
+output.instance.set_number("y", 2)
 ```
 
-The following APIs set an instance field by field: `setNumber(fieldName, number)` `setBoolean(fieldName, boolean)` and `setString(fieldName, string)`.
+The following APIs set an instance field by field: `set_number(fieldName, number)` `set_boolean(fieldName, boolean)` and `set_string(fieldName, string)`.
 
 Nested fields can be accessed with the dot notation `"x.y.z"`. Arrays or sequences can be accessed with square brakets: `"x.y[1].z"`. For more information on how to access
 fields, see the "Data Access API" section of the
@@ -175,7 +175,7 @@ fields, see the "Data Access API" section of the
 To read/take samples, first get a reference to the input port:
 
 ```py
-input = connector.getInput("MySubscriber::MySquareReader")
+input = connector.get_input("MySubscriber::MySquareReader")
 ```
 
 Then call the `read()` or `take()` API:

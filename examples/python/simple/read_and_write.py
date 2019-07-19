@@ -15,10 +15,10 @@ filepath = osPath.dirname(osPath.realpath(__file__))
 sysPath.append(filepath + "/../../../")
 import rticonnextdds_connector as rti
 
-connector = rti.Connector("MyParticipantLibrary::Zero",
+connector = rti.Connector("MyParticipantLibrary::MyParticipant",
                           filepath + "/../ShapeExample.xml")
-inputDDS = connector.getInput("MySubscriber::MySquareReader")
-outputDDS = connector.getOutput("MyPublisher::MySquareWriter")
+inputDDS = connector.get_input("MySubscriber::MySquareReader")
+outputDDS = connector.get_output("MyPublisher::MySquareWriter")
 
 for i in range(1, 500):
     inputDDS.take()
@@ -31,6 +31,6 @@ for i in range(1, 500):
             sample['x'] = sample['y']
             sample['y'] = tmp
             sample['color'] = "RED"
-            outputDDS.instance.setDictionary(sample)
+            outputDDS.instance.set_dictionary(sample)
             outputDDS.write()
     sleep(2)

@@ -3,28 +3,40 @@ Writing data (Output)
 
 .. py:currentmodule:: rticonnextdds_connector
 
+
+.. testsetup:: *
+
+   import rticonnextdds_connector as rti
+   connector = rti.Connector("MyParticipantLibrary::MyParticipant", "ShapeExample.xml");
+
 Getting the Output
 ~~~~~~~~~~~~~~~~~~
 
-To write a data sample, first get a reference to the output port::
+To write a data sample, first get a reference to the output port:
 
-   output = connector.getOutput("MyPublisher::MySquareWriter")
+.. testcode::
 
-:meth:`Connector.getOutput()` returns an :class:`Output` object.
+   output = connector.get_output("MyPublisher::MySquareWriter")
+
+:meth:`Connector.get_output()` returns an :class:`Output` object.
 
 Populating the data sample
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Then set the ``Output.instance`` fields. You can set them member by member::
+Then set the ``Output.instance`` fields. You can set them member by member:
 
-   output.instance.setNumber("x", 1)
-   output.instance.setNumber("y", 2)
-   output.instance.setNumber("shapesize", 30)
-   output.instance.setString("color", "BLUE")
+.. testcode::
 
-Or using a dictionary::
+   output.instance.set_number("x", 1)
+   output.instance.set_number("y", 2)
+   output.instance.set_number("shapesize", 30)
+   output.instance.set_string("color", "BLUE")
 
-   output.instance.setDictionary({"x":1, "y":2, "shapesize":30, "color":"BLUE"})
+Or using a dictionary:
+
+.. testcode::
+
+   output.instance.set_dictionary({"x":1, "y":2, "shapesize":30, "color":"BLUE"})
 
 The name of each member corresponds to the type assigned to this output in XML.
 For the previous example, this is a possible XML definition::

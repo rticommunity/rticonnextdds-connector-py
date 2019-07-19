@@ -22,6 +22,7 @@ import sys
 import weakref
 import platform
 import json
+from contextlib import contextmanager
 
 from ctypes import *
 (bits, linkage) = platform.architecture()
@@ -175,137 +176,77 @@ rtin_RTIDDSConnector_freeString.argtypes = [POINTER(c_char)]
 #Python Class Definition
 
 class Samples:
-	"""A collection of data samples
-
-	TODO: complete documentation
-	TODO: fieldName format (create new section and link to it)
-
-	Attributes:
-		* ``input`` (:class:`Input`): The ``Input`` that owns this ``Samples``.
-
-	"""
-
 	def __init__(self,input):
-		self.input = input;
+		self.input = input
 
 	def getLength(self):
-		"""Gets the number of samples"""
-
-		return int(rtin_RTIDDSConnector_getSamplesLength(self.input.connector.native,tocstring(self.input.name)));
+		return int(rtin_RTIDDSConnector_getSamplesLength(self.input.connector.native,tocstring(self.input.name)))
 
 	def getNumber(self, index, fieldName):
-		"""Gets the value of a numeric field for a given sample index
-
-		:param number index: The index of the sample to access
-		:param str fieldName: The name of the field in that sample. See :ref:`Accessing the data`.
-		:return: The numeric value for the field ``fieldName`` in the sample in position ``index``.
-		"""
-
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		return rtin_RTIDDSConnector_getNumberFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
+		return rtin_RTIDDSConnector_getNumberFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName))
 
 	def getBoolean(self, index, fieldName):
-		"""Gets the value of a boolean field for a given sample index
-
-		:param number index: The index of the sample to access
-		:param str fieldName: The name of the field in that sample. See :ref:`Accessing the data`.
-		:return: The boolean value for the field ``fieldName`` in the sample in position ``index``.
-		"""
-
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		return rtin_RTIDDSConnector_getBooleanFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
+		return rtin_RTIDDSConnector_getBooleanFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName))
 
 	def getString(self, index, fieldName):
-		"""Gets the value of a string field for a given sample index
-
-		:param number index: The index of the sample to access
-		:param str fieldName: The name of the field in that sample. See :ref:`Accessing the data`.
-		:return: The string value for the field ``fieldName`` in the sample in position ``index``.
-		"""
-
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		theStrPtr = rtin_RTIDDSConnector_getStringFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName));
-		theStr = fromcstring(cast(theStrPtr, c_char_p).value);
-		rtin_RTIDDSConnector_freeString(theStrPtr);
-		return theStr;
+		theStrPtr = rtin_RTIDDSConnector_getStringFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName))
+		theStr = fromcstring(cast(theStrPtr, c_char_p).value)
+		rtin_RTIDDSConnector_freeString(theStrPtr)
+		return theStr
 
 	def getDictionary(self, index):
-		"""Gets a dictionary with the values of all the fields for a given sample index
-
-		The dictionary keys are the field names and the dictionary values correspond
-		to each field value. To see how nested types, sequences, and arrays are
-		represented, see :ref:`Accessing the data`.
-
-		:param number index: The index of the sample to access
-		:return: A dictionary containing all the fields of the sample in position ``index``.
-		"""
-
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		jsonStrPtr = rtin_RTIDDSConnector_getJSONSample(self.input.connector.native,tocstring(self.input.name),index);
+		jsonStrPtr = rtin_RTIDDSConnector_getJSONSample(self.input.connector.native,tocstring(self.input.name),index)
 		jsonStr = cast(jsonStrPtr, c_char_p).value
 		myDict = json.loads(fromcstring(jsonStr))
 		rtin_RTIDDSConnector_freeString((jsonStrPtr))
-		return myDict;
+		return myDict
 
 	def getNative(self,index):
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		dynDataPtr = rtin_RTIDDSConnector_getNativeSample(self.input.connector.native,tocstring(self.input.name),index);
-		return dynDataPtr;
+		dynDataPtr = rtin_RTIDDSConnector_getNativeSample(self.input.connector.native,tocstring(self.input.name),index)
+		return dynDataPtr
+
 
 class Infos:
-	"""A collection of meta-data
-
-	Contains meta-data about each data sample in ``Input.samples``.
-
-	Attributes:
-		* ``input`` (:class:`Input`): The ``Input`` that owns this ``Infos``.
-	"""
-
 	def __init__(self,input):
-		self.input = input;
+		self.input = input
 
 	def getLength(self):
-		"""Gets the number of samples"""
-
-		return int(rtin_RTIDDSConnector_getInfosLength(self.input.connector.native,tocstring(self.input.name)));
+		return int(rtin_RTIDDSConnector_getInfosLength(self.input.connector.native,tocstring(self.input.name)))
 
 	def isValid(self, index):
-		"""Returns whether the data for a given sample index is valid
-
-		Given an variable ``input`` of type :class:`Input`, ``input.infos.isValid(index)``
-		indicates whether the data of ``input.samples`` in that position is valid.
-		If true, ``input.sample``'s getters (such as ``input.samples.getDictionary(index)``)
-		will return valid data.
-		"""
-
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		return rtin_RTIDDSConnector_getBooleanFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('valid_data'));
+		return rtin_RTIDDSConnector_getBooleanFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('valid_data'))
 
 	def getSampleIdentity(self, index):
 		jsonStr = rtin_RTIDDSConnector_getJSONFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('sample_identity'))
@@ -326,7 +267,8 @@ class SampleIterator:
 		self.index = index
 		self.length = input.samples.getLength()
 
-	def isValid(self):
+	@property
+	def is_valid(self):
 		"""Returns whether this sample contains valid data
 
 		If this returns ``False``, the data getters (``getDictionary()``, ``getNumber()``...)
@@ -335,7 +277,8 @@ class SampleIterator:
 
 		return self.input.infos.isValid(self.index)
 
-	def getDictionary(self):
+	@property
+	def dictionary(self):
 		"""Gets a dictionary with the values of all the fields of this sample
 
 		The dictionary keys are the field names and the dictionary values correspond
@@ -347,7 +290,7 @@ class SampleIterator:
 
 		return self.input.samples.getDictionary(self.index)
 
-	def getNumber(self, fieldName):
+	def get_number(self, fieldName):
 		"""Gets the value of a numeric field in this sample
 
 		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
@@ -356,7 +299,7 @@ class SampleIterator:
 
 		return self.input.samples.getNumber(self.index, fieldName)
 
-	def getBoolean(self, fieldName):
+	def get_boolean(self, fieldName):
 		"""Gets the value of a boolean field in this sample
 
 		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
@@ -365,7 +308,7 @@ class SampleIterator:
 
 		return self.input.samples.getBoolean(self.index, fieldName)
 
-	def getString(self, fieldName):
+	def get_string(self, fieldName):
 		"""Gets the value of a string field in this sample
 
 		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
@@ -405,7 +348,7 @@ class ValidSampleIterator(SampleIterator):
 class Input:
 	"""Allows reading data for a Topic
 
-	To get an input object, use :meth:`Connector.getInput()`.
+	To get an input object, use :meth:`Connector.get_input()`.
 
 	Attributes:
 		* ``connector`` (:class:`Connector`): The ``Connector`` that created this ``Input``
@@ -416,7 +359,7 @@ class Input:
 	def __init__(self, connector, name):
 		self.connector = connector
 		self.name = name
-		self.native= rtin_RTIDDSConnector_getReader(self.connector.native,tocstring(self.name))
+		self.native = rtin_RTIDDSConnector_getReader(self.connector.native,tocstring(self.name))
 		if self.native == None:
 			raise ValueError("Invalid Subscription::DataReader name")
 		self.samples = Samples(self)
@@ -438,7 +381,8 @@ class Input:
 	def __getitem__(self, index):
 		return SampleIterator(self, index)
 
-	def getSampleCount(self):
+	@property
+	def sample_count(self):
 		"""Returns the number of samples available
 
 		:return: The number of samples available since the last time read/take was called
@@ -446,7 +390,7 @@ class Input:
 
 		return self.samples.getLength()
 
-	def getSample(self, index):
+	def get_sample(self, index):
 		"""Returns an iterator to the sample in a given index
 
 		Important: Calling :meth`Input.read()` or :meth`Input.take()` invalidates
@@ -462,7 +406,8 @@ class Input:
 	def __iter__(self):
 		return SampleIterator(self)
 
-	def getDataIterator(self):
+	@property
+	def data_iterator(self):
 		"""Returns an iterator to the data samples
 
 		The iterator provides access to all the data samples retrieved by the
@@ -476,7 +421,8 @@ class Input:
 		"""
 		return SampleIterator(self)
 
-	def getValidDataIterator(self):
+	@property
+	def valid_data_iterator(self):
 		"""Returns an iterator to the data samples with valid data
 
 		The iterator provides access to the data samples retrieved by the
@@ -510,9 +456,9 @@ class Instance:
 	"""
 
 	def __init__(self, output):
-		self.output = output;
+		self.output = output
 
-	def setNumber(self, fieldName, value):
+	def set_number(self, fieldName, value):
 		"""Sets a numeric field
 
 		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
@@ -520,12 +466,16 @@ class Instance:
 		"""
 
 		try:
-			rtin_RTIDDSConnector_setNumberIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value);
+			rtin_RTIDDSConnector_setNumberIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value)
 		except ctypes.ArgumentError as e:
 			raise TypeError("field:{0} should be of type Numeric"\
 				.format(fieldName))
 
-	def setBoolean(self,fieldName, value):
+	# Deprecated: use set_number
+	def setNumber(self, fieldName, value):
+		self.set_number(fieldName, value)
+
+	def set_boolean(self,fieldName, value):
 		"""Sets a Boolean field
 
 		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
@@ -533,12 +483,16 @@ class Instance:
 		"""
 
 		try:
-			rtin_RTIDDSConnector_setBooleanIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value);
+			rtin_RTIDDSConnector_setBooleanIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value)
 		except ctypes.ArgumentError as e:
 			raise TypeError("field:{0} should be of type Boolean"\
 				.format(fieldName))
 
-	def setString(self, fieldName, value):
+	# Deprecated: use set_boolean
+	def setBoolean(self, fieldName, value):
+		self.set_boolean(fieldName, value)
+
+	def set_string(self, fieldName, value):
 		"""Sets a string field
 
 		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
@@ -546,12 +500,16 @@ class Instance:
 		"""
 
 		try:
-			rtin_RTIDDSConnector_setStringIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),tocstring(value));
+			rtin_RTIDDSConnector_setStringIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),tocstring(value))
 		except AttributeError | ctypes.ArgumentError as e:
 			raise TypeError("field:{0} should be of type String"\
 				.format(fieldName))
 
-	def setDictionary(self,dictionary):
+	# Deprecated: use set_string
+	def setString(self, fieldName, value):
+		self.set_string(fieldName, value)
+
+	def set_dictionary(self, dictionary):
 		"""Sets the member values specified in a dictionary
 
 		The keys in the dictionary may be a subset of the members of this
@@ -564,22 +522,31 @@ class Instance:
 		"""
 
 		jsonStr = json.dumps(dictionary)
-		rtin_RTIDDSConnector_setJSONInstance(self.output.connector.native,tocstring(self.output.name),tocstring(jsonStr));
+		rtin_RTIDDSConnector_setJSONInstance(self.output.connector.native,tocstring(self.output.name),tocstring(jsonStr))
 
-	def getNative(self):
+	# Deprecated: use set_dictionary
+	def setDictionary(self, dictionary):
+		self.set_dictionary(dictionary)
+
+	@property
+	def native(self):
 		"""Obtains the native C object
 
 		This allows accessing additional *Connect DDS* APIs in C.
 		"""
 
-		dynDataPtr = rtin_RTIDDSConnector_getNativeInstance(self.output.connector.native,tocstring(self.output.name));
-		return dynDataPtr;
+		dynDataPtr = rtin_RTIDDSConnector_getNativeInstance(self.output.connector.native,tocstring(self.output.name))
+		return dynDataPtr
+
+	# Deprecated: use native property
+	def getNative(self):
+		return self.native
 
 
 class Output:
 	"""Allows writting data for a DDS Topic
 
-	To obtain an Output, use :meth:`Connector.getOutput()`.
+	To obtain an Output, use :meth:`Connector.get_output()`.
 
 	Use the attribute ``instance`` to set the values of the data sample you want
 	to write.
@@ -602,12 +569,12 @@ class Output:
 	"""
 
 	def __init__(self, connector, name):
-		self.connector = connector;
-		self.name = name;
+		self.connector = connector
+		self.name = name
 		self.native= rtin_RTIDDSConnector_getWriter(self.connector.native,tocstring(self.name))
 		if self.native ==None:
 			raise ValueError("Invalid Publication::DataWriter name")
-		self.instance = Instance(self);
+		self.instance = Instance(self)
 
 	def write(self, options=None):
 		"""Publishes the values of the current``instance``
@@ -623,9 +590,9 @@ class Output:
 				jsonStr = json.dumps(options)
 			else:
 				jsonStr = options
-			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), tocstring(jsonStr));
+			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), tocstring(jsonStr))
 		else:
-			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), None);
+			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), None)
 
 	def clear_members(self):
 		"""Resets the values of the members of this ``Output.instance``
@@ -639,7 +606,7 @@ class Output:
 		to 30, and `x` and `y` to 0.
 		"""
 
-		return rtin_RTIDDSConnector_clear(self.connector.native,tocstring(self.name));
+		return rtin_RTIDDSConnector_clear(self.connector.native,tocstring(self.name))
 
 class Connector:
 	"""Loads a configuration and creates its Inputs and Outputs
@@ -660,12 +627,12 @@ class Connector:
 	*Connector* uses The XML format of `RTI's XML-Based Application Creation <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/xml_application_creation/html_files/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted/index.htm#XMLBasedAppCreation/UnderstandingPrototyper/XMLTagsConfigEntities.htm%3FTocPath%3D5.%2520Understanding%2520XML-Based%2520Application%2520Creation%7C5.5%2520XML%2520Tags%2520for%2520Configuring%2520Entities%7C_____0>`__.
 
 	After creating it, the ``Connector``'s Inputs can be used to read data, and
-	the Outputs to write. See :meth:`getInput()` and :meth:`getOutput()`.
+	the Outputs to write. See :meth:`get_input()` and :meth:`get_output()`.
 
 	An application can create multiple ``Connector`` instances for the same or
 	different configurations.
 
-	A ``Connector`` instance must be deleted with :meth:`delete()`.
+	A ``Connector`` instance must be deleted with :meth:`close()`.
 
 	:param str configName: The configuration to load. 	The ``configName`` format is ``"LibraryName::ParticipantName"``, where ``LibraryName`` is the ``name`` attribute of a ``<domain_participant_library>`` tag, and ``ParticipantName`` is the ``name`` attribute of a ``<domain_participant>`` tag inside the library.
 	:param str url: An URL locating the XML document. The ``url`` can be a file path (for example, ``'/tmp/my_dds_config.xml'``) or a string containing the full XML document with the following format ``'str://"<dds>...</dds>"'``)
@@ -677,19 +644,23 @@ class Connector:
 		if self.native == None:
 			raise ValueError("Invalid participant profile, xml path or xml profile")
 
-	def delete(self):
+	def close(self):
 		"""Frees all the resources created by this Connector instance"""
 
-		rtin_RTIDDSConnector_delete(self.native);
+		rtin_RTIDDSConnector_delete(self.native)
 
-	def getOutput(self, outputName):
-		"""Returns the :class:`Output` named ``outputName``
+	# Deprecated: use close()
+	def delete(self):
+		rtin_RTIDDSConnector_delete(self.native)
 
-		``outputName`` identifies a ``<data_writer>`` tag in the
+	def get_output(self, output_name):
+		"""Returns the :class:`Output` named ``output_name``
+
+		``output_name`` identifies a ``<data_writer>`` tag in the
 		configuration loaded by this ``Connector``. For example, the following code::
 
 			connector = rti.Connector("MyParticipantLibrary::MyParticipant", "MyExample.xml")
-			connector.getOutput("MyPublisher::MyWriter")
+			connector.get_output("MyPublisher::MyWriter")
 
 
 		Loads the ``Output`` in this example XML::
@@ -705,23 +676,26 @@ class Connector:
 			  ...
 			<domain_participant_library>
 
-		:param str outputName: The name of a the ``data_writer`` to load, with the format ``"PublisherName::DataWriterName"``.
+		:param str output_name: The name of a the ``data_writer`` to load, with the format ``"PublisherName::DataWriterName"``.
 		:return: The Output if it exists, or else it raises ``ValueError``.
 		:rtype: :class:`Output`
 
 		"""
 
-		return Output(self,outputName);
+		return Output(self, output_name)
 
-	def getInput(self, inputName):
-		"""Returns the :class:`Input` named ``inputName``
+	# Deprecated: use get_output
+	def getOutput(self, output_name):
+		return self.get_output(output_name)
 
-		``inputName`` identifies a ``<data_reader>`` tag in the
+	def get_input(self, input_name):
+		"""Returns the :class:`Input` named ``input_name``
+
+		``input_name`` identifies a ``<data_reader>`` tag in the
 		configuration loaded by this ``Connector``. For example, the following code::
 
 			connector = rti.Connector("MyParticipantLibrary::MyParticipant", "MyExample.xml")
-			connector.getInput("MySubscriber::MyReader")
-
+			connector.get_input("MySubscriber::MyReader")
 
 		Loads the ``Output`` in this example XML::
 
@@ -736,15 +710,37 @@ class Connector:
 			  ...
 			<domain_participant_library>
 
-		:param str inputName: The name of a the ``data_reader`` to load, with the format ``"SubscriberName::DataReaderName"``.
+		:param str input_name: The name of a the ``data_reader`` to load, with the format ``"SubscriberName::DataReaderName"``.
 		:return: The Input if it exists, or else it raises ``ValueError``.
 		:rtype: :class:`Input`
 
 		"""
 
-		return Input(self, inputName);
+		return Input(self, input_name)
+
+	# Deprecated: use get_input()
+	def getInput(self, input_name):
+		return self.get_input(input_name)
 
 	def wait(self,timeout):
 		"""TODO: document this function"""
 
-		return rtin_RTIDDSConnector_wait(self.native,timeout);
+		return rtin_RTIDDSConnector_wait(self.native,timeout)
+
+@contextmanager
+def open_connector(configName, url):
+	"""A resource manager that creates and deletes a Connector
+
+	It takes the sames arguments as the :class:`Connector` class::
+
+		with rti.open_connector("MyParticipantLibrary::MyParticipant","./ShapeExample.xml") as connector:
+			input = connector.get_input("SubscriberName::DataReaderName")
+			# ...
+		# connector closed after with block exits
+	"""
+
+	connector = Connector(configName, url)
+	try:
+		yield connector
+	finally:
+		connector.close()

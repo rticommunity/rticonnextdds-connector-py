@@ -35,6 +35,6 @@ applications accessing the RTI Connect DDS databus.
 This is the documentation of the *Python* binding. For other supported languages,
 see the `rticonnextdds-connector <https://github.com/rticommunity/rticonnextdds-connector>`__ repository.
 
-To get started with *RTI Connext DDS Connector for Python*, 
+To get started with *RTI Connext DDS Connector for Python*,
 go to the `rticonnextdds-connector-py <https://github.com/rticommunity/rticonnextdds-connector-py>`__ repository.
 

@@ -1,7 +1,9 @@
 # Minimal makefile for Sphinx documentation
 #
 
-# Typical usage: "make html"
+# Typical usage:
+#  - make html - to build the documentation
+#  - make test - to test the code snippets in the documentation
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.
@@ -15,6 +17,12 @@ help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 .PHONY: help Makefile
+
+
+# Executes the code snippets in the documentation
+test: Makefile
+	@cp ../examples/python/ShapeExample.xml .
+	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) -b doctest $(O)
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
