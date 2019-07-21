@@ -24,8 +24,8 @@ with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../S
     for i in range(1, 500):
         dds_input.take()
         for sample in dds_input.valid_data_iterator:
-                # You can get all the fields in a dictionary
-                data = sample.dictionary
+                # You can get all the fields in a get_dictionary()
+                data = sample.get_dictionary()
                 x = data['x']
                 y = data['y']
 

@@ -6,9 +6,10 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-import sys,os,pytest,threading,time
-sys.path.append(os.path.dirname(os.path.realpath(__file__))+ "/../../")
+import sys, os, pytest, threading, time
 import rticonnextdds_connector as rti
+
+sys.path.append(os.path.dirname(os.path.realpath(__file__))+ "/../../")
 
 """
 This module contains pytest fixtures used for testing connector code.
@@ -40,9 +41,10 @@ def rtiConnectorFixture(request):
     "../xml/ShapeExample.xml")
   participant_profile="MyParticipantLibrary::Zero"
   rti_connector = rti.Connector(participant_profile,xml_path)
+
   def cleanup():
-    #TODO implement function to cleanup rti.Connector
-    print("\n No-op cleanup function called for connector")
+    rti_connector.close()
+
   request.addfinalizer(cleanup)
   return rti_connector
 
@@ -67,8 +69,8 @@ def rtiInputFixture(rtiConnectorFixture):
   :rtype: :class:`rticonnextdds_connector.Input`
 
   """
-  DR="MySubscriber::MySquareReader"
-  return rtiConnectorFixture.get_input(DR)
+
+  return rtiConnectorFixture.get_input("MySubscriber::MySquareReader")
 
 @pytest.fixture(scope="session")
 def rtiOutputFixture(rtiConnectorFixture):
@@ -90,5 +92,5 @@ def rtiOutputFixture(rtiConnectorFixture):
   :returns: session-scoped Output object for testing
   :rtype: :class:`rticonnextdds_connector.Output`
   """
-  DW="MyPublisher::MySquareWriter"
-  return rtiConnectorFixture.getOutput(DW)
+
+  return rtiConnectorFixture.getOutput("MyPublisher::MySquareWriter")

@@ -21,15 +21,26 @@ To create a new :class:`Connector`, pass an XML file and a configuration name:
 
    connector = rti.Connector("MyParticipantLibrary::MyParticipant", "ShapeExample.xml");
 
-*Connector* uses The XML format of `RTI's XML-Based Application Creation <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/xml_application_creation/html_files/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted/index.htm#XMLBasedAppCreation/UnderstandingPrototyper/XMLTagsConfigEntities.htm%3FTocPath%3D5.%2520Understanding%2520XML-Based%2520Application%2520Creation%7C5.5%2520XML%2520Tags%2520for%2520Configuring%2520Entities%7C_____0>`__.
+The XML file defines your types, QoS profiles, and DDS Entities. *Connector*
+uses the XML schema of `RTI's XML-Based Application Creation <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/xml_application_creation/html_files/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted/index.htm#XMLBasedAppCreation/UnderstandingPrototyper/XMLTagsConfigEntities.htm%3FTocPath%3D5.%2520Understanding%2520XML-Based%2520Application%2520Creation%7C5.5%2520XML%2520Tags%2520for%2520Configuring%2520Entities%7C_____0>`__.
 
-See an example here: `ShapeExample.xml <https://github.com/rticommunity/rticonnextdds-connector-py/blob/master/examples/python/ShapeExample.xml>`__.
+The previous code loads the *domain_participant* called *MyParticipant* inside
+the *domain_participant_library* called *MyParticipantLibrary* defined in the
+file ShapeExample.xml::
 
-When you create a ``Connector``, the DDS *DomainParticipant* you select and all
-its contained entities (*Topics*, *Subscribers*, *DataReaders*, *Publishers*, *DataWriters*)
-are created.
+   <domain_participant_library name="MyParticipantLibrary">
+     <domain_participant name="MyParticipant" domain_ref="MyDomainLibrary::MyDomain">
+       ...
+     </domain_participant>
+   </domain_participant_library>
 
-For more information about the DDS entities, see `Part 2 - Core Concepts <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/PartCoreConcepts.htm#partcoreconcepts_4109331811_915546%3FTocPath%3DPart%25202%253A%2520Core%2520Concepts%7C_____0>`__
+See the full file here: `ShapeExample.xml <https://github.com/rticommunity/rticonnextdds-connector-py/blob/master/examples/python/ShapeExample.xml>`__.
+
+When you create a ``Connector``, the DDS *DomainParticipant* that you selected
+and all its contained entities (*Topics*, *Subscribers*, *DataReaders*,
+*Publishers*, *DataWriters*) are created.
+
+For more information about the DDS entities, see `Part 2 - Core Concepts <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/PartCoreConcepts.htm#partcoreconcepts_4109331811_915546%3FTocPath%3DPart%25202%253A%2520Core%2520Concepts%7C_____0>`__
 from the *RTI Connext DDS Core Libraries User's Manual*.
 
 Closing a *Connector*
@@ -40,7 +51,7 @@ created, call :meth:`Connector.close()`:
 
 .. testcode::
 
-   connector = rti.Connector("MyParticipantLibrary::MyParticipant","./ShapeExample.xml")
+   connector = rti.Connector("MyParticipantLibrary::MyParticipant", "ShapeExample.xml")
    # ...
    connector.close()
 
@@ -51,7 +62,9 @@ and automatically close the connector:
 
    with rti.open_connector("MyParticipantLibrary::MyParticipant", "ShapeExample.xml") as connector:
       # Use connector
-      input = connector.get_input("MySubscriber::MySquareReader");
+      input = connector.get_input("MySubscriber::MySquareReader")
+      # ...
+
 
 Reading and Writing Data
 ~~~~~~~~~~~~~~~~~~~~~~~~

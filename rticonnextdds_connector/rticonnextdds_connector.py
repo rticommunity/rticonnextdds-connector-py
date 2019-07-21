@@ -268,17 +268,16 @@ class SampleIterator:
 		self.length = input.samples.getLength()
 
 	@property
-	def is_valid(self):
+	def valid_data(self):
 		"""Returns whether this sample contains valid data
 
-		If this returns ``False``, the data getters (``getDictionary()``, ``getNumber()``...)
+		If this returns ``False``, the data getters (``get_dictionary()``, ``get_number()``...)
 		cannot be called.
 		"""
 
 		return self.input.infos.isValid(self.index)
 
-	@property
-	def dictionary(self):
+	def get_dictionary(self):
 		"""Gets a dictionary with the values of all the fields of this sample
 
 		The dictionary keys are the field names and the dictionary values correspond
@@ -614,17 +613,6 @@ class Connector:
 	A ``Connector`` instance loads a configuration from an XML document. For example::
 
 		connector = rti.Connector("MyParticipantLibrary::MyParticipant", "MyExample.xml")
-
-	This example loads the domain_participant called Zero defined in the file
-	ShapeExample.xml::
-
-		<domain_participant_library name="MyParticipantLibrary">
-		  <domain_participant name="MyParticipant" domain_ref="MyDomainLibrary::MyDomain">
-		    ...
-		  </domain_participant>
-		</domain_participant_library>
-
-	*Connector* uses The XML format of `RTI's XML-Based Application Creation <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/xml_application_creation/html_files/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted/index.htm#XMLBasedAppCreation/UnderstandingPrototyper/XMLTagsConfigEntities.htm%3FTocPath%3D5.%2520Understanding%2520XML-Based%2520Application%2520Creation%7C5.5%2520XML%2520Tags%2520for%2520Configuring%2520Entities%7C_____0>`__.
 
 	After creating it, the ``Connector``'s Inputs can be used to read data, and
 	the Outputs to write. See :meth:`get_input()` and :meth:`get_output()`.

@@ -18,7 +18,16 @@ To write a data sample, first get a reference to the output port:
 
    output = connector.get_output("MyPublisher::MySquareWriter")
 
-:meth:`Connector.get_output()` returns an :class:`Output` object.
+:meth:`Connector.get_output()` returns an :class:`Output` object. This example,
+obtains the output defined by the *data_writer* named *MySquareWriter* within
+the *publisher* named *MyPublisher*::
+
+   <publisher name="MyPublisher">
+     <data_writer name="MySquareWriter" topic_ref="Square" />
+   </publisher>
+
+This *publisher* is defined inside the *domain_participant* selected to create
+this ``connector`` (see :ref:`Create a new *Connector*`).
 
 Populating the data sample
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,16 +48,16 @@ Or using a dictionary:
    output.instance.set_dictionary({"x":1, "y":2, "shapesize":30, "color":"BLUE"})
 
 The name of each member corresponds to the type assigned to this output in XML.
-For the previous example, this is a possible XML definition::
+For example::
 
    <struct name="ShapeType">
-		<member name="color" type="string" stringMaxLength="128" key="true" default="RED"/>
-		<member name="x" type="long" />
-		<member name="y" type="long" />
-		<member name="shapesize" type="long" default="30"/>
-	</struct>
+     <member name="color" type="string" stringMaxLength="128" key="true" default="RED"/>
+     <member name="x" type="long" />
+     <member name="y" type="long" />
+     <member name="shapesize" type="long" default="30"/>
+    </struct>
 
-See :class:`Instance` and See :ref:`Accessing the data` for more information.
+See :class:`Instance` and :ref:`Accessing the data` for more information.
 
 Writing the data sample
 ~~~~~~~~~~~~~~~~~~~~~~~
