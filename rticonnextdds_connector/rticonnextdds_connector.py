@@ -378,6 +378,8 @@ class Input:
 		return rtin_RTIDDSConnector_wait(self.connector.native,timeout)
 
 	def __getitem__(self, index):
+		"""Equivalent to :meth:`get_sample()`"""
+
 		return SampleIterator(self, index)
 
 	@property
@@ -392,10 +394,13 @@ class Input:
 	def get_sample(self, index):
 		"""Returns an iterator to the sample in a given index
 
-		Important: Calling :meth`Input.read()` or :meth`Input.take()` invalidates
+		Important: Calling :meth:`read()` or :meth:`take()` invalidates
 		all iterators previously returned.
 
-		:param number index: A zero-based index, less than :meth:`getSampleCount()`.
+		The `Input` class also provides ``__getitem__``, making it possible to
+		interchangeably write ``input[i]`` or ``input.get_sample(i)``
+
+		:param number index: A zero-based index, less than :attr:`sample_count`.
 
 		:return: An iterator that accesses the sample in the position indicated by ``index``.
 		:rtype: :class:`SampleIterator`
@@ -403,6 +408,8 @@ class Input:
 		return SampleIterator(self, index)
 
 	def __iter__(self):
+		"""Equivalent to :attr:`data_iterator` """
+
 		return SampleIterator(self)
 
 	@property
@@ -412,8 +419,12 @@ class Input:
 		The iterator provides access to all the data samples retrieved by the
 		most-recent call to :meth:`read()` or :meth:`take()`.
 
-		This iterator may return samples with invalid data. Use :meth:`getValidDataIterator()`
+		This iterator may return samples with invalid data. Use :attr:`valid_data_iterator`
 		to access only samples with valid data.
+
+		The `Input` class also provides ``__iter__``, making it possible to 
+		interchangeably write ``for sample in input`` or 
+		``for sample in input.data_iterator``.
 
 		:return: An iterator to the samples
 		:rtype: :class:`SampleIterator`
@@ -429,7 +440,7 @@ class Input:
 		with invalid data (meta-data only).
 
 		To access all samples, including those with meta-data only,
-		use :meth:`getDataIterator()`
+		use :attr:`data_iterator`
 
 		By using this iterator, it is not necessary to check if each sample
 		contains valid data.

@@ -165,7 +165,7 @@ class TestDataflow:
       and z == testMsg['z'] and color == testMsg['color'] \
       and shapesize == testMsg['shapesize']
 
-    x = rtiInputFixture.get_sample(0).get_number("x")
+    x = rtiInputFixture[0].get_number("x")
     y = rtiInputFixture.get_sample(0).get_number("y")
     z = rtiInputFixture.get_sample(0).get_boolean("z")
     color  = rtiInputFixture[0].get_string("color")

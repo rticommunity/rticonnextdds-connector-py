@@ -68,13 +68,18 @@ meta-data only:
       if sample.valid_data:
          print(sample.get_dictionary())
 
+The class ``Input`` itself is iterable, so it is also possible to write
+``for sample in input``, which is equivalent to ``for sample in input.data_iterator``.
+
 It is possible to access an individual sample too:
 
 .. testcode::
 
    if input.sample_count > 0:
-      if input.get_sample(0).valid_data:
-         print(input.get_sample(0).get_dictionary())
+      if input[0].valid_data:
+         print(input[0].get_dictionary())
+
+Note that the equivalent method :meth:`Input.get_sample()` is also available.
 
 TODO: explain use-cases for getInfo() (not yet implemented)
 

@@ -54,6 +54,11 @@ class TestDataIterators:
       assert sample.get_number("x") == i
       assert sample.get_dictionary()["y"] == i
 
+    for sample, i in zip(populatedInput, range(1, 10)):
+      assert sample.valid_data
+      assert sample.get_number("x") == i
+      assert sample.get_dictionary()["y"] == i
+
   def test_valid_data_iterator(self, populatedInput):
     """Tests Input.valid_data_iterator"""
 

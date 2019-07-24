@@ -78,7 +78,7 @@ participant_name = "MyParticipantLibrary::MyParticipant"
 with rti.open_connector(participant_name, file_name) as connector:
     output = connector.get_output("MyPublisher::MySquareWriter")
 
-    # TODO: wait for match instead of slee
+    # TODO: wait for match instead of sleep
     sleep(2)
 
     output.instance.set_dictionary(
@@ -100,7 +100,7 @@ with rti.open_connector(participant_name, file_name) as connector:
     for i in range(1, 500):
         dds_input.take()
         for sample in dds_input.valid_data_iterator:
-            print(sample.dictionary)
+            print(sample.get_dictionary())
 ```
 
 ### License
