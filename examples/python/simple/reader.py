@@ -12,10 +12,11 @@ from __future__ import print_function
 from sys import path as sysPath
 from os import path as osPath
 from time import sleep
-import rticonnextdds_connector as rti
 
 filepath = osPath.dirname(osPath.realpath(__file__))
 sysPath.append(filepath + "/../../../")
+import rticonnextdds_connector as rti
+
 
 with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../ShapeExample.xml") as connector:
 

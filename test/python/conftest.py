@@ -7,9 +7,9 @@
 ###############################################################################
 
 import sys, os, pytest, threading, time
-import rticonnextdds_connector as rti
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__))+ "/../../")
+import rticonnextdds_connector as rti
 
 """
 This module contains pytest fixtures used for testing connector code.
