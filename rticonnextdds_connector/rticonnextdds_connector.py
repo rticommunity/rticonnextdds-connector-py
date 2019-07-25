@@ -331,6 +331,10 @@ class SampleIterator:
 		else:
 			raise StopIteration
 
+	def next(self):
+		"""Moves to the next sample"""
+		return self.__next__()
+
 class ValidSampleIterator(SampleIterator):
 	"""Iterates and provides access to data samples with valid data
 
@@ -344,6 +348,10 @@ class ValidSampleIterator(SampleIterator):
 			self.index = self.index + 1
 
 		return SampleIterator.__next__(self)
+
+	def next(self):
+		return self.__next__()
+
 class Input:
 	"""Allows reading data for a Topic
 
