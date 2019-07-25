@@ -11,6 +11,7 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
 
 class TestDataIterators:
+
   """
   This class tests the iteration of Input samples with data_iterator and
   valid_data_iterator
@@ -23,6 +24,12 @@ class TestDataIterators:
     that)
 
     """
+
+    rtiInputFixture.expected_count = 3
+
+    # Add extra element so that if the iterators fail and advance one element
+    # too many, we can detect it in the zip's below
+    rtiInputFixture.expected_values = {1.0, 2.0, 3.0, None}
 
     rtiOutputFixture.instance.set_dictionary(
       {"x":1, "y":1, "z":True, "color":"BLUE", "shapesize":5})
@@ -48,23 +55,35 @@ class TestDataIterators:
     """Tests Input.data_iterator"""
 
     assert populatedInput.sample_count == 3
+    count = 0
 
-    for sample, i in zip(populatedInput.data_iterator, range(1, 10)):
+    for sample, i in zip(populatedInput.data_iterator, populatedInput.expected_values):
       assert sample.valid_data
       assert sample.get_number("x") == i
       assert sample.get_dictionary()["y"] == i
+      count = count + 1
 
-    for sample, i in zip(populatedInput, range(1, 10)):
+    assert count == populatedInput.expected_count
+
+    count = 0
+    for sample, i in zip(populatedInput, populatedInput.expected_values):
       assert sample.valid_data
       assert sample.get_number("x") == i
       assert sample.get_dictionary()["y"] == i
+      count = count + 1
+
+    assert count == populatedInput.expected_count
 
   def test_valid_data_iterator(self, populatedInput):
     """Tests Input.valid_data_iterator"""
 
     assert populatedInput.sample_count == 3
 
-    for sample, i in zip(populatedInput.valid_data_iterator, range(1, 10)):
+    count = 0
+    for sample, i in zip(populatedInput.valid_data_iterator, populatedInput.expected_values):
       assert sample.valid_data
       assert sample.get_number("x") == i
       assert sample.get_dictionary()["y"] == i
+      count = count + 1
+
+    assert count == populatedInput.expected_count
