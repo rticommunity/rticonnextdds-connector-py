@@ -23,7 +23,7 @@ class TestDataAccess:
 
     xml_path = os.path.join(
       os.path.dirname(os.path.realpath(__file__)),
-      "../xml/Testconnector.xml")
+      "../xml/TestConnector.xml")
 
     participant_profile="MyParticipantLibrary::DataAccessTest"
     with rti.open_connector(participant_profile, xml_path) as rti_connector:
