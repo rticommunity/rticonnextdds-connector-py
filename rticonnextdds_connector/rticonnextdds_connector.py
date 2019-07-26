@@ -373,12 +373,22 @@ class Input:
 		self.infos = Infos(self)
 
 	def read(self):
-		"""TODO: document this function"""
+		"""Access the samples received by this Input
+
+		This operation performs the same operation as :meth:`take()` except that
+		the samples remain accessible.
+		"""
 
 		rtin_RTIDDSConnector_read(self.connector.native,tocstring(self.name))
 
 	def take(self):
-		"""TODO: document this function"""
+		"""Accesses the sample received by this Input
+
+		After calling this method, the samples are accessible with
+		:attr:`data_iterator`, :attr:`valid_data_iterator`, 
+		or :meth:`get_sample()`.
+
+		"""
 
 		rtin_RTIDDSConnector_take(self.connector.native,tocstring(self.name))
 

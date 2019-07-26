@@ -18,6 +18,12 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                 <transport_builtin>
                     <mask>UDPV4 | SHMEM</mask>
                 </transport_builtin>
+                <database>
+                    <shutdown_cleanup_period>
+                        <sec>0</sec>
+                        <nanosec>100000000</nanosec>
+                    </shutdown_cleanup_period>
+                </database>
             </participant_qos>
             <datawriter_qos>
                 <reliability>
@@ -63,6 +69,56 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <member name="fillKind" type="nonBasic" nonBasicTypeName="ShapeFillKind"/>
             <member name="angle" type="float"/>
         </struct>
+
+        <enum name="Color">
+            <enumerator name="RED"/>
+            <enumerator name="GREEN"/>
+            <enumerator name="BLUE"/>
+        </enum>
+        <struct name= "Point">
+            <member name="x" type="int32"/>
+            <member name="y" type="int32"/>
+        </struct>
+        <union name="MyUnion">
+            <discriminator type="nonBasic" nonBasicTypeName="Color"/>
+            <case>
+              <caseDiscriminator value="(RED)"/>
+              <member name="point" type="nonBasic"  nonBasicTypeName= "Point"/>
+            </case>
+            <case>
+              <caseDiscriminator value="(GREEN)"/>
+              <member name="my_long" type="int32"/>
+            </case>
+            <case>
+              <caseDiscriminator value="(BLUE)"/>
+              <member name="my_int_sequence" sequenceMaxLength="10" type="int32"/>
+            </case>
+        </union>
+        <union name="MyIntUnion">
+            <discriminator type="long"/>
+            <case>
+              <caseDiscriminator value="10"/>
+              <member name="point" type="nonBasic"  nonBasicTypeName= "Point"/>
+            </case>
+            <case>
+              <caseDiscriminator value="20"/>
+              <member name="my_long" type="int32"/>
+            </case>
+        </union>
+        <struct name= "MyType">
+            <member name="my_long" type="int32"/>
+            <member name="my_double" type="float64"/>
+            <member name="my_enum" type="nonBasic"  nonBasicTypeName= "Color"/>
+            <member name="my_string" stringMaxLength="512" type="string"/>
+            <member name="my_point" type="nonBasic"  nonBasicTypeName= "Point"/>
+            <member name="my_union" type="nonBasic"  nonBasicTypeName= "MyUnion"/>
+            <member name="my_int_union" type="nonBasic"  nonBasicTypeName= "MyIntUnion"/>
+            <member name="my_int_sequence" sequenceMaxLength="10" type="int32"/>
+            <member name="my_point_sequence" sequenceMaxLength="10" type="nonBasic"  nonBasicTypeName= "Point"/>
+            <member name="my_array" type="nonBasic"  nonBasicTypeName= "Point" arrayDimensions="5"/>
+            <member name="my_optional" type="nonBasic"  nonBasicTypeName= "Point" optional="true"/>
+            <member name="my_optional_int" type="int32" optional="true"/>
+        </struct>
     </types>
 
     <!-- Domain Library -->
@@ -70,6 +126,10 @@ This code contains trade secrets of Real-Time Innovations, Inc.
         <domain name="MyDomain" domain_id="0">
             <register_type name="ShapeType" type_ref="ShapeType" />
             <topic name="Square" register_type_ref="ShapeType"/>
+        </domain>
+        <domain name="DataAccessDomain" domain_id="0">
+            <register_type name="MyType" type_ref="MyType" />
+            <topic name="TestTopic" register_type_ref="MyType"/>
         </domain>
     </domain_library>
 
@@ -82,6 +142,16 @@ This code contains trade secrets of Real-Time Innovations, Inc.
 
             <subscriber name="MySubscriber">
                 <data_reader name="MySquareReader" topic_ref="Square" />
+            </subscriber>
+        </domain_participant>
+
+        <domain_participant name="DataAccessTest" domain_ref="MyDomainLibrary::DataAccessDomain">
+            <publisher name="TestPublisher">
+                <data_writer name="TestWriter" topic_ref="TestTopic" />
+            </publisher>
+
+            <subscriber name="TestSubscriber">
+                <data_reader name="TestReader" topic_ref="TestTopic" />
             </subscriber>
         </domain_participant>
     </domain_participant_library>

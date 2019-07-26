@@ -35,7 +35,7 @@ class TestConnector:
     """
     invalid_participant_profile = "InvalidParticipantProfile"
     xml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-      "../xml/ShapeExample.xml")
+      "../xml/TestConnector.xml")
     with pytest.raises(ValueError):
       connector = rti.Connector(invalid_participant_profile,xml_path)
 
@@ -69,7 +69,7 @@ class TestConnector:
     """
     connectors = []
     xml_path= os.path.join(os.path.dirname(os.path.realpath(__file__)),
-      "../xml/ShapeExample.xml")
+      "../xml/TestConnector.xml")
     participant_profile="MyParticipantLibrary::Zero"
     for i in range (0,5):
      connectors.append(rti.Connector(participant_profile,xml_path))
