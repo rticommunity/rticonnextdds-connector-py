@@ -23,6 +23,7 @@ import weakref
 import platform
 import json
 from contextlib import contextmanager
+from enum import Enum
 
 from ctypes import *
 (bits, linkage) = platform.architecture()
@@ -46,6 +47,17 @@ def fromcstring3(s):
 		return s.decode('utf8')
 	except AttributeError as e:
 		raise
+
+class ReturnCode:
+	ok = 0
+	no_data = 11
+
+class DdsError(Exception):
+	pass
+
+def check_retcode(retcode):
+	if retcode != ReturnCode.ok and retcode != ReturnCode.no_data:
+		raise DdsError
 
 if sys.version_info[0] == 3 :
 	tocstring = tocstring3
@@ -147,17 +159,17 @@ rtin_RTIDDSConnector_getSamplesLength = rti.RTIDDSConnector_getInfosLength
 rtin_RTIDDSConnector_getSamplesLength.restype = ctypes.c_double
 rtin_RTIDDSConnector_getSamplesLength.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
 
-rtin_RTIDDSConnector_getNumberFromSamples = rti.RTIDDSConnector_getNumberFromSamples
-rtin_RTIDDSConnector_getNumberFromSamples.restype = ctypes.c_double
-rtin_RTIDDSConnector_getNumberFromSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+rtin_RTIDDSConnector_getNumberFromSamples = rti.RTIDDSConnector_getNumberFromSamplesWithRetcode
+rtin_RTIDDSConnector_getNumberFromSamples.restype = ctypes.c_int
+rtin_RTIDDSConnector_getNumberFromSamples.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_double), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
 
-rtin_RTIDDSConnector_getBooleanFromSamples = rti.RTIDDSConnector_getBooleanFromSamples
+rtin_RTIDDSConnector_getBooleanFromSamples = rti.RTIDDSConnector_getBooleanFromSamplesWithRetcode
 rtin_RTIDDSConnector_getBooleanFromSamples.restype = ctypes.c_int
-rtin_RTIDDSConnector_getBooleanFromSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+rtin_RTIDDSConnector_getBooleanFromSamples.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
 
-rtin_RTIDDSConnector_getStringFromSamples = rti.RTIDDSConnector_getStringFromSamples
-rtin_RTIDDSConnector_getStringFromSamples.restype = POINTER(c_char)
-rtin_RTIDDSConnector_getStringFromSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+rtin_RTIDDSConnector_getStringFromSamples = rti.RTIDDSConnector_getStringFromSamplesWithRetcode
+rtin_RTIDDSConnector_getStringFromSamples.restype = ctypes.c_int
+rtin_RTIDDSConnector_getStringFromSamples.argtypes = [ctypes.c_void_p, POINTER(c_char_p), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
 
 rtin_RTIDDSConnector_getJSONSample = rti.RTIDDSConnector_getJSONSample
 rtin_RTIDDSConnector_getJSONSample.restype = POINTER(c_char)
@@ -187,9 +199,22 @@ class Samples:
 			raise ValueError("index must be an integer")
 		if index < 0:
 			raise ValueError("index must be positive")
-		#Adding 1 to index because the C API was based on Lua where indexes start from 1
+
+		# Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		return rtin_RTIDDSConnector_getNumberFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName))
+		c_value = ctypes.c_double()
+		retcode = rtin_RTIDDSConnector_getNumberFromSamples(
+			self.input.connector.native,
+			ctypes.byref(c_value),
+			tocstring(self.input.name),
+			index,
+			tocstring(fieldName))
+		check_retcode(retcode)
+
+		if retcode == ReturnCode.no_data:
+			return None
+
+		return c_value.value
 
 	def getBoolean(self, index, fieldName):
 		if type(index) is not int:
@@ -198,19 +223,43 @@ class Samples:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		return rtin_RTIDDSConnector_getBooleanFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName))
+
+		c_value = ctypes.c_int()
+		retcode = rtin_RTIDDSConnector_getBooleanFromSamples(
+			self.input.connector.native,
+			ctypes.byref(c_value),
+			tocstring(self.input.name),
+			index,
+			tocstring(fieldName))
+		check_retcode(retcode)
+
+		if retcode == ReturnCode.no_data:
+			return None
+
+		return c_value.value
 
 	def getString(self, index, fieldName):
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
 			raise ValueError("index must be positive")
-		#Adding 1 to index because the C API was based on Lua where indexes start from 1
+
 		index = index + 1
-		theStrPtr = rtin_RTIDDSConnector_getStringFromSamples(self.input.connector.native,tocstring(self.input.name),index,tocstring(fieldName))
-		theStr = fromcstring(cast(theStrPtr, c_char_p).value)
-		rtin_RTIDDSConnector_freeString(theStrPtr)
-		return theStr
+		c_value = ctypes.c_char_p()
+		retcode = rtin_RTIDDSConnector_getStringFromSamples(
+			self.input.connector.native,
+			ctypes.byref(c_value),
+			tocstring(self.input.name),
+			index,
+			tocstring(fieldName))
+		check_retcode(retcode)
+		if retcode == ReturnCode.no_data:
+			return None
+
+		str_value = fromcstring(cast(c_value, c_char_p).value)
+		rtin_RTIDDSConnector_freeString(c_value)
+
+		return str_value
 
 	def getDictionary(self, index):
 		if type(index) is not int:

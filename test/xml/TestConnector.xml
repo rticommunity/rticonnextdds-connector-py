@@ -118,6 +118,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <member name="my_array" type="nonBasic"  nonBasicTypeName= "Point" arrayDimensions="5"/>
             <member name="my_optional" type="nonBasic"  nonBasicTypeName= "Point" optional="true"/>
             <member name="my_optional_int" type="int32" optional="true"/>
+            <member name="my_optional_bool" type="boolean" optional="true"/>
         </struct>
     </types>
 
@@ -130,6 +131,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
         <domain name="DataAccessDomain" domain_id="0">
             <register_type name="MyType" type_ref="MyType" />
             <topic name="TestTopic" register_type_ref="MyType"/>
+            <topic name="TestTopic2" register_type_ref="MyType"/>
         </domain>
     </domain_library>
 
@@ -148,10 +150,12 @@ This code contains trade secrets of Real-Time Innovations, Inc.
         <domain_participant name="DataAccessTest" domain_ref="MyDomainLibrary::DataAccessDomain">
             <publisher name="TestPublisher">
                 <data_writer name="TestWriter" topic_ref="TestTopic" />
+                <data_writer name="TestWriter2" topic_ref="TestTopic2" />
             </publisher>
 
             <subscriber name="TestSubscriber">
                 <data_reader name="TestReader" topic_ref="TestTopic" />
+                <data_reader name="TestReader2" topic_ref="TestTopic2" />
             </subscriber>
         </domain_participant>
     </domain_participant_library>
