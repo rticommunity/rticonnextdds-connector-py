@@ -23,7 +23,6 @@ import weakref
 import platform
 import json
 from contextlib import contextmanager
-from enum import Enum
 
 from ctypes import *
 (bits, linkage) = platform.architecture()
