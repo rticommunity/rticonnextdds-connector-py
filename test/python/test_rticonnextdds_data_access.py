@@ -72,6 +72,8 @@ class TestDataAccess:
       if input.sample_count == count:
         break
       time.sleep(.5)
+
+    assert input.sample_count == count
     if do_take:
       input.take()
 
@@ -184,22 +186,23 @@ class TestDataAccess:
     assert sample.get_string("my_union#") == "my_long"
     assert sample.get_number("my_union.my_long") == 3
 
-
   def test_set_optional(self, test_output, test_input):
-    test_output.instance.set_number("my_optional.x", 101)
+    test_output.instance.set_number("my_optional_point.x", 101)
     test_output.write()
     self.wait_for_data(test_input)
 
     sample = test_input[0]
-    assert sample.get_number("my_optional.x") == 101
+    assert sample.get_number("my_optional_point.x") == 101
 
   def test_unset_optional_number(self, populated_input):
     sample = populated_input[0]
-    assert sample.get_number("my_optional_int") == None
+    assert sample.get_number("my_optional_long") == None
+    with pytest.raises(KeyError) as execinfo:
+      value = sample.get_dictionary()['my_optional_long']
 
   def test_unset_optional_string(self, populated_input):
     sample = populated_input[0]
-    assert sample.get_string("my_optional_int") == None
+    assert sample.get_string("my_optional_long") == None
 
   def test_unset_optional_boolean(self, test_output, test_input):
     test_output.write()
@@ -208,7 +211,85 @@ class TestDataAccess:
 
   def test_unset_complex_optional(self, populated_input):
     sample = populated_input[0]
-    assert sample.get_number("my_optional.x") == None
+    assert sample.get_number("my_optional_point.x") == None
+
+  def test_reset_optional_number(self, test_output, test_input):
+    test_output.instance.set_number("my_optional_long", 33)
+    test_output.instance.set_number("my_optional_long", None)
+    test_output.write()
+    self.wait_for_data(test_input)
+    assert test_input[0].get_number("my_optional_long") == None
+
+  def test_reset_optional_boolean(self, test_output, test_input):
+    test_output.instance.set_boolean("my_optional_bool", True)
+    test_output.instance.set_boolean("my_optional_bool", None)
+    test_output.write()
+    self.wait_for_data(test_input)
+    assert test_input[0].get_boolean("my_optional_bool") == None
+
+  def test_reset_complex_optional(self, test_output, test_input):
+    test_output.instance.set_number("my_optional_point.x", 44)
+    test_output.instance.clear_member("my_optional_point")
+    test_output.write()
+    self.wait_for_data(test_input)
+    assert test_input[0].get_number("my_optional_point.x") == None
+
+  def test_clear_complex_member(self, test_output, test_input):
+    test_output.instance.set_number("my_point.x", 44)
+    test_output.instance.clear_member("my_point")
+    test_output.write()
+    self.wait_for_data(test_input)
+    assert test_input[0].get_number("my_point.x") == 0
+
+  def test_clear_sequence(self, test_output, test_input):
+    test_output.instance.set_number("my_union.my_int_sequence[3]", 10)
+    test_output.instance.set_number("my_point.x", 3)
+    test_output.instance.clear_member("my_union.my_int_sequence")
+    test_output.write()
+
+    self.wait_for_data(test_input)
+    assert test_input[0].get_number("my_union.my_int_sequence#") == 0
+    assert test_input[0].get_number("my_point.x") == 3
+
+  def test_clear_with_dictionary(self, test_dictionary, test_output, test_input):
+    """Tests using None in a dictionary to clear a member"""
+
+    # Set non-default values
+    test_output.instance.set_dictionary(test_dictionary)
+    test_output.instance.set_boolean("my_optional_bool", True)
+
+    # Reset members using None in a dictionary--optional members are set to None,
+    # other members are initialized to their default value
+    test_output.instance.set_dictionary({
+      'my_optional_point': None,
+      'my_optional_long': None,
+      'my_point': None,
+      'my_long': None,
+      'my_optional_bool': None,
+      'my_point_sequence': None,
+      'my_string': None,
+      'my_union': None,
+      'my_enum': None,
+    })
+    test_output.write()
+    self.wait_for_data(test_input)
+
+    sample = test_input[0]
+    assert sample.get_number("my_optional_point.x") == None
+    assert sample.get_number("my_optional_long") == None
+    assert sample.get_number("my_point.x") == 0
+    assert sample.get_number("my_point.y") == 0
+    assert sample.get_number("my_long") == 0
+    assert sample.get_boolean("my_optional_bool") == None
+    assert sample.get_number("my_point_sequence#") == 0
+    assert sample.get_string("my_string") == ""
+    assert sample.get_string("my_union#") == "point"
+    assert sample.get_number("my_enum") == 2
+    assert sample.get_number("my_double") == test_dictionary['my_double']
+
+  def test_bad_clear_member(self, test_output):
+    with pytest.raises(rti.DdsError) as execinfo:
+      test_output.instance.clear_member("my_nonexistent_member")
 
   @pytest.mark.xfail
   def test_reset_sequence(self, test_output, test_input):
@@ -230,6 +311,3 @@ class TestDataAccess:
     # The other fields are unchanged:
     assert sample.get_number("my_point.x") == 3
     assert sample.get_number("my_point_sequence#") == 2
-
-
-

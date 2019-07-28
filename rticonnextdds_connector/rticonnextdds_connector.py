@@ -125,6 +125,9 @@ rtin_RTIDDSConnector_setBooleanIntoSamples = rti.RTIDDSConnector_setBooleanIntoS
 rtin_RTIDDSConnector_setBooleanIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_int]
 rtin_RTIDDSConnector_setStringIntoSamples = rti.RTIDDSConnector_setStringIntoSamples
 rtin_RTIDDSConnector_setStringIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
+rtin_RTIDDSConnector_clearMember = rti.RTIDDSConnector_clearMember
+rtin_RTIDDSConnector_clearMember.restype = ctypes.c_int
+rtin_RTIDDSConnector_clearMember.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
 
 rtin_RTIDDSConnector_write = rti.RTIDDSConnector_write
 rtin_RTIDDSConnector_write.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
@@ -534,18 +537,40 @@ class Instance:
 	def __init__(self, output):
 		self.output = output
 
+	def clear_member(self, fieldName):
+		"""Resets a member to its default value
+
+		The effect is the same as that of :meth:`Output.clear_members()` except
+		that only one member is cleared.
+
+		:param str fieldName: The name of the field. It can be a complex member or a primitive member. See :ref:`Accessing the data`.
+		"""
+
+		retcode = rtin_RTIDDSConnector_clearMember(
+			self.output.connector.native,
+			tocstring(self.output.name),
+			tocstring(fieldName))
+		check_retcode(retcode)
+
 	def set_number(self, fieldName, value):
 		"""Sets a numeric field
 
 		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
-		:param number value: A numeric value
+		:param number value: A numeric value or None to unset an optional member
 		"""
 
-		try:
-			rtin_RTIDDSConnector_setNumberIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value)
-		except ctypes.ArgumentError as e:
-			raise TypeError("field:{0} should be of type Numeric"\
-				.format(fieldName))
+		if value == None:
+			self.clear_member(fieldName)
+		else:
+			try:
+				rtin_RTIDDSConnector_setNumberIntoSamples(
+					self.output.connector.native,
+					tocstring(self.output.name),
+					tocstring(fieldName),
+					value)
+			except ctypes.ArgumentError as e:
+				raise TypeError("field:{0} should be of type Numeric"\
+					.format(fieldName))
 
 	# Deprecated: use set_number
 	def setNumber(self, fieldName, value):
@@ -555,14 +580,21 @@ class Instance:
 		"""Sets a Boolean field
 
 		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
-		:param number value: ``TRUE`` or ``FALSE``.
+		:param number value: ``TRUE`` or ``FALSE`` or None to unset an optional member
 		"""
 
-		try:
-			rtin_RTIDDSConnector_setBooleanIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),value)
-		except ctypes.ArgumentError as e:
-			raise TypeError("field:{0} should be of type Boolean"\
-				.format(fieldName))
+		if value == None:
+			self.clear_member(fieldName)
+		else:
+			try:
+				rtin_RTIDDSConnector_setBooleanIntoSamples(
+						self.output.connector.native,
+						tocstring(self.output.name),
+						tocstring(fieldName),
+						value)
+			except ctypes.ArgumentError as e:
+				raise TypeError("field:{0} should be of type Boolean"\
+					.format(fieldName))
 
 	# Deprecated: use set_boolean
 	def setBoolean(self, fieldName, value):
@@ -572,14 +604,21 @@ class Instance:
 		"""Sets a string field
 
 		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
-		:param number value: ``TRUE`` or ``FALSE``.
+		:param str value: The string value or None to unset an optional member
 		"""
 
-		try:
-			rtin_RTIDDSConnector_setStringIntoSamples(self.output.connector.native,tocstring(self.output.name),tocstring(fieldName),tocstring(value))
-		except AttributeError | ctypes.ArgumentError as e:
-			raise TypeError("field:{0} should be of type String"\
-				.format(fieldName))
+		if value == None:
+			self.clear_member(fieldName)
+		else:
+			try:
+				rtin_RTIDDSConnector_setStringIntoSamples(
+					self.output.connector.native,
+					tocstring(self.output.name),
+					tocstring(fieldName),
+					tocstring(value))
+			except AttributeError | ctypes.ArgumentError as e:
+				raise TypeError("field:{0} should be of type String"\
+					.format(fieldName))
 
 	# Deprecated: use set_string
 	def setString(self, fieldName, value):
@@ -588,13 +627,20 @@ class Instance:
 	def set_dictionary(self, dictionary):
 		"""Sets the member values specified in a dictionary
 
-		The keys in the dictionary may be a subset of the members of this
-		``Instance``'s type. If any key is missing, that field retains its old
-		value. You can use :meth:`Output.clear_members()` before setting a
-		dictionary with a subset of the keys if you want the missing members to
-		have a default value.
+		The dictionary keys are the member names of the Output's type,
+		and the dictionary values are the values for those members.
 
-		:param dict dictionary: The dictionary containing the keys
+		This method sets the values of those member that are explicitly specified
+		in the dictionary. Any member that is not specified in the dictionary
+		retains its previous value.
+
+		To clear members that are not in the dictionary, you can call
+		:meth:`Output.clear_members()` before this method. You can also
+		explicitly set any value in the dictionary to ``None`` to set that member
+		to its default value.
+
+		:param dict dictionary: The dictionary containing the keys (member names)
+		and values (values for the members)
 		"""
 
 		jsonStr = json.dumps(dictionary)
@@ -675,7 +721,7 @@ class Output:
 
 		If the member is defined with the ``default`` attribute, it gets that value.
 		Otherwise numbers are set to 0, and strings are set to empty. Sequences
-		are cleared.
+		are cleared. Optional members are set to ``None``.
 
 		For example, if this ``Output``'s type is `ShapeType` (from the previous 
 		example), then ``clear_members()`` sets `color` to "RED", `shapesize`

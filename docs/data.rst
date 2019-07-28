@@ -9,8 +9,10 @@ Accessing the data
    connector = rti.Connector("MyParticipantLibrary::DataAccessTest", "../test/xml/TestConnector.xml")
    output = connector.get_output("TestPublisher::TestWriter")
    input = connector.get_input("TestSubscriber::TestReader")
+   output.instance.set_number("my_int_sequence[10]", 10)
+   output.instance.set_number("my_point_sequence[10].x", 10)
    output.write()
-   time.sleep(10)
+   time.sleep(2)
 
 The types you use to write or read data may included nested structs, sequences and
 arrays of primitive types or structs, etc.
@@ -54,7 +56,8 @@ We will use the following type definition of MyType::
             <member name="my_int_sequence" sequenceMaxLength="10" type="int32"/>
             <member name="my_point_sequence" sequenceMaxLength="10" type="nonBasic"  nonBasicTypeName= "Point"/>
             <member name="my_array" type="nonBasic"  nonBasicTypeName= "Point" arrayDimensions="5"/>
-            <member name="my_optional" type="nonBasic"  nonBasicTypeName= "Point" optional="true"/>
+            <member name="my_optional_point" type="nonBasic"  nonBasicTypeName= "Point" optional="true"/>
+            <member name="my_optional_long" type="int32" optional="true"/>
         </struct>
     </types>
 
@@ -86,13 +89,19 @@ Which corresponds to the following IDL definition::
         sequence<long, 10> my_int_sequence;
         sequence<Point, 10> my_point_sequence;
         Point my_array[5];
-        @optional Point my_optional;
+        @optional Point my_optional_point;
+        @optional long my_optional_long;
     };
 
 Note that you can get the XML definition of an IDL file with *rtiddsgen -convertToXml MyType.idl*.
 
 We will refer to an ``Output`` named ``output`` and
 ``Input`` named ``input`` such that ``input.sample_count > 0``.
+
+Accessing numbers, strings and boolean members
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+TODO: complete
 
 Accessing nested members
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -102,6 +111,13 @@ The "." notation allows accessing a nested field, for example:
 .. testcode::
 
     output.instance.set_number("my_point.x", 10)
+    output.instance.set_number("my_point.y", 20)
+
+It is possible to reset the value of a complex member back to its default:
+
+.. testcode::
+
+    output.instance.clear_member("my_point.x") # x and y are now 0
 
 Accessing arrays and sequences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -118,19 +134,81 @@ In an Output, sequences are automatically resized:
 
 .. testcode::
 
-    output.instance.set_number("my_int_sequence[1]", 10)
+    output.instance.set_number("my_int_sequence[5]", 10) # length is now 5
+    output.instance.set_number("my_int_sequence[4]", 9) # length still 5
 
-For a non-primitive sequence:
+You can clear a sequence:
 
 .. testcode::
 
-    output.instance.set_number("my_sequence[1].x", 10)
+    output.instance.clear_member("my_int_sequence") # my_int_sequence is now empty
 
-To get the length of a sequence (Input only):
+To get the length of a sequence in an Input sample:
 
 .. testcode::
 
     length = input[0].get_number("my_sequence#")
+
+Accessing optional members
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Optional members may have a value or not. They are accessed the same way as
+non-optional members, except that ``None`` is a possible value.
+
+On an Input, any of the getters may return ``None`` if the field is optional:
+
+.. testcode::
+
+    if input[0].get_number("my_optional_long") == None:
+        print("my_optional_long not set")
+
+    if input[0].get_number("my_optional_point.x") == None:
+        print("my_optional_point not set")
+
+:meth:`SampleIterator.get_dictionary()` returns a dictionary that doesn't include unset
+optional members.
+
+To set an optional member on an Output:
+
+.. testcode::
+
+    output.instance.set_number("my_optional_long", 10)
+
+To reset it, there are two possibilities:
+
+.. testcode::
+
+    output.instance.set_number("my_optional_long", None) # Option 1
+    output.instance.clear_member("my_optional_long") # Option 2
+
+When the optional member is a complex type, when any of its members is first set,
+the rest are initialized to their default values:
+
+.. testcode::
+
+    output.instance.set_number("my_optional_point.x", 10)
+
+If ``my_optional_point`` was not previously set, the previous code also sets
+``y`` to 0.
+
+To unset an optional complex member:
+
+.. testcode::
+
+    output.instance.clear_member("my_optional_point")
+
+Note that :meth:`Instance.set_dictionary()` doesn't clear those members that are
+not specified; their value remains. For example:
+
+.. testcode::
+
+    output.instance.set_number("my_optional_long", 5)
+    output.instance.set_dictionary({'my_double': 3.3, 'my_long': 4}) # my_optional_long is still 5
+
+To clear a member, set it to ``None`` explicitly::
+
+    output.instance.set_dictionary({'my_double': 3.3, 'my_long': 4, 'my_optional_long': None})
+
 
 Accessing unions
 ^^^^^^^^^^^^^^^^
