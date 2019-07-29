@@ -52,7 +52,18 @@ class ReturnCode:
 	no_data = 11
 
 class DdsError(Exception):
-	pass
+	def __init__(self):
+		Exception.__init__(self, "DDS Exception: " + get_last_dds_error_message())
+
+
+def get_last_dds_error_message():
+	error_msg = rtin_RTIDDSConnector_getLastErrorMessage()
+	if error_msg:
+		str_value = fromcstring(cast(error_msg, c_char_p).value)
+		rtin_RTIDDSConnector_freeString(error_msg)
+	else:
+		str_value = ""
+	return str_value
 
 def check_retcode(retcode):
 	if retcode != ReturnCode.ok and retcode != ReturnCode.no_data:
@@ -179,6 +190,10 @@ rtin_RTIDDSConnector_getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p,
 
 rtin_RTIDDSConnector_setJSONInstance = rti.RTIDDSConnector_setJSONInstance
 rtin_RTIDDSConnector_setJSONInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
+
+rtin_RTIDDSConnector_getLastErrorMessage = rti.RTIDDSConnector_getLastErrorMessage
+rtin_RTIDDSConnector_getLastErrorMessage.restype = POINTER(c_char)
+rtin_RTIDDSConnector_getLastErrorMessage.argtypes = []
 
 rtin_RTIDDSConnector_getNativeInstance = rti.RTIDDSConnector_getNativeInstance
 rtin_RTIDDSConnector_getNativeInstance.restype = ctypes.c_void_p

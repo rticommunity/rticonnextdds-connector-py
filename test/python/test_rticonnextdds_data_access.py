@@ -142,7 +142,7 @@ class TestDataAccess:
 
   def test_bad_member_name(self, populated_input):
     sample = populated_input[0]
-    with pytest.raises(rti.DdsError) as execinfo:
+    with pytest.raises(rti.DdsError, match=r".*Cannot find.*my_nonexistent_member.*") as execinfo:
       sample.get_number("my_nonexistent_member")
 
   def test_bad_member_syntax(self, populated_input):
