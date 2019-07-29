@@ -418,7 +418,7 @@ class Input:
 		self.connector = connector
 		self.name = name
 		self.native = rtin_RTIDDSConnector_getReader(self.connector.native,tocstring(self.name))
-		if self.native == None:
+		if self.native is None:
 			raise ValueError("Invalid Subscription::DataReader name")
 		self.samples = Samples(self)
 		self.infos = Infos(self)
@@ -559,7 +559,7 @@ class Instance:
 		:param number value: A numeric value or None to unset an optional member
 		"""
 
-		if value == None:
+		if value is None:
 			self.clear_member(fieldName)
 		else:
 			try:
@@ -583,7 +583,7 @@ class Instance:
 		:param number value: ``TRUE`` or ``FALSE`` or None to unset an optional member
 		"""
 
-		if value == None:
+		if value is None:
 			self.clear_member(fieldName)
 		else:
 			try:
@@ -607,7 +607,7 @@ class Instance:
 		:param str value: The string value or None to unset an optional member
 		"""
 
-		if value == None:
+		if value is None:
 			self.clear_member(fieldName)
 		else:
 			try:
@@ -639,8 +639,7 @@ class Instance:
 		explicitly set any value in the dictionary to ``None`` to set that member
 		to its default value.
 
-		:param dict dictionary: The dictionary containing the keys (member names)
-		and values (values for the members)
+		:param dict dictionary: The dictionary containing the keys (member names) and values (values for the members)
 		"""
 
 		jsonStr = json.dumps(dictionary)
@@ -752,7 +751,7 @@ class Connector:
 
 	def __init__(self, configName, url):
 		self.native = rtin_RTIDDSConnector_new(tocstring(configName), tocstring(url), None)
-		if self.native == None:
+		if self.native is None:
 			raise ValueError("Invalid participant profile, xml path or xml profile")
 
 	def close(self):

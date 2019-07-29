@@ -50,6 +50,7 @@ class TestDataAccess:
       'my_enum': 1,
       'my_string': 'hello',
       'my_point': {'x': 3, 'y': 4},
+      'my_point_alias': {'x': 30, 'y': 40},
       'my_union': {'my_int_sequence': [10, 20, 30]},
       'my_int_union': {'my_long': 222},
       'my_point_sequence': [{'x': 10, 'y': 20}, {'x': 11, 'y': 21}],
@@ -188,51 +189,56 @@ class TestDataAccess:
 
   def test_set_optional(self, test_output, test_input):
     test_output.instance.set_number("my_optional_point.x", 101)
+    test_output.instance.set_number("my_point_alias.x", 202)
     test_output.write()
     self.wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample.get_number("my_optional_point.x") == 101
+    assert sample.get_number("my_point_alias.x") == 202
 
   def test_unset_optional_number(self, populated_input):
     sample = populated_input[0]
-    assert sample.get_number("my_optional_long") == None
+    assert sample.get_number("my_optional_long") is None
     with pytest.raises(KeyError) as execinfo:
       value = sample.get_dictionary()['my_optional_long']
 
   def test_unset_optional_string(self, populated_input):
     sample = populated_input[0]
-    assert sample.get_string("my_optional_long") == None
+    assert sample.get_string("my_optional_long") is None
 
   def test_unset_optional_boolean(self, test_output, test_input):
     test_output.write()
     self.wait_for_data(test_input)
-    assert test_input[0].get_boolean("my_optional_bool") == None
+    assert test_input[0].get_boolean("my_optional_bool") is None
 
   def test_unset_complex_optional(self, populated_input):
     sample = populated_input[0]
-    assert sample.get_number("my_optional_point.x") == None
+    assert sample.get_number("my_optional_point.x") is None
 
   def test_reset_optional_number(self, test_output, test_input):
     test_output.instance.set_number("my_optional_long", 33)
     test_output.instance.set_number("my_optional_long", None)
     test_output.write()
     self.wait_for_data(test_input)
-    assert test_input[0].get_number("my_optional_long") == None
+    assert test_input[0].get_number("my_optional_long") is None
 
   def test_reset_optional_boolean(self, test_output, test_input):
     test_output.instance.set_boolean("my_optional_bool", True)
     test_output.instance.set_boolean("my_optional_bool", None)
     test_output.write()
     self.wait_for_data(test_input)
-    assert test_input[0].get_boolean("my_optional_bool") == None
+    assert test_input[0].get_boolean("my_optional_bool") is None
 
   def test_reset_complex_optional(self, test_output, test_input):
     test_output.instance.set_number("my_optional_point.x", 44)
+    test_output.instance.set_number("my_point_alias.x", 55)
     test_output.instance.clear_member("my_optional_point")
+    test_output.instance.clear_member("my_point_alias")
     test_output.write()
     self.wait_for_data(test_input)
-    assert test_input[0].get_number("my_optional_point.x") == None
+    assert test_input[0].get_number("my_optional_point.x") is None
+    assert test_input[0].get_number("my_point_alias.x") is None
 
   def test_clear_complex_member(self, test_output, test_input):
     test_output.instance.set_number("my_point.x", 44)
@@ -264,6 +270,7 @@ class TestDataAccess:
       'my_optional_point': None,
       'my_optional_long': None,
       'my_point': None,
+      'my_point_alias': None,
       'my_long': None,
       'my_optional_bool': None,
       'my_point_sequence': None,
@@ -275,12 +282,13 @@ class TestDataAccess:
     self.wait_for_data(test_input)
 
     sample = test_input[0]
-    assert sample.get_number("my_optional_point.x") == None
-    assert sample.get_number("my_optional_long") == None
+    assert sample.get_number("my_optional_point.x") is None
+    assert sample.get_number("my_optional_long") is None
     assert sample.get_number("my_point.x") == 0
     assert sample.get_number("my_point.y") == 0
+    assert sample.get_number("my_point_alias.x") is None
     assert sample.get_number("my_long") == 0
-    assert sample.get_boolean("my_optional_bool") == None
+    assert sample.get_boolean("my_optional_bool") is None
     assert sample.get_number("my_point_sequence#") == 0
     assert sample.get_string("my_string") == ""
     assert sample.get_string("my_union#") == "point"

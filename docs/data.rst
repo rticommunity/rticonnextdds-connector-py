@@ -152,17 +152,19 @@ To get the length of a sequence in an Input sample:
 Accessing optional members
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Optional members may have a value or not. They are accessed the same way as
-non-optional members, except that ``None`` is a possible value.
+A optional member is a member that applications can decide to send or not as
+part of every published sample. Therefore, optional members may have a value or not.
+They are accessed the same way as non-optional members, except that ``None`` is
+a possible value.
 
 On an Input, any of the getters may return ``None`` if the field is optional:
 
 .. testcode::
 
-    if input[0].get_number("my_optional_long") == None:
+    if input[0].get_number("my_optional_long") is None:
         print("my_optional_long not set")
 
-    if input[0].get_number("my_optional_point.x") == None:
+    if input[0].get_number("my_optional_point.x") is None:
         print("my_optional_point not set")
 
 :meth:`SampleIterator.get_dictionary()` returns a dictionary that doesn't include unset
@@ -174,15 +176,8 @@ To set an optional member on an Output:
 
     output.instance.set_number("my_optional_long", 10)
 
-To reset it, there are two possibilities:
-
-.. testcode::
-
-    output.instance.set_number("my_optional_long", None) # Option 1
-    output.instance.clear_member("my_optional_long") # Option 2
-
-When the optional member is a complex type, when any of its members is first set,
-the rest are initialized to their default values:
+If the type of the optional member is not primitive, when any of its members is
+first set, the rest are initialized to their default values:
 
 .. testcode::
 
@@ -191,7 +186,14 @@ the rest are initialized to their default values:
 If ``my_optional_point`` was not previously set, the previous code also sets
 ``y`` to 0.
 
-To unset an optional complex member:
+There are several ways to reset an optional member. If the type is primitive:
+
+.. testcode::
+
+    output.instance.set_number("my_optional_long", None) # Option 1
+    output.instance.clear_member("my_optional_long") # Option 2
+
+If the member type is complex:
 
 .. testcode::
 
@@ -209,6 +211,10 @@ To clear a member, set it to ``None`` explicitly::
 
     output.instance.set_dictionary({'my_double': 3.3, 'my_long': 4, 'my_optional_long': None})
 
+
+For more information about optional members in DDS, see the *Getting Started Guide
+Addendum for Extensible Types*,
+`section 3.2 Optional Members <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/getting_started_extras/html_files/RTI_ConnextDDS_CoreLibraries_GettingStarted_ExtensibleAddendum/index.htm#ExtensibleTypesAddendum/Optional_Members.htm#3.2_Optional_Members%3FTocPath%3D3.%2520Type%2520System%2520Enhancements%7C3.2%2520Optional%2520Members%7C_____0>`__. 
 
 Accessing unions
 ^^^^^^^^^^^^^^^^

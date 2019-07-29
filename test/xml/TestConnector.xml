@@ -105,6 +105,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
               <member name="my_long" type="int32"/>
             </case>
         </union>
+        <typedef name="PointAlias" type="nonBasic"  nonBasicTypeName= "Point"/>
         <struct name= "MyType">
             <member name="my_long" type="int32"/>
             <member name="my_double" type="float64"/>
@@ -119,6 +120,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <member name="my_optional_point" type="nonBasic"  nonBasicTypeName= "Point" optional="true"/>
             <member name="my_optional_long" type="int32" optional="true"/>
             <member name="my_optional_bool" type="boolean" optional="true"/>
+            <member name="my_point_alias" type="nonBasic"  nonBasicTypeName= "PointAlias" optional="true"/>
         </struct>
     </types>
 
