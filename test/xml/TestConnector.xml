@@ -105,10 +105,11 @@ This code contains trade secrets of Real-Time Innovations, Inc.
               <member name="my_long" type="int32"/>
             </case>
         </union>
+        <typedef name="PointAlias" type="nonBasic"  nonBasicTypeName= "Point"/>
         <struct name= "MyType">
             <member name="my_long" type="int32"/>
             <member name="my_double" type="float64"/>
-            <member name="my_enum" type="nonBasic"  nonBasicTypeName= "Color"/>
+            <member name="my_enum" type="nonBasic"  nonBasicTypeName= "Color" default="BLUE"/>
             <member name="my_string" stringMaxLength="512" type="string"/>
             <member name="my_point" type="nonBasic"  nonBasicTypeName= "Point"/>
             <member name="my_union" type="nonBasic"  nonBasicTypeName= "MyUnion"/>
@@ -116,8 +117,10 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <member name="my_int_sequence" sequenceMaxLength="10" type="int32"/>
             <member name="my_point_sequence" sequenceMaxLength="10" type="nonBasic"  nonBasicTypeName= "Point"/>
             <member name="my_array" type="nonBasic"  nonBasicTypeName= "Point" arrayDimensions="5"/>
-            <member name="my_optional" type="nonBasic"  nonBasicTypeName= "Point" optional="true"/>
-            <member name="my_optional_int" type="int32" optional="true"/>
+            <member name="my_optional_point" type="nonBasic"  nonBasicTypeName= "Point" optional="true"/>
+            <member name="my_optional_long" type="int32" optional="true"/>
+            <member name="my_optional_bool" type="boolean" optional="true"/>
+            <member name="my_point_alias" type="nonBasic"  nonBasicTypeName= "PointAlias" optional="true"/>
         </struct>
     </types>
 
@@ -130,6 +133,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
         <domain name="DataAccessDomain" domain_id="0">
             <register_type name="MyType" type_ref="MyType" />
             <topic name="TestTopic" register_type_ref="MyType"/>
+            <topic name="TestTopic2" register_type_ref="MyType"/>
         </domain>
     </domain_library>
 
@@ -148,10 +152,12 @@ This code contains trade secrets of Real-Time Innovations, Inc.
         <domain_participant name="DataAccessTest" domain_ref="MyDomainLibrary::DataAccessDomain">
             <publisher name="TestPublisher">
                 <data_writer name="TestWriter" topic_ref="TestTopic" />
+                <data_writer name="TestWriter2" topic_ref="TestTopic2" />
             </publisher>
 
             <subscriber name="TestSubscriber">
                 <data_reader name="TestReader" topic_ref="TestTopic" />
+                <data_reader name="TestReader2" topic_ref="TestTopic2" />
             </subscriber>
         </domain_participant>
     </domain_participant_library>
