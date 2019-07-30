@@ -47,16 +47,13 @@ def fromcstring3(s):
 	except AttributeError as e:
 		raise
 
-class ReturnCode:
-	ok = 0
-	no_data = 11
-
 class DdsError(Exception):
+	"""An error in the *RTIConnext DDS Core*"""
 	def __init__(self):
-		Exception.__init__(self, "DDS Exception: " + get_last_dds_error_message())
+		Exception.__init__(self, "DDS Exception: " + _get_last_dds_error_message())
 
 
-def get_last_dds_error_message():
+def _get_last_dds_error_message():
 	error_msg = rtin_RTIDDSConnector_getLastErrorMessage()
 	if error_msg:
 		str_value = fromcstring(cast(error_msg, c_char_p).value)
@@ -65,8 +62,12 @@ def get_last_dds_error_message():
 		str_value = ""
 	return str_value
 
-def check_retcode(retcode):
-	if retcode != ReturnCode.ok and retcode != ReturnCode.no_data:
+class _ReturnCode:
+	ok = 0
+	no_data = 11
+
+def _check_retcode(retcode):
+	if retcode != _ReturnCode.ok and retcode != _ReturnCode.no_data:
 		raise DdsError
 
 if sys.version_info[0] == 3 :
@@ -226,9 +227,9 @@ class Samples:
 			tocstring(self.input.name),
 			index,
 			tocstring(fieldName))
-		check_retcode(retcode)
+		_check_retcode(retcode)
 
-		if retcode == ReturnCode.no_data:
+		if retcode == _ReturnCode.no_data:
 			return None
 
 		return c_value.value
@@ -248,9 +249,9 @@ class Samples:
 			tocstring(self.input.name),
 			index,
 			tocstring(fieldName))
-		check_retcode(retcode)
+		_check_retcode(retcode)
 
-		if retcode == ReturnCode.no_data:
+		if retcode == _ReturnCode.no_data:
 			return None
 
 		return c_value.value
@@ -269,8 +270,8 @@ class Samples:
 			tocstring(self.input.name),
 			index,
 			tocstring(fieldName))
-		check_retcode(retcode)
-		if retcode == ReturnCode.no_data:
+		_check_retcode(retcode)
+		if retcode == _ReturnCode.no_data:
 			return None
 
 		str_value = fromcstring(cast(c_value, c_char_p).value)
@@ -565,7 +566,7 @@ class Instance:
 			self.output.connector.native,
 			tocstring(self.output.name),
 			tocstring(fieldName))
-		check_retcode(retcode)
+		_check_retcode(retcode)
 
 	def set_number(self, fieldName, value):
 		"""Sets a numeric field
