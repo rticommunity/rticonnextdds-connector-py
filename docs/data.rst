@@ -50,7 +50,8 @@ We will use the following type definition of MyType::
         <struct name= "MyType">
             <member name="my_long" type="int32"/>
             <member name="my_double" type="float64"/>
-            <member name="my_enum" type="nonBasic"  nonBasicTypeName= "Color"/>
+            <member name="my_enum" type="nonBasic"  nonBasicTypeName= "Color" default="GREEN"/>
+            <member name="my_boolean" type="boolean" />
             <member name="my_point" type="nonBasic"  nonBasicTypeName= "Point"/>
             <member name="my_union" type="nonBasic"  nonBasicTypeName= "MyUnion"/>
             <member name="my_int_sequence" sequenceMaxLength="10" type="int32"/>
@@ -83,6 +84,7 @@ Which corresponds to the following IDL definition::
         long my_long;
         double my_double;
         Color my_enum;
+        boolean my_boolean;
         string<512> my_string;
         Point my_point;
         MyUnion my_union;
@@ -98,32 +100,109 @@ Note that you can get the XML definition of an IDL file with *rtiddsgen -convert
 We will refer to an ``Output`` named ``output`` and
 ``Input`` named ``input`` such that ``input.sample_count > 0``.
 
-Accessing numbers, strings and boolean members
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Using dictionaries vs accessing individual members
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-TODO: complete
+In an Input or an Output you can access the data all at once, using a dictionary,
+or member by member. Using a dictionary is usually more efficient if you intend
+to access most or all of the data members of a large type.
 
-Accessing nested members
-^^^^^^^^^^^^^^^^^^^^^^^^
+In an Output, :meth:`Instance.set_dictionary` receives a dictionary with all or
+some of the Output type members, and in an Input, :meth:`SampleIterator.get_dictionary`
+retrieves all the members.
 
-The "." notation allows accessing a nested field, for example:
+On the other hand the methods described in the following section receive a
+``field_name`` argument to get or set a specific member.
+
+Accessing basic members (numbers, strings and booleans)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To set a field in an :class:`Output`, use the appropriate setter.
+
+To set any numeric type, including enumerations:
+
+.. testcode::
+
+    output.instance.set_number("my_long", 2)
+    output.instance.set_number("my_double, 2.14)
+    output.instance.set_number("my_enum", 2)
+
+To set booleans:
+
+.. testcode::
+
+    output.instance.set_boolean("my_boolean", True)
+
+To set strings:
+
+.. testcode::
+
+    output.instance.set_string("my_string", "Hello, World!")
+
+
+As an alternative to the setters, the special method ``__setitem__`` can be used:
+
+.. testcode::
+
+    output.instance["my_double"] = 2.14
+    output.instance["my_boolean"] = True
+    output.instance["my_string"] = "Hello, World!"
+
+In all cases, the type of the assigned value must be consistent with the type
+of the field as defined in the configuration file.
+
+Similarly, to get a field in a :class:`Input` sample, use the appropriate
+getter: :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.get_boolean()`,
+:meth:`SampleIterator.get_string()`, or ``__getitem__``. ``get_string`` also works
+with numeric fields, returning the number as a string.
+
+.. testcode::
+
+    for sample in input.valid_data_iterator:
+        value = sample.get_number("my_double")
+        value = sample.get_boolean("my_boolean")
+        value = sample.get_string("my_string")
+
+        # or alternatively:
+        value = sample["my_double"]
+        value = sample["my_boolean"]
+        value = sample["my_string"]
+
+        # get number as string:
+        value = sample.get_string("my_double")
+
+Note that the typed getters and setters perform better than ``__setitem__``
+and ``__getitem__`` in applications that write or read at high rates.
+Also ``__setitem__`` or ``__getitem__`` shouldn't be used as an alternative
+to ``get_dictionary`` or ``set_dictionary`` (see previous section).
+
+
+Accessing structs
+^^^^^^^^^^^^^^^^^
+
+To access a nested member, use "." to identify the fully-qualified ``field_name``
+and pass it to the corresponding setter or getter.
 
 .. testcode::
 
     output.instance.set_number("my_point.x", 10)
     output.instance.set_number("my_point.y", 20)
 
+    # alternatively:
+    output.instance["my_point.x"] = 10
+    output.instance["my_point.y"] = 20
+
 It is possible to reset the value of a complex member back to its default:
 
 .. testcode::
 
-    output.instance.clear_member("my_point.x") # x and y are now 0
+    output.instance.clear_member("my_point") # x and y are now 0
 
 Accessing arrays and sequences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use ``[index]`` after a the name of a sequence or an array member to access an
-element:
+Use ``field_name[index]`` as the ``field_name`` to access an element of
+a sequence or array:
 
 .. testcode::
 
@@ -148,6 +227,15 @@ To get the length of a sequence in an Input sample:
 .. testcode::
 
     length = input[0].get_number("my_sequence#")
+
+
+In dictionaries, sequences and arrays are represented as lists. For example:
+
+.. testcode::
+
+    output.instance.set_dictionary({
+        "my_int_sequence":[1, 2],
+        "my_point_sequence":[{"x":1, "y":1}, {"x":2, "y":2}]})
 
 Accessing optional members
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -231,7 +319,7 @@ You can change it later:
 
     output.instance.set_number("my_union.my_long", 10)
 
-In an Input, you can obtain the selected member::
+In an Input, you can obtain the selected member as a string::
 
     if input[0].get_string("my_union#") == "point":
         value = input[0].get_number("my_union.point")

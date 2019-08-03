@@ -6,7 +6,7 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-import pytest,sys,os
+import pytest,sys,os,ctypes
 sys.path.append(os.path.dirname(os.path.realpath(__file__))+ "/../../")
 import rticonnextdds_connector as rti
 
@@ -49,3 +49,14 @@ class TestInput:
       and isinstance(rtiInputFixture.connector,rti.Connector) \
       and isinstance(rtiInputFixture.samples,rti.Samples) \
       and isinstance(rtiInputFixture.infos,rti.Infos)
+
+  def test_reader_native_call(self, rtiInputFixture):
+    get_topic = rti.rti.DDS_DataReader_get_topicdescription
+    get_topic.restype = ctypes.c_void_p
+    get_topic.argtypes = [ctypes.c_void_p]
+    topic = get_topic(rtiInputFixture.native)
+
+    get_name = rti.rti.DDS_TopicDescription_get_name
+    get_name.restype = ctypes.c_char_p
+    get_name.argtypes = [ctypes.c_void_p]
+    assert get_name(topic) == "Square"
