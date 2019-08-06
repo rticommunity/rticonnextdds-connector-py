@@ -66,6 +66,12 @@ To write the values you set in ``Output.instance`` call :meth:`Output.write()`::
 
    output.write()
 
+If the *datawriter_qos* is reliable, you can use :meth:`Output.wait()`
+to block until all matching reliable subscribers acknowledge the reception of the
+data sample::
+
+    output.wait()
+
 Class reference: Output, Instance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

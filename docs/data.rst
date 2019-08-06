@@ -11,8 +11,11 @@ Accessing the data
    input = connector.get_input("TestSubscriber::TestReader")
    output.instance.set_number("my_int_sequence[10]", 10)
    output.instance.set_number("my_point_sequence[10].x", 10)
+   output.instance.set_number("my_optional_long", 10)
+   output.instance.set_number("my_optional_point.x", 10)
    output.write()
-   time.sleep(2)
+   input.wait(2000)
+   input.take()
 
 The types you use to write or read data may included nested structs, sequences and
 arrays of primitive types or structs, etc.
@@ -56,7 +59,7 @@ We will use the following type definition of MyType::
             <member name="my_union" type="nonBasic"  nonBasicTypeName= "MyUnion"/>
             <member name="my_int_sequence" sequenceMaxLength="10" type="int32"/>
             <member name="my_point_sequence" sequenceMaxLength="10" type="nonBasic"  nonBasicTypeName= "Point"/>
-            <member name="my_array" type="nonBasic"  nonBasicTypeName= "Point" arrayDimensions="5"/>
+            <member name="my_point_array" type="nonBasic"  nonBasicTypeName= "Point" arrayDimensions="3"/>
             <member name="my_optional_point" type="nonBasic"  nonBasicTypeName= "Point" optional="true"/>
             <member name="my_optional_long" type="int32" optional="true"/>
         </struct>
@@ -90,7 +93,7 @@ Which corresponds to the following IDL definition::
         MyUnion my_union;
         sequence<long, 10> my_int_sequence;
         sequence<Point, 10> my_point_sequence;
-        Point my_array[5];
+        Point my_point_array[3];
         @optional Point my_optional_point;
         @optional long my_optional_long;
     };
@@ -124,7 +127,7 @@ To set any numeric type, including enumerations:
 .. testcode::
 
     output.instance.set_number("my_long", 2)
-    output.instance.set_number("my_double, 2.14)
+    output.instance.set_number("my_double", 2.14)
     output.instance.set_number("my_enum", 2)
 
 To set booleans:
@@ -199,6 +202,21 @@ It is possible to reset the value of a complex member back to its default:
 
     output.instance.clear_member("my_point") # x and y are now 0
 
+Structs in dictionaries are set as follows:
+
+.. testcode::
+
+    output.instance.set_dictionary({"my_point":{"x":10, "y":20}})
+
+When an member of a struct is not set, it retains its previous value. If we run
+the following code after the previous call to ``set_dictionary``:
+
+.. testcode::
+
+    output.instance.set_dictionary({"my_point":{"y":200}})
+
+The value of ``my_point`` is now ``{"x":10, "y":200}``
+
 Accessing arrays and sequences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -227,7 +245,7 @@ To get the length of a sequence in an Input sample:
 
 .. testcode::
 
-    length = input[0].get_number("my_sequence#")
+    length = input[0].get_number("my_int_sequence#")
 
 
 In dictionaries, sequences and arrays are represented as lists. For example:
@@ -237,6 +255,25 @@ In dictionaries, sequences and arrays are represented as lists. For example:
     output.instance.set_dictionary({
         "my_int_sequence":[1, 2],
         "my_point_sequence":[{"x":1, "y":1}, {"x":2, "y":2}]})
+
+Arrays have a constant length that can't be changed. When you don't set all the elements
+of an array, the remaining elements retain their previous value. However, sequences
+are always overwritten. See the following example:
+
+.. testcode::
+
+    output.instance.set_dictionary({
+        "my_point_sequence":[{"x":1, "y":1}, {"x":2, "y":2}],
+        "my_point_array":[{"x":1, "y":1}, {"x":2, "y":2}, {"x":3, "y":3}]})
+
+    output.instance.set_dictionary({
+        "my_point_sequence":[{"x":100}],
+        "my_point_array":[{"x":100}, {"y":200}]})
+
+After the second call to ``set_dictionary``, the contents of ``my_point_sequence``
+are ``[{"x":100, "y":0}]``, but the contents of ``my_point_array`` are:
+``[{"x":100, "y":1}, {"x":2, "y":200}, {"x":3, "y":3}]``.
+
 
 Accessing optional members
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -312,7 +349,7 @@ In an Output the union member is automatically selected when you set it:
 
 .. testcode::
 
-    output.instance.set_string("my_union.my_string", "hello")
+    output.instance.set_number("my_union.point.x", 10)
 
 You can change it later:
 
