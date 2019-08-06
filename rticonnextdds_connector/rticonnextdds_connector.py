@@ -60,6 +60,10 @@ class Error(Exception):
 	def __init__(self, message):
 		Exception.__init__(self, message)
 
+class TimeoutError(Error):
+	"""A timeout error in operations that can block"""
+	def __init__(self):
+		Error.__init__(self, "DDS Timeout Error")
 
 def _get_last_dds_error_message():
 	error_msg = rtin_RTIDDSConnector_getLastErrorMessage()
@@ -71,11 +75,15 @@ def _get_last_dds_error_message():
 
 class _ReturnCode:
 	ok = 0
+	timeout = 10
 	no_data = 11
 
 def _check_retcode(retcode):
 	if retcode != _ReturnCode.ok and retcode != _ReturnCode.no_data:
-		raise Error("DDS Exception: " + _get_last_dds_error_message())
+		if retcode == _ReturnCode.timeout:
+			raise TimeoutError
+		else:
+			raise Error("DDS Exception: " + _get_last_dds_error_message())
 
 if sys.version_info[0] == 3 :
 	tocstring = tocstring3
@@ -150,6 +158,10 @@ rtin_RTIDDSConnector_clearMember.argtypes = [ctypes.c_void_p, ctypes.c_char_p, c
 
 rtin_RTIDDSConnector_write = rti.RTIDDSConnector_write
 rtin_RTIDDSConnector_write.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
+
+rtin_RTIDDSConnector_waitForAcknowledgments = rti.RTIDDSConnector_wait_for_acknowledgments
+rtin_RTIDDSConnector_waitForAcknowledgments.restype = ctypes.c_int
+rtin_RTIDDSConnector_waitForAcknowledgments.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
 rtin_RTIDDSConnector_read = rti.RTIDDSConnector_read
 rtin_RTIDDSConnector_read.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
@@ -785,6 +797,22 @@ class Output:
 			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), tocstring(jsonStr))
 		else:
 			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), None)
+
+	def wait(self, timeout=None):
+		"""Waits until all matching reliable subscriptions have acknowledged all
+		 the samples that have been currently written.
+
+		This method only waits if this output is configured with a reliable *datawriter_qos*.
+
+		If the operation times out, it raises :class:`TimeoutError`.
+
+		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
+		"""
+
+		if timeout is None:
+			timeout = -1
+		retcode = rtin_RTIDDSConnector_waitForAcknowledgments(self.native, timeout)
+		_check_retcode(retcode)
 
 	def clear_members(self):
 		"""Resets the values of the members of this ``Output.instance``
