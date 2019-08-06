@@ -48,17 +48,23 @@ def fromcstring3(s):
 	except AttributeError as e:
 		raise
 
+def _move_native_string(native_str):
+	"""Copies a natively-allocated string into a python string and returns the
+	native memory"""
+	python_str = fromcstring(cast(native_str, c_char_p).value)
+	rtin_RTIDDSConnector_freeString(native_str)
+	return python_str
+
 class Error(Exception):
 	"""An error in the *RTIConnext DDS Core*"""
-	def __init__(self):
-		Exception.__init__(self, "DDS Exception: " + _get_last_dds_error_message())
+	def __init__(self, message):
+		Exception.__init__(self, message)
 
 
 def _get_last_dds_error_message():
 	error_msg = rtin_RTIDDSConnector_getLastErrorMessage()
 	if error_msg:
-		str_value = fromcstring(cast(error_msg, c_char_p).value)
-		rtin_RTIDDSConnector_freeString(error_msg)
+		str_value = _move_native_string(error_msg)
 	else:
 		str_value = ""
 	return str_value
@@ -69,7 +75,7 @@ class _ReturnCode:
 
 def _check_retcode(retcode):
 	if retcode != _ReturnCode.ok and retcode != _ReturnCode.no_data:
-		raise Error
+		raise Error("DDS Exception: " + _get_last_dds_error_message())
 
 if sys.version_info[0] == 3 :
 	tocstring = tocstring3
@@ -279,10 +285,7 @@ class Samples:
 		if retcode == _ReturnCode.no_data:
 			return None
 
-		str_value = fromcstring(cast(c_value, c_char_p).value)
-		rtin_RTIDDSConnector_freeString(c_value)
-
-		return str_value
+		return _move_native_string(c_value)
 
 	def getDictionary(self, index):
 		if type(index) is not int:
@@ -291,11 +294,8 @@ class Samples:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		jsonStrPtr = rtin_RTIDDSConnector_getJSONSample(self.input.connector.native,tocstring(self.input.name),index)
-		jsonStr = cast(jsonStrPtr, c_char_p).value
-		myDict = json.loads(fromcstring(jsonStr))
-		rtin_RTIDDSConnector_freeString((jsonStrPtr))
-		return myDict
+		native_json_str = rtin_RTIDDSConnector_getJSONSample(self.input.connector.native,tocstring(self.input.name),index)
+		return json.loads(_move_native_string(native_json_str))
 
 	def getNative(self,index):
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
@@ -382,11 +382,10 @@ class SampleIterator:
 		elif selection.value == 2:
 			return bool_value.value
 		elif selection.value == 3:
-			python_str_value = fromcstring(cast(string_value, c_char_p).value)
-			rtin_RTIDDSConnector_freeString(string_value)
-			return python_str_value
+			return _move_native_string(string_value)
 		else:
-			return None
+			# This shouldn't happen
+			raise Error("Unexpected rtin_RTIDDSConnector_getAnyValueFromSamples result")
 
 	def get_dictionary(self):
 		"""Gets a dictionary with the values of all the fields of this sample
@@ -634,8 +633,6 @@ class Instance:
 			self.set_string(field_name, value)
 		elif isinstance(value, bool):
 			self.set_boolean(field_name, value)
-		# elif isinstance(value, dict):
-		# 	self.set_dictionary(field_name, value)
 		else:
 			raise TypeError("'{0}' is not a valid type for 'value'".format(type(value).__name__))
 

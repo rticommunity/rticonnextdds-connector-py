@@ -59,4 +59,4 @@ class TestInput:
     get_name = rti.rti.DDS_TopicDescription_get_name
     get_name.restype = ctypes.c_char_p
     get_name.argtypes = [ctypes.c_void_p]
-    assert get_name(topic) == "Square"
+    assert rti.fromcstring(get_name(topic)) == "Square"

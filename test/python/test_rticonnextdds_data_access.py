@@ -359,17 +359,17 @@ class TestDataAccess:
     assert count > 0
 
   def test_input_performance(self, populated_input):
-    numIter = 1000
+    num_iter = 1000
     sample = populated_input[0]
 
     start = time.time()
-    for i in range (1, numIter):
+    for i in range (1, num_iter):
       v = sample.get_number("my_long")
     end = time.time()
     get_number_duration = end - start
 
     start = time.time()
-    for i in range (1, numIter):
+    for i in range (1, num_iter):
       v = sample["my_long"]
     end = time.time()
     get_item_duration = end - start
@@ -378,17 +378,17 @@ class TestDataAccess:
       (get_item_duration - get_number_duration) / get_number_duration))
 
   def test_output_performance(self, test_output):
-    numIter = 1000
+    num_iter = 1000
     sample = test_output.instance
 
     start = time.time()
-    for i in range (1, numIter):
+    for i in range (1, num_iter):
       sample.set_number("my_long", 10)
     end = time.time()
     get_number_duration = end - start
 
     start = time.time()
-    for i in range (1, numIter):
+    for i in range (1, num_iter):
       sample["my_long"] = 10
     end = time.time()
     get_item_duration = end - start

@@ -140,7 +140,8 @@ To set strings:
     output.instance.set_string("my_string", "Hello, World!")
 
 
-As an alternative to the setters, the special method ``__setitem__`` can be used:
+As an alternative to the setters, the special method ``__setitem__`` can be used
+as follows:
 
 .. testcode::
 
