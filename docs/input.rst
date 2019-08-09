@@ -81,6 +81,38 @@ It is possible to access an individual sample too:
 
 Note that the equivalent method :meth:`Input.get_sample()` is also available.
 
+It is also possible to supply a member_name to :meth:`SampleIterator.get_dictionary()`,
+doing this will return a dictionary containing all the fields of the sample's complex member
+called member_name.
+Given the following type::
+
+   <types>
+        <struct name= "MyPoint">
+            <member name="x" type="int32"/>
+            <member name="y" type="int32"/>
+        </struct>
+        <struct name= "MyStruct">
+            <member name="the_long" type="int32"/>
+            <member name="the_point" type="nonBasic"  nonBasicTypeName= "MyPoint"/>
+        </struct>
+    </types>
+
+It is possible to access the data of the_point as follows:
+
+.. testcode::
+
+   for sample in input.valid_data_iterator:
+      print(sample.get_dictionary("the_point"))
+
+The member_name argument to get_dictionary must correspond to a type with one of
+the following types: array, sequence, struct, value or union. Any other types
+will cause the method to fail:
+
+.. testcode::
+
+   for sample in input.valid_data_iterator:
+      print(sample.get_dictionary("the_long")) # ERROR, the_long is a basic type
+
 TODO: explain use-cases for getInfo() (not yet implemented)
 
 Important: calling read/take again invalidates all iterators currently in

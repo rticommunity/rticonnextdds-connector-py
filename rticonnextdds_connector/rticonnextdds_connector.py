@@ -189,6 +189,10 @@ rtin_RTIDDSConnector_getJSONSample = rti.RTIDDSConnector_getJSONSample
 rtin_RTIDDSConnector_getJSONSample.restype = POINTER(c_char)
 rtin_RTIDDSConnector_getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]
 
+rtin_RTIDDSConector_getJSONMember = rti.RTIDDSConnector_getJSONMember
+rtin_RTIDDSConector_getJSONMember.restype = ctypes.c_int
+rtin_RTIDDSConector_getJSONMember.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, POINTER(c_char_p)]
+
 rtin_RTIDDSConnector_setJSONInstance = rti.RTIDDSConnector_setJSONInstance
 rtin_RTIDDSConnector_setJSONInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
 
@@ -279,14 +283,30 @@ class Samples:
 
 		return str_value
 
-	def getDictionary(self, index):
+	def getDictionary(self, index, member_name = None):
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
 			raise ValueError("index must be positive")
-		#Adding 1 to index because the C API was based on Lua where indexes start from 1
+		# Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		jsonStrPtr = rtin_RTIDDSConnector_getJSONSample(self.input.connector.native,tocstring(self.input.name),index)
+		if member_name is None:
+			jsonStrPtr = rtin_RTIDDSConnector_getJSONSample(
+				self.input.connector.native,
+				tocstring(self.input.name),
+				index)
+		elif not isinstance(member_name, str):
+			raise ValueError("member_name must be a string")
+		else:
+			jsonStrPtr = ctypes.c_char_p()
+			retcode = rtin_RTIDDSConector_getJSONMember(
+				self.input.connector.native,
+				tocstring(self.input.name),
+				index,
+				tocstring(member_name),
+				ctypes.byref(jsonStrPtr))
+			_check_retcode(retcode)
+
 		jsonStr = cast(jsonStrPtr, c_char_p).value
 		myDict = json.loads(fromcstring(jsonStr))
 		rtin_RTIDDSConnector_freeString((jsonStrPtr))
@@ -297,7 +317,6 @@ class Samples:
 		index = index + 1
 		dynDataPtr = rtin_RTIDDSConnector_getNativeSample(self.input.connector.native,tocstring(self.input.name),index)
 		return dynDataPtr
-
 
 class Infos:
 	def __init__(self,input):
@@ -344,17 +363,18 @@ class SampleIterator:
 
 		return self.input.infos.isValid(self.index)
 
-	def get_dictionary(self):
+	def get_dictionary(self, member_name = None):
 		"""Gets a dictionary with the values of all the fields of this sample
 
 		The dictionary keys are the field names and the dictionary values correspond
 		to each field value. To see how nested types, sequences, and arrays are
 		represented, see :ref:`Accessing the data`.
 
-		:return: A dictionary containing all the fields of the sample.
+		:param str element_name: (Optional) The complex member within the type to obtain.
+		:return: A dictionary containing all the fields of the sample, or the complex type if element_name is supplied.
 		"""
 
-		return self.input.samples.getDictionary(self.index)
+		return self.input.samples.getDictionary(self.index, member_name)
 
 	def get_number(self, fieldName):
 		"""Gets the value of a numeric field in this sample

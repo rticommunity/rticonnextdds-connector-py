@@ -8,11 +8,11 @@ To run the tests for python binding of **rticonnextdds_connector**:
 
 2. To execute all the tests, issue the following command from the base directory: 
   
-   ``py.test ./test/python``
+   ``pytest ./test/python``
   
    To execute each test individually, also include the name of the test file: 
   
-   ``py.test ./test/python/test_rticonnextdds_input.py``
+   ``pytest ./test/python/test_rticonnextdds_input.py``
 
 **Note:** Some tests are marked to fail with ``@pytest.mark.xfail`` annotation either because those tests are expected to fail due to implicit type conversion or because the functionality being tested is not yet supported by the python connector library. These tests will be reported as ``xfail``.
 
@@ -27,3 +27,4 @@ Python tests are organized as follows:
 3. ``test_rticonnextdds_input.py``: Contains tests for ``rticonnextdds_connector.Input`` object
 3. ``test_rticonnextdds_output.py``: Contains tests for ``rticonnextdds_connector.Output`` object
 4. ``test_rticonnextdds_dataflow.py``: Tests the dataflow between an ``rticonnextdds_connector.Input`` and ``rticonnextdds_connector.Output`` object.
+4. ``test_rticonnextdds_data_access.py``: Tests the various methods available to access data from a ``rticonnextdds_connector.SampleIterator``object.
