@@ -87,21 +87,19 @@ Important: calling read/take again invalidates all iterators currently in
 use. For that reason, it is not recommended to store the result of
 ``get_sample()``.
 
-In addition to ``getDictionary``, you can get the values of specific fields
-using :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.getBoolean()` and
+In addition to ``get_dictionary``, you can get the values of specific fields
+using :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.get_bool()` and
 :meth:`SampleIterator.get_string()`, for example:
 
 .. testcode::
 
    for sample in input.valid_data_iterator:
-      x = sample.get_number("x")
+      x = sample.get_number("x") # or just sample["x"]
       y = sample.get_number("y")
       size = sample.get_number("shapesize")
-      color = sample.get_string("color")
-      print("Received x: " + repr(x) + " y: " + repr(y) + " size: " + repr(size) + " color: " + color)
+      color = sample.get_string("color") # or just sample["color"]
 
-The previous example shows how to access simple fields. For more complicated types,
-see :ref:`Accessing the data`.
+See more information in :ref:`Accessing the data`.
 
 Class reference: Input, SampleIterator, ValidSampleIterator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

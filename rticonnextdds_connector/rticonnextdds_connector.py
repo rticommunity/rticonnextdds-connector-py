@@ -23,6 +23,7 @@ import weakref
 import platform
 import json
 from contextlib import contextmanager
+from numbers import Number
 
 from ctypes import *
 (bits, linkage) = platform.architecture()
@@ -47,28 +48,42 @@ def fromcstring3(s):
 	except AttributeError as e:
 		raise
 
-class DdsError(Exception):
-	"""An error in the *RTIConnext DDS Core*"""
-	def __init__(self):
-		Exception.__init__(self, "DDS Exception: " + _get_last_dds_error_message())
+def _move_native_string(native_str):
+	"""Copies a natively-allocated string into a python string and returns the
+	native memory"""
+	python_str = fromcstring(cast(native_str, c_char_p).value)
+	rtin_RTIDDSConnector_freeString(native_str)
+	return python_str
 
+class Error(Exception):
+	"""An error in the *RTIConnext DDS Core*"""
+	def __init__(self, message):
+		Exception.__init__(self, message)
+
+class TimeoutError(Error):
+	"""A timeout error in operations that can block"""
+	def __init__(self):
+		Error.__init__(self, "DDS Timeout Error")
 
 def _get_last_dds_error_message():
 	error_msg = rtin_RTIDDSConnector_getLastErrorMessage()
 	if error_msg:
-		str_value = fromcstring(cast(error_msg, c_char_p).value)
-		rtin_RTIDDSConnector_freeString(error_msg)
+		str_value = _move_native_string(error_msg)
 	else:
 		str_value = ""
 	return str_value
 
 class _ReturnCode:
 	ok = 0
+	timeout = 10
 	no_data = 11
 
 def _check_retcode(retcode):
 	if retcode != _ReturnCode.ok and retcode != _ReturnCode.no_data:
-		raise DdsError
+		if retcode == _ReturnCode.timeout:
+			raise TimeoutError
+		else:
+			raise Error("DDS Exception: " + _get_last_dds_error_message())
 
 if sys.version_info[0] == 3 :
 	tocstring = tocstring3
@@ -144,6 +159,10 @@ rtin_RTIDDSConnector_clearMember.argtypes = [ctypes.c_void_p, ctypes.c_char_p, c
 rtin_RTIDDSConnector_write = rti.RTIDDSConnector_write
 rtin_RTIDDSConnector_write.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
 
+rtin_RTIDDSConnector_waitForAcknowledgments = rti.RTIDDSConnector_wait_for_acknowledgments
+rtin_RTIDDSConnector_waitForAcknowledgments.restype = ctypes.c_int
+rtin_RTIDDSConnector_waitForAcknowledgments.argtypes = [ctypes.c_void_p, ctypes.c_int]
+
 rtin_RTIDDSConnector_read = rti.RTIDDSConnector_read
 rtin_RTIDDSConnector_read.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
 rtin_RTIDDSConnector_take = rti.RTIDDSConnector_take
@@ -185,6 +204,10 @@ rtin_RTIDDSConnector_getStringFromSamples = rti.RTIDDSConnector_getStringFromSam
 rtin_RTIDDSConnector_getStringFromSamples.restype = ctypes.c_int
 rtin_RTIDDSConnector_getStringFromSamples.argtypes = [ctypes.c_void_p, POINTER(c_char_p), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
 
+rtin_RTIDDSConnector_getAnyValueFromSamples = rti.RTIDDSConnector_getAnyValueFromSamples
+rtin_RTIDDSConnector_getAnyValueFromSamples.restype = ctypes.c_int
+rtin_RTIDDSConnector_getAnyValueFromSamples.argtypes = [ctypes.c_void_p, POINTER(c_double), POINTER(c_int), POINTER(c_char_p), POINTER(c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+
 rtin_RTIDDSConnector_getJSONSample = rti.RTIDDSConnector_getJSONSample
 rtin_RTIDDSConnector_getJSONSample.restype = POINTER(c_char)
 rtin_RTIDDSConnector_getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]
@@ -212,7 +235,7 @@ class Samples:
 	def getLength(self):
 		return int(rtin_RTIDDSConnector_getSamplesLength(self.input.connector.native,tocstring(self.input.name)))
 
-	def getNumber(self, index, fieldName):
+	def getNumber(self, index, field_name):
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -226,7 +249,7 @@ class Samples:
 			ctypes.byref(c_value),
 			tocstring(self.input.name),
 			index,
-			tocstring(fieldName))
+			tocstring(field_name))
 		_check_retcode(retcode)
 
 		if retcode == _ReturnCode.no_data:
@@ -234,7 +257,7 @@ class Samples:
 
 		return c_value.value
 
-	def getBoolean(self, index, fieldName):
+	def getBoolean(self, index, field_name):
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -248,7 +271,7 @@ class Samples:
 			ctypes.byref(c_value),
 			tocstring(self.input.name),
 			index,
-			tocstring(fieldName))
+			tocstring(field_name))
 		_check_retcode(retcode)
 
 		if retcode == _ReturnCode.no_data:
@@ -256,7 +279,7 @@ class Samples:
 
 		return c_value.value
 
-	def getString(self, index, fieldName):
+	def getString(self, index, field_name):
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
@@ -269,15 +292,12 @@ class Samples:
 			ctypes.byref(c_value),
 			tocstring(self.input.name),
 			index,
-			tocstring(fieldName))
+			tocstring(field_name))
 		_check_retcode(retcode)
 		if retcode == _ReturnCode.no_data:
 			return None
 
-		str_value = fromcstring(cast(c_value, c_char_p).value)
-		rtin_RTIDDSConnector_freeString(c_value)
-
-		return str_value
+		return _move_native_string(c_value)
 
 	def getDictionary(self, index):
 		if type(index) is not int:
@@ -286,11 +306,8 @@ class Samples:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		jsonStrPtr = rtin_RTIDDSConnector_getJSONSample(self.input.connector.native,tocstring(self.input.name),index)
-		jsonStr = cast(jsonStrPtr, c_char_p).value
-		myDict = json.loads(fromcstring(jsonStr))
-		rtin_RTIDDSConnector_freeString((jsonStrPtr))
-		return myDict
+		native_json_str = rtin_RTIDDSConnector_getJSONSample(self.input.connector.native,tocstring(self.input.name),index)
+		return json.loads(_move_native_string(native_json_str))
 
 	def getNative(self,index):
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
@@ -326,7 +343,17 @@ class Infos:
 class SampleIterator:
 	"""Iterates and provides access to a data sample
 
-	See :meth:`Input.getDataIterator()` and :meth:`Input.getSample()`.
+	A SampleIterator provides access to the data recieved by an input.
+	SampleIterators are returned by :meth:`Input.data_iterator()`,
+	and :meth:`Input.get_sample()`; :meth:`Input.valid_data_iterator()` returns
+	a subclass, :class:`ValidSampleIterator`.
+
+	See :ref:`Reading data (Input)`.
+
+	Special methods:
+		* ``__getitem__`` retrieves a field, see :ref:`Accessing the data`
+		* ``__iter__`` enables iteration
+		* ``__next__`` moves to the next sample
 	"""
 
 	def __init__(self, input, index = -1):
@@ -338,11 +365,39 @@ class SampleIterator:
 	def valid_data(self):
 		"""Returns whether this sample contains valid data
 
-		If this returns ``False``, the data getters (``get_dictionary()``, ``get_number()``...)
-		cannot be called.
+		If this returns ``False``, this object's getters cannot be called.
 		"""
 
 		return self.input.infos.isValid(self.index)
+
+	def __getitem__(self, field_name):
+		number_value = ctypes.c_double()
+		bool_value = ctypes.c_int()
+		string_value = ctypes.c_char_p()
+		selection = ctypes.c_int()
+		retcode = rtin_RTIDDSConnector_getAnyValueFromSamples(
+			self.input.connector.native,
+			ctypes.byref(number_value),
+			ctypes.byref(bool_value),
+			ctypes.byref(string_value),
+			ctypes.byref(selection),
+			tocstring(self.input.name),
+			self.index + 1,
+			tocstring(field_name))
+		_check_retcode(retcode)
+
+		if retcode == _ReturnCode.no_data:
+			return None
+
+		if selection.value == 1:
+			return number_value.value
+		elif selection.value == 2:
+			return bool_value.value
+		elif selection.value == 3:
+			return _move_native_string(string_value)
+		else:
+			# This shouldn't happen
+			raise Error("Unexpected rtin_RTIDDSConnector_getAnyValueFromSamples result")
 
 	def get_dictionary(self):
 		"""Gets a dictionary with the values of all the fields of this sample
@@ -356,32 +411,36 @@ class SampleIterator:
 
 		return self.input.samples.getDictionary(self.index)
 
-	def get_number(self, fieldName):
+	def get_number(self, field_name):
 		"""Gets the value of a numeric field in this sample
 
-		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
-		:return: The numeric value for the field ``fieldName``.
+		:param str field_name: The name of the field. See :ref:`Accessing the data`.
+		:return: The numeric value for the field ``field_name``.
 		"""
 
-		return self.input.samples.getNumber(self.index, fieldName)
+		return self.input.samples.getNumber(self.index, field_name)
 
-	def get_boolean(self, fieldName):
+	def get_boolean(self, field_name):
 		"""Gets the value of a boolean field in this sample
 
-		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
-		:return: The boolean value for the field ``fieldName``.
+		:param str field_name: The name of the field. See :ref:`Accessing the data`.
+		:return: The boolean value for the field ``field_name``.
 		"""
 
-		return self.input.samples.getBoolean(self.index, fieldName)
+		return self.input.samples.getBoolean(self.index, field_name)
 
-	def get_string(self, fieldName):
+	def get_string(self, field_name):
 		"""Gets the value of a string field in this sample
 
-		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
-		:return: The string value for the field ``fieldName``.
+		:param str field_name: The name of the field. See :ref:`Accessing the data`.
+		:return: The string value for the field ``field_name``.
 		"""
 
-		return self.input.samples.getString(self.index, fieldName)
+		return self.input.samples.getString(self.index, field_name)
+
+	@property
+	def native(self):
+		return self.input.samples.getNative(self.index)
 
 	def __iter__(self):
 		"""Enables iteration"""
@@ -407,7 +466,7 @@ class ValidSampleIterator(SampleIterator):
 
 	This iterator provides the same methods as :class:`SampleIterator`.
 
-	See :meth:`Input.getValidDataIterator()`.
+	See :meth:`Input.valid_data_iterator`.
 	"""
 
 	def __next__(self):
@@ -544,101 +603,122 @@ class Instance:
 		An Instance has an associated DDS Type, specified in the XML configuration,
 		and it allows setting the values for the fields of the DDS Type.
 
-		TODO: fieldName format (create new section and link to it)
-
 		Attributes:
 			* ``output`` (:class:`Output`): The ``Output`` that owns this ``Instance``.
+
+		Special methods:
+			* ``__setitem__``, see `:ref:`Accessing the data`.
 	"""
 
 	def __init__(self, output):
 		self.output = output
 
-	def clear_member(self, fieldName):
+	def clear_member(self, field_name):
 		"""Resets a member to its default value
 
 		The effect is the same as that of :meth:`Output.clear_members()` except
 		that only one member is cleared.
 
-		:param str fieldName: The name of the field. It can be a complex member or a primitive member. See :ref:`Accessing the data`.
+		:param str field_name: The name of the field. It can be a complex member or a primitive member. See :ref:`Accessing the data`.
 		"""
 
 		retcode = rtin_RTIDDSConnector_clearMember(
 			self.output.connector.native,
 			tocstring(self.output.name),
-			tocstring(fieldName))
+			tocstring(field_name))
 		_check_retcode(retcode)
 
-	def set_number(self, fieldName, value):
+	def __setitem__(self, field_name, value):
+		"""Sets the value of field_name
+
+		:param str field_name: The name of the field. See :ref:`Accessing the data`.
+		:param number value: A numeric, boolean or string value or ``None`` to unset an optional member.
+
+		The type of the argument must correspond with the type of the field as defined
+		in the configuration file.
+
+		This is an alternative to :meth:`set_number`, :meth:`set_string` and :meth:`set_boolean`
+		"""
+		if isinstance(value, Number):
+			self.set_number(field_name, value)
+		elif isinstance(value, str):
+			self.set_string(field_name, value)
+		elif isinstance(value, bool):
+			self.set_boolean(field_name, value)
+		else:
+			raise TypeError("'{0}' is not a valid type for 'value'".format(type(value).__name__))
+
+	def set_number(self, field_name, value):
 		"""Sets a numeric field
 
-		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
-		:param number value: A numeric value or None to unset an optional member
+		:param str field_name: The name of the field. See :ref:`Accessing the data`.
+		:param number value: A numeric value or ``None`` to unset an optional member
 		"""
 
 		if value is None:
-			self.clear_member(fieldName)
+			self.clear_member(field_name)
 		else:
 			try:
 				rtin_RTIDDSConnector_setNumberIntoSamples(
 					self.output.connector.native,
 					tocstring(self.output.name),
-					tocstring(fieldName),
+					tocstring(field_name),
 					value)
 			except ctypes.ArgumentError as e:
-				raise TypeError("field:{0} should be of type Numeric"\
-					.format(fieldName))
+				raise TypeError("value for field '{0}' must be of a numeric type"\
+					.format(field_name))
 
 	# Deprecated: use set_number
-	def setNumber(self, fieldName, value):
-		self.set_number(fieldName, value)
+	def setNumber(self, field_name, value):
+		self.set_number(field_name, value)
 
-	def set_boolean(self,fieldName, value):
+	def set_boolean(self,field_name, value):
 		"""Sets a Boolean field
 
-		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
-		:param number value: ``TRUE`` or ``FALSE`` or None to unset an optional member
+		:param str field_name: The name of the field. See :ref:`Accessing the data`.
+		:param number value: ``True`` or ``False``, or ``None`` to unset an optional member
 		"""
 
 		if value is None:
-			self.clear_member(fieldName)
+			self.clear_member(field_name)
 		else:
 			try:
 				rtin_RTIDDSConnector_setBooleanIntoSamples(
 						self.output.connector.native,
 						tocstring(self.output.name),
-						tocstring(fieldName),
+						tocstring(field_name),
 						value)
 			except ctypes.ArgumentError as e:
-				raise TypeError("field:{0} should be of type Boolean"\
-					.format(fieldName))
+				raise TypeError("value for field '{0}' must be of type bool"\
+					.format(field_name))
 
 	# Deprecated: use set_boolean
-	def setBoolean(self, fieldName, value):
-		self.set_boolean(fieldName, value)
+	def setBoolean(self, field_name, value):
+		self.set_boolean(field_name, value)
 
-	def set_string(self, fieldName, value):
+	def set_string(self, field_name, value):
 		"""Sets a string field
 
-		:param str fieldName: The name of the field. See :ref:`Accessing the data`.
-		:param str value: The string value or None to unset an optional member
+		:param str field_name: The name of the field. See :ref:`Accessing the data`.
+		:param str value: The string value or ``None`` to unset an optional member
 		"""
 
 		if value is None:
-			self.clear_member(fieldName)
+			self.clear_member(field_name)
 		else:
 			try:
 				rtin_RTIDDSConnector_setStringIntoSamples(
 					self.output.connector.native,
 					tocstring(self.output.name),
-					tocstring(fieldName),
+					tocstring(field_name),
 					tocstring(value))
 			except AttributeError | ctypes.ArgumentError as e:
-				raise TypeError("field:{0} should be of type String"\
-					.format(fieldName))
+				raise TypeError("value for field '{0}' must be of type str"\
+					.format(field_name))
 
 	# Deprecated: use set_string
-	def setString(self, fieldName, value):
-		self.set_string(fieldName, value)
+	def setString(self, field_name, value):
+		self.set_string(field_name, value)
 
 	def set_dictionary(self, dictionary):
 		"""Sets the member values specified in a dictionary
@@ -683,26 +763,13 @@ class Instance:
 class Output:
 	"""Allows writting data for a DDS Topic
 
-	To obtain an Output, use :meth:`Connector.get_output()`.
-
-	Use the attribute ``instance`` to set the values of the data sample you want
-	to write.
-
-	If the name of the member you try to access doesn't exist, TODO: raise exception.
-
-	After that, call :meth:`write()` to publish the instance::
-
-		output.write()
-
-	To publish a new data sample, modify ``instance`` (call :meth:`clear_members()`
-	if you need to start from scratch) and call ``write()`` again.
-
 	Attributes:
 		* ``instance`` (:class:`Instance`): The data that is written when :meth:`write()` is called.
 		* ``connector`` (:class:`Connector`): The Connector that created this Output
 		* ``name`` (str): The name of this ``Output`` (the name used in :meth:`Connector.getOutput`)
 		* ``native``: A native handle that allows accessing additional *Connext DDS* APIs in C.
 
+	See `Writing Data (Output)`.
 	"""
 
 	def __init__(self, connector, name):
@@ -730,6 +797,22 @@ class Output:
 			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), tocstring(jsonStr))
 		else:
 			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), None)
+
+	def wait(self, timeout=None):
+		"""Waits until all matching reliable subscriptions have acknowledged all
+		 the samples that have been currently written.
+
+		This method only waits if this output is configured with a reliable *datawriter_qos*.
+
+		If the operation times out, it raises :class:`TimeoutError`.
+
+		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
+		"""
+
+		if timeout is None:
+			timeout = -1
+		retcode = rtin_RTIDDSConnector_waitForAcknowledgments(self.native, timeout)
+		_check_retcode(retcode)
 
 	def clear_members(self):
 		"""Resets the values of the members of this ``Output.instance``

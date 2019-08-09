@@ -331,3 +331,8 @@ class TestInstance:
     rtiOutputFixture.instance.setDictionary(dict_with_incompatible_types)
     out,err = capfd.readouterr()
     assert 0
+
+  def test_wait_for_acknowledgments(self, rtiOutputFixture):
+    rtiOutputFixture.write()
+    rtiOutputFixture.wait()
+    rtiOutputFixture.wait(1) # Should return immediately
