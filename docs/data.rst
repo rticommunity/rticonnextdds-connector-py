@@ -220,8 +220,8 @@ The value of ``my_point`` is now ``{"x":10, "y":200}``
 Accessing arrays and sequences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use ``field_name[index]`` as the ``field_name`` to access an element of
-a sequence or array:
+Use ``"field_name[index]"`` to access an element of a sequence or array,
+where ``0 <= index < length``:
 
 .. testcode::
 
@@ -232,8 +232,8 @@ In an Output, sequences are automatically resized:
 
 .. testcode::
 
-    output.instance.set_number("my_int_sequence[5]", 10) # length is now 5
-    output.instance.set_number("my_int_sequence[4]", 9) # length still 5
+    output.instance.set_number("my_int_sequence[5]", 10) # length is now 6
+    output.instance.set_number("my_int_sequence[4]", 9) # length still 6
 
 You can clear a sequence:
 

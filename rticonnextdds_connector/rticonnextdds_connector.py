@@ -85,6 +85,9 @@ def _check_retcode(retcode):
 		else:
 			raise Error("DDS Exception: " + _get_last_dds_error_message())
 
+class _ConnectorOptions(ctypes.Structure):
+	_fields_ = [("enable_on_data_event", c_int), ("one_based_sequence_indexing", c_int)]
+
 if sys.version_info[0] == 3 :
 	tocstring = tocstring3
 	fromcstring = fromcstring3
@@ -849,7 +852,14 @@ class Connector:
 	"""
 
 	def __init__(self, configName, url):
-		self.native = rtin_RTIDDSConnector_new(tocstring(configName), tocstring(url), None)
+		# enable data event (default), 0-based seq indexing
+		options = _ConnectorOptions(
+			enable_on_data_event = 1,
+			one_based_sequence_indexing = 0)
+		self.native = rtin_RTIDDSConnector_new(
+			tocstring(configName),
+			tocstring(url),
+			ctypes.byref(options))
 		if self.native is None:
 			raise ValueError("Invalid participant profile, xml path or xml profile")
 
