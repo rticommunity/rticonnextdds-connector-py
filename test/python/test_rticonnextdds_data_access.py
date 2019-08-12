@@ -381,7 +381,7 @@ class TestDataAccess:
 
 
   def test_access_native_dynamic_data(self, populated_input):
-    get_member_count = rti.rti.DDS_DynamicData_get_member_count
+    get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
     get_member_count.restype = ctypes.c_uint
     get_member_count.argtypes = [ctypes.c_void_p]
     count = get_member_count(populated_input[0].native)
