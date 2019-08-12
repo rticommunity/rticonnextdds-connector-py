@@ -26,9 +26,6 @@ from contextlib import contextmanager
 from numbers import Number
 
 from ctypes import *
-(bits, linkage) = platform.architecture()
-osname = platform.system()
-isArm = platform.uname()[4].startswith("arm")
 
 def fromcstring(s):
 	return s
@@ -48,11 +45,15 @@ def fromcstring3(s):
 	except AttributeError as e:
 		raise
 
+if sys.version_info[0] == 3:
+	tocstring = tocstring3
+	fromcstring = fromcstring3
+
 def _move_native_string(native_str):
 	"""Copies a natively-allocated string into a python string and returns the
 	native memory"""
 	python_str = fromcstring(cast(native_str, c_char_p).value)
-	rtin_RTIDDSConnector_freeString(native_str)
+	connector_binding.freeString(native_str)
 	return python_str
 
 class Error(Exception):
@@ -66,7 +67,7 @@ class TimeoutError(Error):
 		Error.__init__(self, "DDS Timeout Error")
 
 def _get_last_dds_error_message():
-	error_msg = rtin_RTIDDSConnector_getLastErrorMessage()
+	error_msg = connector_binding.getLastErrorMessage()
 	if error_msg:
 		str_value = _move_native_string(error_msg)
 	else:
@@ -85,158 +86,162 @@ def _check_retcode(retcode):
 		else:
 			raise Error("DDS Exception: " + _get_last_dds_error_message())
 
+class _ConnectorBinding:
+	def __init__(self):
+		(bits, linkage) = platform.architecture()
+		osname = platform.system()
+		isArm = platform.uname()[4].startswith("arm")
+
+		if "64" in bits:
+			if "Linux" in osname:
+				arch = "x64Linux2.6gcc4.4.5"
+				libname = "librtiddsconnector"
+				post = "so"
+			elif "Darwin" in osname:
+				arch = "x64Darwin16clang8.0"
+				libname = "librtiddsconnector"
+				post = "dylib"
+			elif "Windows" in osname:
+				arch = "x64Win64VS2013"
+				libname = "rtiddsconnector"
+				post = "dll"
+			else:
+				raise RuntimeError("This platform ({0}) is not supported".format(osname))
+		else:
+			if isArm:
+				arch = "armv6vfphLinux3.xgcc4.7.2"
+				libname = "librtiddsconnector"
+				post = "so"
+			elif "Linux" in osname:
+				arch = "i86Linux3.xgcc4.6.3"
+				libname = "librtiddsconnector"
+				post = "so"
+			elif "Windows" in osname:
+				arch = "i86Win32VS2010"
+				libname = "rtiddsconnector"
+				post = "dll"
+			else:
+				raise RuntimeError("This platform ({0}) is not supported".format(osname))
+
+		path = os.path.dirname(os.path.realpath(__file__))
+		path = os.path.join(path, "..", "rticonnextdds-connector/lib", arch)
+		libname = libname + "." + post
+		self.library = ctypes.CDLL(os.path.join(path, libname), ctypes.RTLD_GLOBAL)
+
+		self.new = self.library.RTI_Connector_new
+		self.new.restype = ctypes.c_void_p
+		self.new.argtypes = [ctypes.c_char_p,ctypes.c_char_p,ctypes.c_void_p]
+
+		self.delete = self.library.RTIDDSConnector_delete
+		self.delete.restype = ctypes.c_void_p
+		self.delete.argtypes = [ctypes.c_void_p]
+
+		self.getWriter= self.library.RTI_Connector_get_datawriter
+		self.getWriter.restype= ctypes.c_void_p
+		self.getWriter.argtypes=[ ctypes.c_void_p,ctypes.c_char_p ]
+
+		self.getReader= self.library.RTI_Connector_get_datareader
+		self.getReader.restype= ctypes.c_void_p
+		self.getReader.argtypes=[ ctypes.c_void_p,ctypes.c_char_p ]
+
+		self.getNativeSample = self.library.RTI_Connector_get_native_sample
+		self.getNativeSample.restype = ctypes.c_void_p
+		self.getNativeSample.argtypes=[ ctypes.c_void_p,ctypes.c_char_p, ctypes.c_int]
+
+		self.setNumberIntoSamples = self.library.RTIDDSConnector_setNumberIntoSamples
+		self.setNumberIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_double]
+		self.setBooleanIntoSamples = self.library.RTIDDSConnector_setBooleanIntoSamples
+		self.setBooleanIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_int]
+		self.setStringIntoSamples = self.library.RTIDDSConnector_setStringIntoSamples
+		self.setStringIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
+		self.clearMember = self.library.RTI_Connector_clear_member
+		self.clearMember.restype = ctypes.c_int
+		self.clearMember.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
+
+		self.write = self.library.RTIDDSConnector_write
+		self.write.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
+
+		self.waitForAcknowledgments = self.library.RTI_Connector_wait_for_acknowledgments
+		self.waitForAcknowledgments.restype = ctypes.c_int
+		self.waitForAcknowledgments.argtypes = [ctypes.c_void_p, ctypes.c_int]
+
+		self.read = self.library.RTIDDSConnector_read
+		self.read.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+		self.take = self.library.RTIDDSConnector_take
+		self.take.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+
+		self.wait = self.library.RTI_Connector_wait_for_data
+		self.wait.restype = ctypes.c_int
+		self.wait.argtypes = [ctypes.c_void_p, ctypes.c_int]
+
+		self.getInfosLength = self.library.RTIDDSConnector_getInfosLength
+		self.getInfosLength.restype = ctypes.c_double
+		self.getInfosLength.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
+
+		self.clear = self.library.RTIDDSConnector_clear
+		self.clear.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
+
+		self.getBooleanFromInfos = self.library.RTIDDSConnector_getBooleanFromInfos
+		self.getBooleanFromInfos.restype  = ctypes.c_int
+		self.getBooleanFromInfos.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+
+		self.getJSONFromInfos = self.library.RTIDDSConnector_getJSONFromInfos
+		self.getJSONFromInfos.restype  = ctypes.c_char_p
+		self.getJSONFromInfos.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+
+		self.getSamplesLength = self.library.RTIDDSConnector_getInfosLength
+		self.getSamplesLength.restype = ctypes.c_double
+		self.getSamplesLength.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
+
+		self.getNumberFromSamples = self.library.RTI_Connector_get_number_from_sample
+		self.getNumberFromSamples.restype = ctypes.c_int
+		self.getNumberFromSamples.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_double), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+
+		self.getBooleanFromSamples = self.library.RTI_Connector_get_boolean_from_sample
+		self.getBooleanFromSamples.restype = ctypes.c_int
+		self.getBooleanFromSamples.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+
+		self.getStringFromSamples = self.library.RTI_Connector_get_string_from_sample
+		self.getStringFromSamples.restype = ctypes.c_int
+		self.getStringFromSamples.argtypes = [ctypes.c_void_p, POINTER(c_char_p), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+
+		self.getAnyValueFromSamples = self.library.RTI_Connector_get_any_from_sample
+		self.getAnyValueFromSamples.restype = ctypes.c_int
+		self.getAnyValueFromSamples.argtypes = [ctypes.c_void_p, POINTER(c_double), POINTER(c_int), POINTER(c_char_p), POINTER(c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+
+		self.getJSONSample = self.library.RTIDDSConnector_getJSONSample
+		self.getJSONSample.restype = POINTER(c_char)
+		self.getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]
+
+		self.setJSONInstance = self.library.RTIDDSConnector_setJSONInstance
+		self.setJSONInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
+
+		self.getLastErrorMessage = self.library.RTI_Connector_get_last_error_message
+		self.getLastErrorMessage.restype = POINTER(c_char)
+		self.getLastErrorMessage.argtypes = []
+
+		self.getNativeInstance = self.library.RTIDDSConnector_getNativeInstance
+		self.getNativeInstance.restype = ctypes.c_void_p
+		self.getNativeInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+
+		self.freeString = self.library.RTI_Connector_free_string
+		self.freeString.argtypes = [POINTER(c_char)]
+
+connector_binding = _ConnectorBinding()
+
 class _ConnectorOptions(ctypes.Structure):
 	_fields_ = [("enable_on_data_event", c_int), ("one_based_sequence_indexing", c_int)]
 
-if sys.version_info[0] == 3 :
-	tocstring = tocstring3
-	fromcstring = fromcstring3
-
-
-if "64" in bits:
-	if "Linux" in osname:
-		arch = "x64Linux2.6gcc4.4.5"
-		libname = "librtiddsconnector"
-		post = "so"
-	elif "Darwin" in osname:
-		arch = "x64Darwin16clang8.0"
-		libname = "librtiddsconnector"
-		post = "dylib"
-	elif "Windows" in osname:
-		arch = "x64Win64VS2013"
-		libname = "rtiddsconnector"
-		post = "dll"
-	else:
-		print("platfrom not yet supported")
-else:
-	if isArm:
-		arch = "armv6vfphLinux3.xgcc4.7.2"
-		libname = "librtiddsconnector"
-		post = "so"
-	elif "Linux" in osname:
-		arch = "i86Linux3.xgcc4.6.3"
-		libname = "librtiddsconnector"
-		post = "so"
-	elif "Windows" in osname:
-		arch = "i86Win32VS2010"
-		libname = "rtiddsconnector"
-		post = "dll"
-	else:
-		print("platfrom not yet supported")
-
-path = os.path.dirname(os.path.realpath(__file__))
-path = os.path.join(path, "..", "rticonnextdds-connector/lib", arch)
-libname = libname + "." + post
-rti = ctypes.CDLL(os.path.join(path, libname), ctypes.RTLD_GLOBAL)
-
-rtin_RTIDDSConnector_new = rti.RTIDDSConnector_new
-rtin_RTIDDSConnector_new.restype = ctypes.c_void_p
-rtin_RTIDDSConnector_new.argtypes = [ctypes.c_char_p,ctypes.c_char_p,ctypes.c_void_p]
-
-rtin_RTIDDSConnector_delete = rti.RTIDDSConnector_delete
-rtin_RTIDDSConnector_delete.restype = ctypes.c_void_p
-rtin_RTIDDSConnector_delete.argtypes = [ctypes.c_void_p]
-
-rtin_RTIDDSConnector_getWriter= rti.RTIDDSConnector_getWriter
-rtin_RTIDDSConnector_getWriter.restype= ctypes.c_void_p
-rtin_RTIDDSConnector_getWriter.argtypes=[ ctypes.c_void_p,ctypes.c_char_p ]
-
-rtin_RTIDDSConnector_getReader= rti.RTIDDSConnector_getReader
-rtin_RTIDDSConnector_getReader.restype= ctypes.c_void_p
-rtin_RTIDDSConnector_getReader.argtypes=[ ctypes.c_void_p,ctypes.c_char_p ]
-
-rtin_RTIDDSConnector_getNativeSample = rti.RTIDDSConnector_getNativeSample
-rtin_RTIDDSConnector_getNativeSample.restype = ctypes.c_void_p
-rtin_RTIDDSConnector_getNativeSample.argtypes=[ ctypes.c_void_p,ctypes.c_char_p, ctypes.c_int]
-
-rtin_RTIDDSConnector_setNumberIntoSamples = rti.RTIDDSConnector_setNumberIntoSamples
-rtin_RTIDDSConnector_setNumberIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_double]
-rtin_RTIDDSConnector_setBooleanIntoSamples = rti.RTIDDSConnector_setBooleanIntoSamples
-rtin_RTIDDSConnector_setBooleanIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_int]
-rtin_RTIDDSConnector_setStringIntoSamples = rti.RTIDDSConnector_setStringIntoSamples
-rtin_RTIDDSConnector_setStringIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
-rtin_RTIDDSConnector_clearMember = rti.RTIDDSConnector_clearMember
-rtin_RTIDDSConnector_clearMember.restype = ctypes.c_int
-rtin_RTIDDSConnector_clearMember.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
-
-rtin_RTIDDSConnector_write = rti.RTIDDSConnector_write
-rtin_RTIDDSConnector_write.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
-
-rtin_RTIDDSConnector_waitForAcknowledgments = rti.RTIDDSConnector_wait_for_acknowledgments
-rtin_RTIDDSConnector_waitForAcknowledgments.restype = ctypes.c_int
-rtin_RTIDDSConnector_waitForAcknowledgments.argtypes = [ctypes.c_void_p, ctypes.c_int]
-
-rtin_RTIDDSConnector_read = rti.RTIDDSConnector_read
-rtin_RTIDDSConnector_read.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
-rtin_RTIDDSConnector_take = rti.RTIDDSConnector_take
-rtin_RTIDDSConnector_take.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
-
-rtin_RTIDDSConnector_wait = rti.RTIDDSConnector_wait
-rtin_RTIDDSConnector_wait.restype = ctypes.c_int
-rtin_RTIDDSConnector_wait.argtypes = [ctypes.c_void_p, ctypes.c_int]
-
-rtin_RTIDDSConnector_getInfosLength = rti.RTIDDSConnector_getInfosLength
-rtin_RTIDDSConnector_getInfosLength.restype = ctypes.c_double
-rtin_RTIDDSConnector_getInfosLength.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
-
-rtin_RTIDDSConnector_clear = rti.RTIDDSConnector_clear
-rtin_RTIDDSConnector_clear.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
-
-
-rtin_RTIDDSConnector_getBooleanFromInfos = rti.RTIDDSConnector_getBooleanFromInfos
-rtin_RTIDDSConnector_getBooleanFromInfos.restype  = ctypes.c_int
-rtin_RTIDDSConnector_getBooleanFromInfos.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
-
-rtin_RTIDDSConnector_getJSONFromInfos = rti.RTIDDSConnector_getJSONFromInfos
-rtin_RTIDDSConnector_getJSONFromInfos.restype  = ctypes.c_char_p
-rtin_RTIDDSConnector_getJSONFromInfos.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
-
-rtin_RTIDDSConnector_getSamplesLength = rti.RTIDDSConnector_getInfosLength
-rtin_RTIDDSConnector_getSamplesLength.restype = ctypes.c_double
-rtin_RTIDDSConnector_getSamplesLength.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
-
-rtin_RTIDDSConnector_getNumberFromSamples = rti.RTIDDSConnector_getNumberFromSamplesWithRetcode
-rtin_RTIDDSConnector_getNumberFromSamples.restype = ctypes.c_int
-rtin_RTIDDSConnector_getNumberFromSamples.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_double), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
-
-rtin_RTIDDSConnector_getBooleanFromSamples = rti.RTIDDSConnector_getBooleanFromSamplesWithRetcode
-rtin_RTIDDSConnector_getBooleanFromSamples.restype = ctypes.c_int
-rtin_RTIDDSConnector_getBooleanFromSamples.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
-
-rtin_RTIDDSConnector_getStringFromSamples = rti.RTIDDSConnector_getStringFromSamplesWithRetcode
-rtin_RTIDDSConnector_getStringFromSamples.restype = ctypes.c_int
-rtin_RTIDDSConnector_getStringFromSamples.argtypes = [ctypes.c_void_p, POINTER(c_char_p), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
-
-rtin_RTIDDSConnector_getAnyValueFromSamples = rti.RTIDDSConnector_getAnyValueFromSamples
-rtin_RTIDDSConnector_getAnyValueFromSamples.restype = ctypes.c_int
-rtin_RTIDDSConnector_getAnyValueFromSamples.argtypes = [ctypes.c_void_p, POINTER(c_double), POINTER(c_int), POINTER(c_char_p), POINTER(c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
-
-rtin_RTIDDSConnector_getJSONSample = rti.RTIDDSConnector_getJSONSample
-rtin_RTIDDSConnector_getJSONSample.restype = POINTER(c_char)
-rtin_RTIDDSConnector_getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]
-
-rtin_RTIDDSConnector_setJSONInstance = rti.RTIDDSConnector_setJSONInstance
-rtin_RTIDDSConnector_setJSONInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
-
-rtin_RTIDDSConnector_getLastErrorMessage = rti.RTIDDSConnector_getLastErrorMessage
-rtin_RTIDDSConnector_getLastErrorMessage.restype = POINTER(c_char)
-rtin_RTIDDSConnector_getLastErrorMessage.argtypes = []
-
-rtin_RTIDDSConnector_getNativeInstance = rti.RTIDDSConnector_getNativeInstance
-rtin_RTIDDSConnector_getNativeInstance.restype = ctypes.c_void_p
-rtin_RTIDDSConnector_getNativeInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
-
-rtin_RTIDDSConnector_freeString = rti.RTIDDSConnector_freeString
-rtin_RTIDDSConnector_freeString.argtypes = [POINTER(c_char)]
-
-#Python Class Definition
+#
+# Public API
+#
 
 class Samples:
 	def __init__(self,input):
 		self.input = input
 
 	def getLength(self):
-		return int(rtin_RTIDDSConnector_getSamplesLength(self.input.connector.native,tocstring(self.input.name)))
+		return int(connector_binding.getSamplesLength(self.input.connector.native,tocstring(self.input.name)))
 
 	def getNumber(self, index, field_name):
 		if type(index) is not int:
@@ -247,7 +252,7 @@ class Samples:
 		# Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
 		c_value = ctypes.c_double()
-		retcode = rtin_RTIDDSConnector_getNumberFromSamples(
+		retcode = connector_binding.getNumberFromSamples(
 			self.input.connector.native,
 			ctypes.byref(c_value),
 			tocstring(self.input.name),
@@ -269,7 +274,7 @@ class Samples:
 		index = index + 1
 
 		c_value = ctypes.c_int()
-		retcode = rtin_RTIDDSConnector_getBooleanFromSamples(
+		retcode = connector_binding.getBooleanFromSamples(
 			self.input.connector.native,
 			ctypes.byref(c_value),
 			tocstring(self.input.name),
@@ -290,7 +295,7 @@ class Samples:
 
 		index = index + 1
 		c_value = ctypes.c_char_p()
-		retcode = rtin_RTIDDSConnector_getStringFromSamples(
+		retcode = connector_binding.getStringFromSamples(
 			self.input.connector.native,
 			ctypes.byref(c_value),
 			tocstring(self.input.name),
@@ -309,13 +314,13 @@ class Samples:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		native_json_str = rtin_RTIDDSConnector_getJSONSample(self.input.connector.native,tocstring(self.input.name),index)
+		native_json_str = connector_binding.getJSONSample(self.input.connector.native,tocstring(self.input.name),index)
 		return json.loads(_move_native_string(native_json_str))
 
 	def getNative(self,index):
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		dynDataPtr = rtin_RTIDDSConnector_getNativeSample(self.input.connector.native,tocstring(self.input.name),index)
+		dynDataPtr = connector_binding.getNativeSample(self.input.connector.native,tocstring(self.input.name),index)
 		return dynDataPtr
 
 
@@ -324,7 +329,7 @@ class Infos:
 		self.input = input
 
 	def getLength(self):
-		return int(rtin_RTIDDSConnector_getInfosLength(self.input.connector.native,tocstring(self.input.name)))
+		return int(connector_binding.getInfosLength(self.input.connector.native,tocstring(self.input.name)))
 
 	def isValid(self, index):
 		if type(index) is not int:
@@ -333,14 +338,14 @@ class Infos:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		return rtin_RTIDDSConnector_getBooleanFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('valid_data'))
+		return connector_binding.getBooleanFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('valid_data'))
 
 	def getSampleIdentity(self, index):
-		jsonStr = rtin_RTIDDSConnector_getJSONFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('sample_identity'))
+		jsonStr = connector_binding.getJSONFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('sample_identity'))
 		return json.loads(fromcstring(jsonStr))
 
 	def getRelatedSampleIdentity(self, index):
-		jsonStr = rtin_RTIDDSConnector_getJSONFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('related_sample_identity'))
+		jsonStr = connector_binding.getJSONFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('related_sample_identity'))
 		return json.loads(fromcstring(jsonStr))
 
 class SampleIterator:
@@ -378,7 +383,7 @@ class SampleIterator:
 		bool_value = ctypes.c_int()
 		string_value = ctypes.c_char_p()
 		selection = ctypes.c_int()
-		retcode = rtin_RTIDDSConnector_getAnyValueFromSamples(
+		retcode = connector_binding.getAnyValueFromSamples(
 			self.input.connector.native,
 			ctypes.byref(number_value),
 			ctypes.byref(bool_value),
@@ -400,7 +405,7 @@ class SampleIterator:
 			return _move_native_string(string_value)
 		else:
 			# This shouldn't happen
-			raise Error("Unexpected rtin_RTIDDSConnector_getAnyValueFromSamples result")
+			raise Error("Unexpected connector_binding.getAnyValueFromSamples result")
 
 	def get_dictionary(self):
 		"""Gets a dictionary with the values of all the fields of this sample
@@ -495,7 +500,7 @@ class Input:
 	def __init__(self, connector, name):
 		self.connector = connector
 		self.name = name
-		self.native = rtin_RTIDDSConnector_getReader(self.connector.native,tocstring(self.name))
+		self.native = connector_binding.getReader(self.connector.native,tocstring(self.name))
 		if self.native is None:
 			raise ValueError("Invalid Subscription::DataReader name")
 		self.samples = Samples(self)
@@ -508,7 +513,7 @@ class Input:
 		the samples remain accessible.
 		"""
 
-		rtin_RTIDDSConnector_read(self.connector.native,tocstring(self.name))
+		connector_binding.read(self.connector.native,tocstring(self.name))
 
 	def take(self):
 		"""Accesses the sample received by this Input
@@ -519,10 +524,10 @@ class Input:
 
 		"""
 
-		rtin_RTIDDSConnector_take(self.connector.native,tocstring(self.name))
+		connector_binding.take(self.connector.native,tocstring(self.name))
 
 	def wait(self,timeout):
-		return rtin_RTIDDSConnector_wait(self.connector.native,timeout)
+		return connector_binding.wait(self.connector.native,timeout)
 
 	def __getitem__(self, index):
 		"""Equivalent to :meth:`get_sample()`"""
@@ -625,7 +630,7 @@ class Instance:
 		:param str field_name: The name of the field. It can be a complex member or a primitive member. See :ref:`Accessing the data`.
 		"""
 
-		retcode = rtin_RTIDDSConnector_clearMember(
+		retcode = connector_binding.clearMember(
 			self.output.connector.native,
 			tocstring(self.output.name),
 			tocstring(field_name))
@@ -662,7 +667,7 @@ class Instance:
 			self.clear_member(field_name)
 		else:
 			try:
-				rtin_RTIDDSConnector_setNumberIntoSamples(
+				connector_binding.setNumberIntoSamples(
 					self.output.connector.native,
 					tocstring(self.output.name),
 					tocstring(field_name),
@@ -686,7 +691,7 @@ class Instance:
 			self.clear_member(field_name)
 		else:
 			try:
-				rtin_RTIDDSConnector_setBooleanIntoSamples(
+				connector_binding.setBooleanIntoSamples(
 						self.output.connector.native,
 						tocstring(self.output.name),
 						tocstring(field_name),
@@ -710,7 +715,7 @@ class Instance:
 			self.clear_member(field_name)
 		else:
 			try:
-				rtin_RTIDDSConnector_setStringIntoSamples(
+				connector_binding.setStringIntoSamples(
 					self.output.connector.native,
 					tocstring(self.output.name),
 					tocstring(field_name),
@@ -742,7 +747,7 @@ class Instance:
 		"""
 
 		jsonStr = json.dumps(dictionary)
-		rtin_RTIDDSConnector_setJSONInstance(self.output.connector.native,tocstring(self.output.name),tocstring(jsonStr))
+		connector_binding.setJSONInstance(self.output.connector.native,tocstring(self.output.name),tocstring(jsonStr))
 
 	# Deprecated: use set_dictionary
 	def setDictionary(self, dictionary):
@@ -755,7 +760,7 @@ class Instance:
 		This allows accessing additional *Connect DDS* APIs in C.
 		"""
 
-		dynDataPtr = rtin_RTIDDSConnector_getNativeInstance(self.output.connector.native,tocstring(self.output.name))
+		dynDataPtr = connector_binding.getNativeInstance(self.output.connector.native,tocstring(self.output.name))
 		return dynDataPtr
 
 	# Deprecated: use native property
@@ -778,7 +783,7 @@ class Output:
 	def __init__(self, connector, name):
 		self.connector = connector
 		self.name = name
-		self.native= rtin_RTIDDSConnector_getWriter(self.connector.native,tocstring(self.name))
+		self.native= connector_binding.getWriter(self.connector.native,tocstring(self.name))
 		if self.native ==None:
 			raise ValueError("Invalid Publication::DataWriter name")
 		self.instance = Instance(self)
@@ -797,9 +802,9 @@ class Output:
 				jsonStr = json.dumps(options)
 			else:
 				jsonStr = options
-			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), tocstring(jsonStr))
+			return connector_binding.write(self.connector.native,tocstring(self.name), tocstring(jsonStr))
 		else:
-			return rtin_RTIDDSConnector_write(self.connector.native,tocstring(self.name), None)
+			return connector_binding.write(self.connector.native,tocstring(self.name), None)
 
 	def wait(self, timeout=None):
 		"""Waits until all matching reliable subscriptions have acknowledged all
@@ -814,7 +819,7 @@ class Output:
 
 		if timeout is None:
 			timeout = -1
-		retcode = rtin_RTIDDSConnector_waitForAcknowledgments(self.native, timeout)
+		retcode = connector_binding.waitForAcknowledgments(self.native, timeout)
 		_check_retcode(retcode)
 
 	def clear_members(self):
@@ -829,7 +834,7 @@ class Output:
 		to 30, and `x` and `y` to 0.
 		"""
 
-		return rtin_RTIDDSConnector_clear(self.connector.native,tocstring(self.name))
+		return connector_binding.clear(self.connector.native,tocstring(self.name))
 
 class Connector:
 	"""Loads a configuration and creates its Inputs and Outputs
@@ -856,7 +861,7 @@ class Connector:
 		options = _ConnectorOptions(
 			enable_on_data_event = 1,
 			one_based_sequence_indexing = 0)
-		self.native = rtin_RTIDDSConnector_new(
+		self.native = connector_binding.new(
 			tocstring(configName),
 			tocstring(url),
 			ctypes.byref(options))
@@ -866,11 +871,11 @@ class Connector:
 	def close(self):
 		"""Frees all the resources created by this Connector instance"""
 
-		rtin_RTIDDSConnector_delete(self.native)
+		connector_binding.delete(self.native)
 
 	# Deprecated: use close()
 	def delete(self):
-		rtin_RTIDDSConnector_delete(self.native)
+		connector_binding.delete(self.native)
 
 	def get_output(self, output_name):
 		"""Returns the :class:`Output` named ``output_name``
@@ -944,7 +949,7 @@ class Connector:
 	def wait(self,timeout):
 		"""TODO: document this function"""
 
-		return rtin_RTIDDSConnector_wait(self.native,timeout)
+		return connector_binding.wait(self.native,timeout)
 
 @contextmanager
 def open_connector(configName, url):
