@@ -371,7 +371,7 @@ class SampleIterator:
 		represented, see :ref:`Accessing the data`.
 
 		:param str element_name: (Optional) The complex member within the type to obtain.
-		:return: A dictionary containing all the fields of the sample, or the complex type if element_name is supplied.
+		:return: A dictionary containing all the fields of the sample, or the complex type if element_name is supplied, or the field of a nested member, which can be another complex type, a sequence or an array.
 		"""
 
 		return self.input.samples.getDictionary(self.index, member_name)

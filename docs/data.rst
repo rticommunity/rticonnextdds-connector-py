@@ -149,6 +149,35 @@ To get the length of a sequence in an Input sample:
 
     length = input[0].get_number("my_sequence#")
 
+Accessing complex members
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Using `SampleIterator.get_dictionary("member_name")` - where member_name is the name
+of a complex member within the type - we can obtain all of the fields of just that complex member.
+
+It is possible to access the data of the_point as follows:
+
+.. testcode::
+
+   for sample in input.valid_data_iterator:
+      point = sample.get_dictionary("my_point")
+
+It is also possible to access complex, nested members:
+
+.. testcode::
+
+    for sample in input.valid_data_iterator:
+        point_element = sample.get_dictionary("my_point_sequence[1]")
+
+The member_name argument to get_dictionary must correspond to a type with one of
+the following types: array, sequence, struct, value or union. Any other types
+will cause the method to fail:
+
+.. testcode::
+
+   for sample in input.valid_data_iterator:
+      long = sample.get_dictionary("my_long") # ERROR, the_long is a basic type
+
 Accessing optional members
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
