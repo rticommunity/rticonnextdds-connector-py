@@ -605,7 +605,7 @@ class Input:
 class Instance:
 	"""A data sample
 
-		Instance is the type of :class:`Output`.instance and is the object that
+		``Instance`` is the type of ``Output.instance`` and is the object that
 		is published.
 
 		An Instance has an associated DDS Type, specified in the XML configuration,
@@ -615,7 +615,7 @@ class Instance:
 			* ``output`` (:class:`Output`): The ``Output`` that owns this ``Instance``.
 
 		Special methods:
-			* ``__setitem__``, see `:ref:`Accessing the data`.
+			* ``__setitem__``, see :ref:`Accessing the data`.
 	"""
 
 	def __init__(self, output):
@@ -680,7 +680,7 @@ class Instance:
 	def setNumber(self, field_name, value):
 		self.set_number(field_name, value)
 
-	def set_boolean(self,field_name, value):
+	def set_boolean(self, field_name, value):
 		"""Sets a Boolean field
 
 		:param str field_name: The name of the field. See :ref:`Accessing the data`.
@@ -808,7 +808,7 @@ class Output:
 
 	def wait(self, timeout=None):
 		"""Waits until all matching reliable subscriptions have acknowledged all
-		 the samples that have been currently written.
+		the samples that have been currently written.
 
 		This method only waits if this output is configured with a reliable *datawriter_qos*.
 
@@ -825,9 +825,9 @@ class Output:
 	def clear_members(self):
 		"""Resets the values of the members of this ``Output.instance``
 
-		If the member is defined with the ``default`` attribute, it gets that value.
-		Otherwise numbers are set to 0, and strings are set to empty. Sequences
-		are cleared. Optional members are set to ``None``.
+		If the member is defined with the ``default`` attribute in the configuration
+		file, it gets that value. Otherwise numbers are set to 0, and strings 
+		are set to empty. Sequences are cleared. Optional members are set to ``None``.
 
 		For example, if this ``Output``'s type is `ShapeType` (from the previous 
 		example), then ``clear_members()`` sets `color` to "RED", `shapesize`
