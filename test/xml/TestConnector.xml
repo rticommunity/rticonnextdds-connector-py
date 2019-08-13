@@ -110,13 +110,14 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <member name="my_long" type="int32"/>
             <member name="my_double" type="float64"/>
             <member name="my_enum" type="nonBasic"  nonBasicTypeName= "Color" default="BLUE"/>
+            <member name="my_boolean" type="boolean"/>
             <member name="my_string" stringMaxLength="512" type="string"/>
             <member name="my_point" type="nonBasic"  nonBasicTypeName= "Point"/>
             <member name="my_union" type="nonBasic"  nonBasicTypeName= "MyUnion"/>
             <member name="my_int_union" type="nonBasic"  nonBasicTypeName= "MyIntUnion"/>
             <member name="my_int_sequence" sequenceMaxLength="10" type="int32"/>
             <member name="my_point_sequence" sequenceMaxLength="10" type="nonBasic"  nonBasicTypeName= "Point"/>
-            <member name="my_array" type="nonBasic"  nonBasicTypeName= "Point" arrayDimensions="5"/>
+            <member name="my_point_array" type="nonBasic"  nonBasicTypeName= "Point" arrayDimensions="5"/>
             <member name="my_optional_point" type="nonBasic"  nonBasicTypeName= "Point" optional="true"/>
             <member name="my_optional_long" type="int32" optional="true"/>
             <member name="my_optional_bool" type="boolean" optional="true"/>

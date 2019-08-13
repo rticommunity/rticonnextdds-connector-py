@@ -6,7 +6,7 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-import pytest,time,sys,os
+import pytest,time,sys,os,ctypes
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
 
@@ -55,11 +55,13 @@ class TestDataAccess:
       'my_int_union': {'my_long': 222},
       'my_point_sequence': [{'x': 10, 'y': 20}, {'x': 11, 'y': 21}],
       'my_int_sequence': [1, 2, 3],
-      'my_array': [{'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 5, 'y': 15}]}
+      'my_point_array': [{'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 5, 'y': 15}]}
 
-  @pytest.fixture(scope="class")
+  @pytest.fixture
   def test_output(self, test_connector):
-    return test_connector.get_output("TestPublisher::TestWriter2")
+    output = test_connector.get_output("TestPublisher::TestWriter2")
+    output.clear_members()
+    return output
 
   @pytest.fixture(scope="class")
   def test_input(self, test_connector):
@@ -68,11 +70,11 @@ class TestDataAccess:
   def wait_for_data(self, input, count = 1, do_take = True):
     """Waits until input has count samples"""
 
-    for i in range(1, 20):
+    for i in range(1, 5):
       input.read()
       if input.sample_count == count:
         break
-      time.sleep(.5)
+      input.wait(1000)
 
     assert input.sample_count == count
     if do_take:
@@ -89,7 +91,7 @@ class TestDataAccess:
     output.write()
 
     test_input = test_connector.get_input("TestSubscriber::TestReader")
-    self.wait_for_data(input = test_input, count = 1, do_take = False)
+    self.wait_for_data(input = test_input, count = 1, do_take = True)
 
     assert test_input.sample_count == 1
     assert test_input[0].valid_data
@@ -109,6 +111,7 @@ class TestDataAccess:
   def test_get_boolean(self, populated_input):
     sample = populated_input[0]
     assert sample.get_boolean("my_optional_bool") == True
+    assert sample["my_optional_bool"] == True
 
   @pytest.mark.xfail
   def test_get_boolean_as_number(self, populated_input):
@@ -130,7 +133,12 @@ class TestDataAccess:
     assert sample.get_number("my_int_sequence[2]") == 2
     assert sample.get_number("my_point_sequence#") == 2
     assert sample.get_number("my_int_sequence#") == 3
-    assert sample.get_number("my_array[5].x") == 5
+    assert sample.get_number("my_point_array[5].x") == 5
+    assert sample["my_point_sequence[1].y"] == 20
+    assert sample["my_int_sequence[2]"] == 2
+    assert sample["my_point_sequence#"] == 2
+    assert sample["my_int_sequence#"] == 3
+    assert sample["my_point_array[5].x"] == 5
 
   @pytest.mark.xfail
   def test_bad_sequence_access(self, populated_input):
@@ -142,17 +150,17 @@ class TestDataAccess:
 
   def test_bad_member_name(self, populated_input):
     sample = populated_input[0]
-    with pytest.raises(rti.DdsError, match=r".*Cannot find.*my_nonexistent_member.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*Cannot find.*my_nonexistent_member.*") as excinfo:
       sample.get_number("my_nonexistent_member")
 
   def test_bad_member_syntax(self, populated_input):
     sample = populated_input[0]
-    with pytest.raises(rti.DdsError) as excinfo:
+    with pytest.raises(rti.Error) as excinfo:
       sample.get_number("my_point_sequence[10[.y")
 
   def test_bad_sequence_index(self, populated_input):
     sample = populated_input[0]
-    with pytest.raises(rti.DdsError) as excinfo:
+    with pytest.raises(rti.Error) as excinfo:
       sample.get_number("my_point_sequence[-1].y")
 
   def test_unions(self, populated_input):
@@ -171,6 +179,7 @@ class TestDataAccess:
     sample = populated_input[0]
     assert sample.get_string("my_int_union#") == "my_long"
     assert sample.get_string("my_union#") == "my_int_sequence"
+    assert sample["my_union#"] == "my_int_sequence"
 
   def test_change_union_member(self, test_output, test_input):
     test_output.instance.set_number("my_union.my_int_sequence[1]", 3)
@@ -189,7 +198,7 @@ class TestDataAccess:
 
   def test_set_optional(self, test_output, test_input):
     test_output.instance.set_number("my_optional_point.x", 101)
-    test_output.instance.set_number("my_point_alias.x", 202)
+    test_output.instance["my_point_alias.x"] = 202
     test_output.write()
     self.wait_for_data(test_input)
 
@@ -200,6 +209,7 @@ class TestDataAccess:
   def test_unset_optional_number(self, populated_input):
     sample = populated_input[0]
     assert sample.get_number("my_optional_long") is None
+    assert sample["my_optional_long"] is None
     with pytest.raises(KeyError) as excinfo:
       value = sample.get_dictionary()['my_optional_long']
 
@@ -216,19 +226,32 @@ class TestDataAccess:
     sample = populated_input[0]
     assert sample.get_number("my_optional_point.x") is None
 
+  @pytest.mark.xfail
+  def test_unset_complex_optional_dict2(self, populated_input):
+    sample = populated_input[0]
+    assert sample.get_number("my_optional_point.x") is None
+    dictionary = sample.get_dictionary()
+    # Due to CORE-9685 the previous call to get_number "initializes"
+    # my_optional_point, so get_dictionary now incorrectly returns it
+    assert not "my_optional_point" in dictionary
+
   def test_reset_optional_number(self, test_output, test_input):
     test_output.instance.set_number("my_optional_long", 33)
     test_output.instance.set_number("my_optional_long", None)
     test_output.write()
     self.wait_for_data(test_input)
     assert test_input[0].get_number("my_optional_long") is None
+    assert not "my_optional_long" in test_input[0].get_dictionary()
 
   def test_reset_optional_boolean(self, test_output, test_input):
     test_output.instance.set_boolean("my_optional_bool", True)
     test_output.instance.set_boolean("my_optional_bool", None)
     test_output.write()
     self.wait_for_data(test_input)
-    assert test_input[0].get_boolean("my_optional_bool") is None
+    sample = test_input[0]
+    assert sample.get_boolean("my_optional_bool") is None
+    assert sample["my_optional_bool"] is None
+    assert not "my_optional_bool" in sample.get_dictionary()
 
   def test_reset_complex_optional(self, test_output, test_input):
     test_output.instance.set_number("my_optional_point.x", 44)
@@ -239,6 +262,7 @@ class TestDataAccess:
     self.wait_for_data(test_input)
     assert test_input[0].get_number("my_optional_point.x") is None
     assert test_input[0].get_number("my_point_alias.x") is None
+    assert test_input[0]["my_optional_point.x"] is None
 
   def test_clear_complex_member(self, test_output, test_input):
     test_output.instance.set_number("my_point.x", 44)
@@ -291,12 +315,19 @@ class TestDataAccess:
     assert sample.get_boolean("my_optional_bool") is None
     assert sample.get_number("my_point_sequence#") == 0
     assert sample.get_string("my_string") == ""
+    assert sample["my_string"] == ""
     assert sample.get_string("my_union#") == "point"
     assert sample.get_number("my_enum") == 2
     assert sample.get_number("my_double") == test_dictionary['my_double']
+    dictionary = sample.get_dictionary()
+    print(dictionary)
+    assert not "my_optional_bool" in dictionary
+    assert not "my_optional_long" in dictionary
+    assert not "my_point_alias" in dictionary
+    assert not "my_optional_point" in dictionary
 
   def test_bad_clear_member(self, test_output):
-    with pytest.raises(rti.DdsError) as excinfo:
+    with pytest.raises(rti.Error) as excinfo:
       test_output.instance.clear_member("my_nonexistent_member")
 
   @pytest.mark.xfail
@@ -325,25 +356,25 @@ class TestDataAccess:
     sample = populated_input[0]
 
     # Attempt to get_dictionary for non existent member
-    with pytest.raises(rti.DdsError, match=r".*Cannot find.*IDoNotExist.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*Cannot find.*IDoNotExist.*") as excinfo:
       sample.get_dictionary("IDoNotExist")
 
     # Attempt to get_dictionary for non-complex members
-    with pytest.raises(rti.DdsError, match=r".*invalid TypeCode kind DDS_TK_LONG.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_LONG.*") as excinfo:
       sample.get_dictionary("my_long")
-    with pytest.raises(rti.DdsError, match=r".*invalid TypeCode kind DDS_TK_DOUBLE.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_DOUBLE.*") as excinfo:
       sample.get_dictionary("my_double")
-    with pytest.raises(rti.DdsError, match=r".*invalid TypeCode kind DDS_TK_BOOLEAN.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_BOOLEAN.*") as excinfo:
       sample.get_dictionary("my_optional_bool")
-    with pytest.raises(rti.DdsError, match=r".*invalid TypeCode kind DDS_TK_LONG.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_LONG.*") as excinfo:
       sample.get_dictionary("my_optional_long")
-    with pytest.raises(rti.DdsError, match=r".*invalid TypeCode kind DDS_TK_STRING.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_STRING.*") as excinfo:
       sample.get_dictionary("my_string")
-    with pytest.raises(rti.DdsError, match=r".*invalid TypeCode kind DDS_TK_ENUM.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_ENUM.*") as excinfo:
       sample.get_dictionary("my_enum")
     # It is possible to use get_dictionary to access nested members, but the nested
     # member must be a complex type
-    with pytest.raises(rti.DdsError, match=r".*invalid TypeCode kind DDS_TK_LONG.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_LONG.*") as excinfo:
       sample.get_dictionary("my_point.x")
 
     # Valid values for member_name
@@ -357,6 +388,81 @@ class TestDataAccess:
     assert the_point_sequence == [{'x': 10, 'y': 20}, {'x': 11, 'y': 21}]
     the_point_sequence_1 = sample.get_dictionary("my_point_sequence[1]")
     assert the_point_sequence_1 == {'x': 10, 'y': 20}
-    the_array = sample.get_dictionary("my_array")
-    the_array_1 = sample.get_dictionary("my_array[1]")
+    the_array = sample.get_dictionary("my_point_array")
+    the_array_1 = sample.get_dictionary("my_point_array[1]")
     assert the_array_1 == {'x': 0, 'y': 0}
+
+  def test_shrink_sequence(self, test_output, test_input, test_dictionary):
+    """Tests that set_dictionary shrinks sequences when it receives a smaller one"""
+
+    test_output.instance.set_number("my_int_sequence[3]", 10) # set length to 3
+    test_output.instance.set_number("my_point_sequence[1].x", 11)
+    test_output.instance.set_number("my_point_sequence[1].y", 12)
+    test_output.instance.set_number("my_point_sequence[3].x", 10)
+    test_output.instance.set_dictionary(
+      {"my_point_array":[{'x': 10, 'y': 20}, {'x': 11, 'y': 21}, {'x': 12, 'y': 22}, {'x': 13, 'y': 23}, {'x': 14, 'y': 24}]})
+
+    # Reduce sequences to 1, while arrays retain exiting values
+    test_output.instance.set_dictionary({
+      "my_int_sequence":[40],
+      "my_point_sequence":[{"y":2}],
+      "my_point_array":[{"x":100}, {"y":200}]})
+    test_output.write()
+    self.wait_for_data(test_input)
+
+    sample = test_input[0]
+    assert sample["my_int_sequence#"] == 1 # Length reduced
+    assert sample["my_point_sequence#"] == 1 # Length reduced
+    assert sample["my_int_sequence[1]"] == 40 # New value
+    assert sample["my_point_sequence[1].y"] == 2 # New value
+    assert sample["my_point_sequence[1].x"] == 0 # Doesn't retain previous value
+    assert sample["my_point_array[1].x"] == 100 # New value
+    assert sample["my_point_array[1].y"] == 20 # Retains value
+    assert sample["my_point_array[5].x"] == 14 # Retains value
+
+
+  def test_access_native_dynamic_data(self, populated_input):
+    get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
+    get_member_count.restype = ctypes.c_uint
+    get_member_count.argtypes = [ctypes.c_void_p]
+    count = get_member_count(populated_input[0].native)
+    assert count > 0
+
+  def test_input_performance(self, populated_input):
+    num_iter = 1000
+    sample = populated_input[0]
+
+    start = time.time()
+    for i in range (1, num_iter):
+      v = sample.get_number("my_long")
+    end = time.time()
+    get_number_duration = end - start
+
+    start = time.time()
+    for i in range (1, num_iter):
+      v = sample["my_long"]
+    end = time.time()
+    get_item_duration = end - start
+
+    print("__getitem__ is {:2.2%} slower than get_number".format(
+      (get_item_duration - get_number_duration) / get_number_duration))
+
+  def test_output_performance(self, test_output):
+    num_iter = 1000
+    sample = test_output.instance
+
+    start = time.time()
+    for i in range (1, num_iter):
+      sample.set_number("my_long", 10)
+    end = time.time()
+    get_number_duration = end - start
+
+    start = time.time()
+    for i in range (1, num_iter):
+      sample["my_long"] = 10
+    end = time.time()
+    get_item_duration = end - start
+
+    print("__setitem__ is {:2.2%} slower than set_number".format(
+      (get_item_duration - get_number_duration) / get_number_duration))
+
