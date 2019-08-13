@@ -213,7 +213,7 @@ class _ConnectorBinding:
 		self.getJSONSample.restype = POINTER(c_char)
 		self.getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]
 
-		self.getJSONMember = self.library.RTIDDSConnector_getJSONMember
+		self.getJSONMember = self.library.RTI_Connector_get_JSON_member
 		self.getJSONMember.restype = ctypes.c_int
 		self.getJSONMember.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, POINTER(c_char_p)]
 
