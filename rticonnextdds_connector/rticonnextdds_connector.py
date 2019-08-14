@@ -180,10 +180,6 @@ class _ConnectorBinding:
 		self.wait.restype = ctypes.c_int
 		self.wait.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
-		self.getInfosLength = self.library.RTIDDSConnector_getInfosLength
-		self.getInfosLength.restype = ctypes.c_double
-		self.getInfosLength.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
-
 		self.clear = self.library.RTI_Connector_clear
 		self.clear.restype = ctypes.c_int
 		self.clear.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
@@ -196,9 +192,9 @@ class _ConnectorBinding:
 		self.getJSONFromInfos.restype  = ctypes.c_char_p
 		self.getJSONFromInfos.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
 
-		self.getSamplesLength = self.library.RTIDDSConnector_getInfosLength
-		self.getSamplesLength.restype = ctypes.c_double
-		self.getSamplesLength.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
+		self.getSamplesCount = self.library.RTI_Connector_get_sample_count
+		self.getSamplesCount.restype = ctypes.c_int
+		self.getSamplesCount.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.POINTER(ctypes.c_double)]
 
 		self.getNumberFromSamples = self.library.RTI_Connector_get_number_from_sample
 		self.getNumberFromSamples.restype = ctypes.c_int
@@ -216,7 +212,7 @@ class _ConnectorBinding:
 		self.getAnyValueFromSamples.restype = ctypes.c_int
 		self.getAnyValueFromSamples.argtypes = [ctypes.c_void_p, POINTER(c_double), POINTER(c_int), POINTER(c_char_p), POINTER(c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
 
-		self.getJSONSample = self.library.RTI_Connector_get_JSON_sample
+		self.getJSONSample = self.library.RTI_Connector_get_json_sample
 		self.getJSONSample.restype = ctypes.c_int
 		self.getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, POINTER(c_char_p)]
 
@@ -246,7 +242,13 @@ class Samples:
 		self.input = input
 
 	def getLength(self):
-		return int(connector_binding.getSamplesLength(self.input.connector.native,tocstring(self.input.name)))
+		c_value = ctypes.c_double()
+		retcode = connector_binding.getSamplesCount(
+				self.input.connector.native,
+				tocstring(self.input.name),
+				ctypes.byref(c_value))
+		_check_retcode(retcode)
+		return c_value.value
 
 	def getNumber(self, index, field_name):
 		if type(index) is not int:
@@ -340,7 +342,13 @@ class Infos:
 		self.input = input
 
 	def getLength(self):
-		return int(connector_binding.getInfosLength(self.input.connector.native,tocstring(self.input.name)))
+		c_value = ctypes.c_double()
+		retcode = connector_binding.getSamplesCount(
+				self.input.connector.native,
+				tocstring(self.input.name),
+				ctypes.byref(c_value))
+		_check_retcode(retcode)
+		return c_value.value
 
 	def isValid(self, index):
 		if type(index) is not int:
