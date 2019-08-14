@@ -148,26 +148,32 @@ class _ConnectorBinding:
 		self.getNativeSample.restype = ctypes.c_void_p
 		self.getNativeSample.argtypes=[ ctypes.c_void_p,ctypes.c_char_p, ctypes.c_int]
 
-		self.setNumberIntoSamples = self.library.RTIDDSConnector_setNumberIntoSamples
+		self.setNumberIntoSamples = self.library.RTI_Connector_set_number_into_samples
+		self.setNumberIntoSamples.restype = ctypes.c_int
 		self.setNumberIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_double]
-		self.setBooleanIntoSamples = self.library.RTIDDSConnector_setBooleanIntoSamples
+		self.setBooleanIntoSamples = self.library.RTI_Connector_set_boolean_into_samples
+		self.setBooleanIntoSamples.restype = ctypes.c_int
 		self.setBooleanIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_int]
-		self.setStringIntoSamples = self.library.RTIDDSConnector_setStringIntoSamples
+		self.setStringIntoSamples = self.library.RTI_Connector_set_string_into_samples
+		self.setStringIntoSamples.restype = ctypes.c_int
 		self.setStringIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
 		self.clearMember = self.library.RTI_Connector_clear_member
 		self.clearMember.restype = ctypes.c_int
 		self.clearMember.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
 
-		self.write = self.library.RTIDDSConnector_write
+		self.write = self.library.RTI_Connector_write
+		self.write.restype = ctypes.c_int
 		self.write.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
 
 		self.waitForAcknowledgments = self.library.RTI_Connector_wait_for_acknowledgments
 		self.waitForAcknowledgments.restype = ctypes.c_int
 		self.waitForAcknowledgments.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
-		self.read = self.library.RTIDDSConnector_read
+		self.read = self.library.RTI_Connector_read
+		self.read.restype = ctypes.c_int
 		self.read.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
-		self.take = self.library.RTIDDSConnector_take
+		self.take = self.library.RTI_Connector_take
+		self.take.restype = ctypes.c_int
 		self.take.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
 
 		self.wait = self.library.RTI_Connector_wait_for_data
@@ -178,12 +184,13 @@ class _ConnectorBinding:
 		self.getInfosLength.restype = ctypes.c_double
 		self.getInfosLength.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
 
-		self.clear = self.library.RTIDDSConnector_clear
+		self.clear = self.library.RTI_Connector_clear
+		self.clear.restype = ctypes.c_int
 		self.clear.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
 
-		self.getBooleanFromInfos = self.library.RTIDDSConnector_getBooleanFromInfos
+		self.getBooleanFromInfos = self.library.RTI_Connector_get_boolean_from_infos
 		self.getBooleanFromInfos.restype  = ctypes.c_int
-		self.getBooleanFromInfos.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+		self.getBooleanFromInfos.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
 
 		self.getJSONFromInfos = self.library.RTIDDSConnector_getJSONFromInfos
 		self.getJSONFromInfos.restype  = ctypes.c_char_p
@@ -209,11 +216,12 @@ class _ConnectorBinding:
 		self.getAnyValueFromSamples.restype = ctypes.c_int
 		self.getAnyValueFromSamples.argtypes = [ctypes.c_void_p, POINTER(c_double), POINTER(c_int), POINTER(c_char_p), POINTER(c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
 
-		self.getJSONSample = self.library.RTIDDSConnector_getJSONSample
-		self.getJSONSample.restype = POINTER(c_char)
-		self.getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int]
+		self.getJSONSample = self.library.RTI_Connector_get_JSON_sample
+		self.getJSONSample.restype = ctypes.c_int
+		self.getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, POINTER(c_char_p)]
 
-		self.setJSONInstance = self.library.RTIDDSConnector_setJSONInstance
+		self.setJSONInstance = self.library.RTI_Connector_set_json_instance
+		self.setJSONInstance.restype = ctypes.c_int
 		self.setJSONInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
 
 		self.getLastErrorMessage = self.library.RTI_Connector_get_last_error_message
@@ -311,7 +319,13 @@ class Samples:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		native_json_str = connector_binding.getJSONSample(self.input.connector.native,tocstring(self.input.name),index)
+		native_json_str = ctypes.c_char_p()
+		retcode = connector_binding.getJSONSample(
+			self.input.connector.native,
+			tocstring(self.input.name),
+			index,
+			ctypes.byref(native_json_str))
+		_check_retcode(retcode)
 		return json.loads(_move_native_string(native_json_str))
 
 	def getNative(self,index):
@@ -335,7 +349,18 @@ class Infos:
 			raise ValueError("index must be positive")
 		#Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		return connector_binding.getBooleanFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('valid_data'))
+
+		c_value = ctypes.c_int()
+		retcode = connector_binding.getBooleanFromInfos(
+			self.input.connector.native,
+			ctypes.byref(c_value),
+			tocstring(self.input.name),
+			index,
+			tocstring('valid_data'))
+		_check_retcode(retcode)
+		if retcode == _ReturnCode.no_data:
+			return None
+		return c_value.value
 
 	def getSampleIdentity(self, index):
 		jsonStr = connector_binding.getJSONFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('sample_identity'))
@@ -510,7 +535,7 @@ class Input:
 		the samples remain accessible.
 		"""
 
-		connector_binding.read(self.connector.native,tocstring(self.name))
+		_check_retcode(connector_binding.read(self.connector.native,tocstring(self.name)))
 
 	def take(self):
 		"""Accesses the sample received by this Input
@@ -521,7 +546,7 @@ class Input:
 
 		"""
 
-		connector_binding.take(self.connector.native,tocstring(self.name))
+		_check_retcode(connector_binding.take(self.connector.native,tocstring(self.name)))
 
 	def wait(self,timeout):
 		return connector_binding.wait(self.connector.native,timeout)
@@ -664,11 +689,11 @@ class Instance:
 			self.clear_member(field_name)
 		else:
 			try:
-				connector_binding.setNumberIntoSamples(
+				_check_retcode(connector_binding.setNumberIntoSamples(
 					self.output.connector.native,
 					tocstring(self.output.name),
 					tocstring(field_name),
-					value)
+					value))
 			except ctypes.ArgumentError as e:
 				raise TypeError("value for field '{0}' must be of a numeric type"\
 					.format(field_name))
@@ -688,11 +713,11 @@ class Instance:
 			self.clear_member(field_name)
 		else:
 			try:
-				connector_binding.setBooleanIntoSamples(
+				_check_retcode(connector_binding.setBooleanIntoSamples(
 						self.output.connector.native,
 						tocstring(self.output.name),
 						tocstring(field_name),
-						value)
+						value))
 			except ctypes.ArgumentError as e:
 				raise TypeError("value for field '{0}' must be of type bool"\
 					.format(field_name))
@@ -712,11 +737,11 @@ class Instance:
 			self.clear_member(field_name)
 		else:
 			try:
-				connector_binding.setStringIntoSamples(
+				_check_retcode(connector_binding.setStringIntoSamples(
 					self.output.connector.native,
 					tocstring(self.output.name),
 					tocstring(field_name),
-					tocstring(value))
+					tocstring(value)))
 			except AttributeError | ctypes.ArgumentError as e:
 				raise TypeError("value for field '{0}' must be of type str"\
 					.format(field_name))
@@ -744,7 +769,10 @@ class Instance:
 		"""
 
 		jsonStr = json.dumps(dictionary)
-		connector_binding.setJSONInstance(self.output.connector.native,tocstring(self.output.name),tocstring(jsonStr))
+		_check_retcode(connector_binding.setJSONInstance(
+			self.output.connector.native,
+			tocstring(self.output.name),
+			tocstring(jsonStr)))
 
 	# Deprecated: use set_dictionary
 	def setDictionary(self, dictionary):
@@ -799,9 +827,10 @@ class Output:
 				jsonStr = json.dumps(options)
 			else:
 				jsonStr = options
-			return connector_binding.write(self.connector.native,tocstring(self.name), tocstring(jsonStr))
+			retcode = connector_binding.write(self.connector.native,tocstring(self.name), tocstring(jsonStr))
 		else:
-			return connector_binding.write(self.connector.native,tocstring(self.name), None)
+			retcode = connector_binding.write(self.connector.native,tocstring(self.name), None)
+		_check_retcode(retcode)
 
 	def wait(self, timeout=None):
 		"""Waits until all matching reliable subscriptions have acknowledged all
@@ -831,7 +860,8 @@ class Output:
 		to 30, and `x` and `y` to 0.
 		"""
 
-		return connector_binding.clear(self.connector.native,tocstring(self.name))
+		retcode = connector_binding.clear(self.connector.native,tocstring(self.name))
+		_check_retcode(retcode)
 
 class Connector:
 	"""Loads a configuration and creates its Inputs and Outputs
