@@ -122,6 +122,8 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <member name="my_optional_long" type="int32" optional="true"/>
             <member name="my_optional_bool" type="boolean" optional="true"/>
             <member name="my_point_alias" type="nonBasic"  nonBasicTypeName= "PointAlias" optional="true"/>
+            <member name="my_int64" type="int64"/>
+            <member name="my_uint64" type="uint64"/>
         </struct>
     </types>
 
