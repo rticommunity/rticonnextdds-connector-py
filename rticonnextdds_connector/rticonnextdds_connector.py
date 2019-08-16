@@ -132,7 +132,7 @@ class _ConnectorBinding:
 		self.new.restype = ctypes.c_void_p
 		self.new.argtypes = [ctypes.c_char_p,ctypes.c_char_p,ctypes.c_void_p]
 
-		self.delete = self.library.RTIDDSConnector_delete
+		self.delete = self.library.RTI_Connector_delete
 		self.delete.restype = ctypes.c_void_p
 		self.delete.argtypes = [ctypes.c_void_p]
 
@@ -228,9 +228,9 @@ class _ConnectorBinding:
 		self.getLastErrorMessage.restype = POINTER(c_char)
 		self.getLastErrorMessage.argtypes = []
 
-		self.getNativeInstance = self.library.RTIDDSConnector_getNativeInstance
-		self.getNativeInstance.restype = ctypes.c_void_p
-		self.getNativeInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+		self.getNativeInstance = self.library.RTI_Connector_get_native_instance
+		self.getNativeInstance.restype = ctypes.c_int
+		self.getNativeInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.POINTER(ctypes.c_void_p)]
 
 		self.freeString = self.library.RTI_Connector_free_string
 		self.freeString.argtypes = [POINTER(c_char)]
@@ -814,7 +814,12 @@ class Instance:
 		This allows accessing additional *Connect DDS* APIs in C.
 		"""
 
-		dynDataPtr = connector_binding.getNativeInstance(self.output.connector.native,tocstring(self.output.name))
+		dynamic_data_pointer = ctypes.c_void_p()
+		retcode = connector_binding.getNativeInstance(
+			self.output.connector.native,
+			tocstring(self.output.name),
+			ctypes.byref(dynamic_data_pointer))
+		_check_retcode(retcode)
 		return dynDataPtr
 
 	# Deprecated: use native property
