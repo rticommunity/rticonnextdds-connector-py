@@ -151,12 +151,15 @@ class _ConnectorBinding:
 		self.setNumberIntoSamples = self.library.RTI_Connector_set_number_into_samples
 		self.setNumberIntoSamples.restype = ctypes.c_int
 		self.setNumberIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_double]
+
 		self.setBooleanIntoSamples = self.library.RTI_Connector_set_boolean_into_samples
 		self.setBooleanIntoSamples.restype = ctypes.c_int
 		self.setBooleanIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_int]
+
 		self.setStringIntoSamples = self.library.RTI_Connector_set_string_into_samples
 		self.setStringIntoSamples.restype = ctypes.c_int
 		self.setStringIntoSamples.argtypes = [ctypes.c_void_p, ctypes.c_char_p,ctypes.c_char_p,ctypes.c_char_p]
+
 		self.clearMember = self.library.RTI_Connector_clear_member
 		self.clearMember.restype = ctypes.c_int
 		self.clearMember.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
@@ -172,6 +175,7 @@ class _ConnectorBinding:
 		self.read = self.library.RTI_Connector_read
 		self.read.restype = ctypes.c_int
 		self.read.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+
 		self.take = self.library.RTI_Connector_take
 		self.take.restype = ctypes.c_int
 		self.take.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
@@ -188,9 +192,9 @@ class _ConnectorBinding:
 		self.getBooleanFromInfos.restype  = ctypes.c_int
 		self.getBooleanFromInfos.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
 
-		self.getJSONFromInfos = self.library.RTIDDSConnector_getJSONFromInfos
-		self.getJSONFromInfos.restype  = ctypes.c_char_p
-		self.getJSONFromInfos.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+		self.getJSONFromInfos = self.library.RTI_Connector_get_json_from_infos
+		self.getJSONFromInfos.restype  = ctypes.c_int
+		self.getJSONFromInfos.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.POINTER(ctypes.c_char_p)]
 
 		self.getSamplesCount = self.library.RTI_Connector_get_sample_count
 		self.getSamplesCount.restype = ctypes.c_int
@@ -371,12 +375,26 @@ class Infos:
 		return c_value.value
 
 	def getSampleIdentity(self, index):
-		jsonStr = connector_binding.getJSONFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('sample_identity'))
-		return json.loads(fromcstring(jsonStr))
+		native_json_str = ctypes.c_char_p()
+		retcode = connector_binding.getJSONFromInfos(
+			self.input.connector.native,
+			tocstring(self.input.name),
+			index,
+			tocstring('sample_identity'),
+			ctypes.byref(native_json_str))
+		_check_retcode(retcode)
+		return json.loads(fromcstring(native_json_str))
 
 	def getRelatedSampleIdentity(self, index):
-		jsonStr = connector_binding.getJSONFromInfos(self.input.connector.native,tocstring(self.input.name),index,tocstring('related_sample_identity'))
-		return json.loads(fromcstring(jsonStr))
+		native_json_str = ctypes.c_char_p()
+		retcode = connector_binding.getJSONFromInfos(
+			self.input.connector.native,
+			tocstring(self.input.name),
+			index,
+			tocstring('related_sample_identity'),
+			ctypes.byref(native_json_str))
+		_check_retcode(retcode)
+		return json.loads(fromcstring(native_json_str))
 
 class SampleIterator:
 	"""Iterates and provides access to a data sample
