@@ -113,10 +113,15 @@ class TestDataAccess:
     assert sample.get_boolean("my_optional_bool") == True
     assert sample["my_optional_bool"] == True
 
-  @pytest.mark.xfail
   def test_get_boolean_as_number(self, populated_input):
     sample = populated_input[0]
     assert sample.get_number("my_optional_bool") == 1
+
+  def test_set_boolean_as_number(self, test_output, test_input):
+    test_output.instance.set_number("my_optional_bool", 1)
+    test_output.write()
+    self.wait_for_data(test_input)
+    assert test_input[0]["my_optional_bool"] == True
 
   def test_get_enum(self, populated_input):
     sample = populated_input[0]
