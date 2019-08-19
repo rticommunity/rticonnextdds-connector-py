@@ -143,8 +143,8 @@ To set strings:
     output.instance.set_string("my_string", "Hello, World!")
 
 
-As an alternative to the setters, the special method ``__setitem__`` can be used
-as follows:
+As an alternative to the previous setters, the special method ``__setitem__``
+can be used as follows:
 
 .. testcode::
 
@@ -158,7 +158,7 @@ of the field as defined in the configuration file.
 Similarly, to get a field in a :class:`Input` sample, use the appropriate
 getter: :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.get_boolean()`,
 :meth:`SampleIterator.get_string()`, or ``__getitem__``. ``get_string`` also works
-with numeric fields, returning the number as a string.
+with numeric fields, returning the number as a string. For example:
 
 .. testcode::
 
@@ -178,13 +178,14 @@ with numeric fields, returning the number as a string.
 Note that the typed getters and setters perform better than ``__setitem__``
 and ``__getitem__`` in applications that write or read at high rates.
 Also ``__setitem__`` or ``__getitem__`` shouldn't be used as an alternative
-to ``get_dictionary`` or ``set_dictionary`` (see previous section).
+to ``get_dictionary`` or ``set_dictionary`` when the intention is to access
+most of the fields of the sample (see previous section).
 
 
 Accessing structs
 ^^^^^^^^^^^^^^^^^
 
-To access a nested member, use "." to identify the fully-qualified ``field_name``
+To access a nested member, use ``.`` to identify the fully-qualified ``field_name``
 and pass it to the corresponding setter or getter.
 
 .. testcode::
@@ -220,8 +221,8 @@ The value of ``my_point`` is now ``{"x":10, "y":200}``
 Accessing arrays and sequences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Use ``field_name[index]`` as the ``field_name`` to access an element of
-a sequence or array:
+Use ``"field_name[index]"`` to access an element of a sequence or array,
+where ``0 <= index < length``:
 
 .. testcode::
 
@@ -232,8 +233,8 @@ In an Output, sequences are automatically resized:
 
 .. testcode::
 
-    output.instance.set_number("my_int_sequence[5]", 10) # length is now 5
-    output.instance.set_number("my_int_sequence[4]", 9) # length still 5
+    output.instance.set_number("my_int_sequence[5]", 10) # length is now 6
+    output.instance.set_number("my_int_sequence[4]", 9) # length still 6
 
 You can clear a sequence:
 

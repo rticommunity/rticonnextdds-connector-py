@@ -129,24 +129,38 @@ class TestDataAccess:
 
   def test_sequences(self, populated_input):
     sample = populated_input[0]
-    assert sample.get_number("my_point_sequence[1].y") == 20
-    assert sample.get_number("my_int_sequence[2]") == 2
+    assert sample.get_number("my_point_sequence[0].y") == 20
+    assert sample.get_number("my_int_sequence[1]") == 2
     assert sample.get_number("my_point_sequence#") == 2
     assert sample.get_number("my_int_sequence#") == 3
-    assert sample.get_number("my_point_array[5].x") == 5
-    assert sample["my_point_sequence[1].y"] == 20
-    assert sample["my_int_sequence[2]"] == 2
+    assert sample.get_number("my_point_array[4].x") == 5
+    assert sample["my_point_sequence[0].y"] == 20
+    assert sample["my_int_sequence[1]"] == 2
     assert sample["my_point_sequence#"] == 2
     assert sample["my_int_sequence#"] == 3
-    assert sample["my_point_array[5].x"] == 5
+    assert sample["my_point_array[4].x"] == 5
+
+  def test_output_sequences(self, test_output, test_input):
+    test_output.instance.set_number("my_point_sequence[0].y", 20)
+    test_output.instance["my_int_sequence[1]"] = 2
+    test_output.instance["my_point_array[4].x"] = 5
+    test_output.write()
+    self.wait_for_data(test_input)
+
+    sample = test_input[0]
+    assert sample["my_point_sequence[0].y"] == 20
+    assert sample["my_int_sequence[1]"] == 2
+    assert sample["my_point_sequence#"] == 1
+    assert sample["my_int_sequence#"] == 2
+    assert sample["my_point_array[4].x"] == 5
 
   @pytest.mark.xfail
   def test_bad_sequence_access(self, populated_input):
     sample = populated_input[0]
     with pytest.raises(AttributeError) as excinfo:
-      sample.get_number("my_point_sequence[10].y")
+      sample.get_number("my_point_sequence[9].y")
     with pytest.raises(AttributeError) as excinfo:
-      sample.get_number("my_int_sequence[10]")
+      sample.get_number("my_int_sequence[9]")
 
   def test_bad_member_name(self, populated_input):
     sample = populated_input[0]
@@ -156,7 +170,7 @@ class TestDataAccess:
   def test_bad_member_syntax(self, populated_input):
     sample = populated_input[0]
     with pytest.raises(rti.Error) as excinfo:
-      sample.get_number("my_point_sequence[10[.y")
+      sample.get_number("my_point_sequence[9[.y")
 
   def test_bad_sequence_index(self, populated_input):
     sample = populated_input[0]
@@ -166,7 +180,7 @@ class TestDataAccess:
   def test_unions(self, populated_input):
     sample = populated_input[0]
     assert sample.get_number("my_union.my_int_sequence#") == 3
-    assert sample.get_number("my_union.my_int_sequence[2]") == 20
+    assert sample.get_number("my_union.my_int_sequence[1]") == 20
     assert sample.get_number("my_int_union.my_long") == 222
 
   @pytest.mark.xfail
@@ -272,7 +286,7 @@ class TestDataAccess:
     assert test_input[0].get_number("my_point.x") == 0
 
   def test_clear_sequence(self, test_output, test_input):
-    test_output.instance.set_number("my_union.my_int_sequence[3]", 10)
+    test_output.instance.set_number("my_union.my_int_sequence[2]", 10)
     test_output.instance.set_number("my_point.x", 3)
     test_output.instance.clear_member("my_union.my_int_sequence")
     test_output.write()
@@ -332,7 +346,7 @@ class TestDataAccess:
 
   @pytest.mark.xfail
   def test_reset_sequence(self, test_output, test_input):
-    test_output.instance.set_number("my_union.my_int_sequence[3]", 10)
+    test_output.instance.set_number("my_union.my_int_sequence[2]", 10)
     test_output.instance.set_number("my_point.x", 3)
     test_output.write()
     self.wait_for_data(test_input)
@@ -395,10 +409,10 @@ class TestDataAccess:
   def test_shrink_sequence(self, test_output, test_input, test_dictionary):
     """Tests that set_dictionary shrinks sequences when it receives a smaller one"""
 
-    test_output.instance.set_number("my_int_sequence[3]", 10) # set length to 3
-    test_output.instance.set_number("my_point_sequence[1].x", 11)
-    test_output.instance.set_number("my_point_sequence[1].y", 12)
-    test_output.instance.set_number("my_point_sequence[3].x", 10)
+    test_output.instance.set_number("my_int_sequence[2]", 10) # set length to 3
+    test_output.instance.set_number("my_point_sequence[0].x", 11)
+    test_output.instance.set_number("my_point_sequence[0].y", 12)
+    test_output.instance.set_number("my_point_sequence[2].x", 10)
     test_output.instance.set_dictionary(
       {"my_point_array":[{'x': 10, 'y': 20}, {'x': 11, 'y': 21}, {'x': 12, 'y': 22}, {'x': 13, 'y': 23}, {'x': 14, 'y': 24}]})
 
@@ -413,12 +427,12 @@ class TestDataAccess:
     sample = test_input[0]
     assert sample["my_int_sequence#"] == 1 # Length reduced
     assert sample["my_point_sequence#"] == 1 # Length reduced
-    assert sample["my_int_sequence[1]"] == 40 # New value
-    assert sample["my_point_sequence[1].y"] == 2 # New value
-    assert sample["my_point_sequence[1].x"] == 0 # Doesn't retain previous value
-    assert sample["my_point_array[1].x"] == 100 # New value
-    assert sample["my_point_array[1].y"] == 20 # Retains value
-    assert sample["my_point_array[5].x"] == 14 # Retains value
+    assert sample["my_int_sequence[0]"] == 40 # New value
+    assert sample["my_point_sequence[0].y"] == 2 # New value
+    assert sample["my_point_sequence[0].x"] == 0 # Doesn't retain previous value
+    assert sample["my_point_array[0].x"] == 100 # New value
+    assert sample["my_point_array[0].y"] == 20 # Retains value
+    assert sample["my_point_array[4].x"] == 14 # Retains value
 
 
   def test_access_native_dynamic_data(self, populated_input):
