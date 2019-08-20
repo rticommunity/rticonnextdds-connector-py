@@ -347,3 +347,11 @@ class TestInstance:
     with pytest.raises(rti.Error) as excinfo:
       rtiOutputFixture.write(json_write_params_invalid)
     rtiOutputFixture.write(json_write_params_valid)
+    rtiOutputFixture.instance["color"] = "1"
+    rtiOutputFixture.write()
+    rtiOutputFixture.instance["color"] = "2"
+    rtiOutputFixture.write()
+    rtiOutputFixture.instance["color"] = "3"
+    # Exception will be raised as we are about to hit max_instances
+    with pytest.raises(rti.Error) as excinfo:
+      rtiOutputFixture.write()
