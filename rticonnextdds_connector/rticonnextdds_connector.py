@@ -334,7 +334,6 @@ class Samples:
 				tocstring(member_name),
 				ctypes.byref(native_json_str))
 			_check_retcode(retcode)
-			# Return None for an unset optional
 			if retcode == _ReturnCode.no_data:
 				return None
 

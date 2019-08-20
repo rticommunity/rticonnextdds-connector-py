@@ -408,7 +408,7 @@ class TestDataAccess:
 
     # Test get_dictoinary with an unset optional
     unset_optional = sample.get_dictionary("my_optional_point")
-    # TODO requires binding changes to return NO_DATA for unset optional
+    # TODO Binding must return NO_DATA for unset optional
     # assert unset_optional is None
 
   def test_shrink_sequence(self, test_output, test_input, test_dictionary):

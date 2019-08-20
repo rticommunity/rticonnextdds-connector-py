@@ -114,6 +114,9 @@ In an Output, :meth:`Instance.set_dictionary` receives a dictionary with all or
 some of the Output type members, and in an Input, :meth:`SampleIterator.get_dictionary`
 retrieves all the members.
 
+It is also possible to provide a ``member_name`` to :meth:`SampleIterator.get_dictionary` to obtain
+a dictionary containing the fields of that nested member only.
+
 On the other hand the methods described in the following section receive a
 ``field_name`` argument to get or set a specific member.
 
@@ -218,7 +221,7 @@ the following code after the previous call to ``set_dictionary``:
 
 The value of ``my_point`` is now ``{"x":10, "y":200}``
 
-It is possible to obtain the dictoinary of a nested struct using
+It is possible to obtain the dictionary of a nested struct using
 `SampleIterator.get_dictionary("member_name")`:
 
 .. testcode::
@@ -226,15 +229,7 @@ It is possible to obtain the dictoinary of a nested struct using
    for sample in input.valid_data_iterator:
       point = sample.get_dictionary("my_point")
 
-It is also possible to supply ``member_name`` as an element of an array (if the
-type of the array is complex):
-
-.. testcode::
-
-   for sample in input.valid_data_iterator:
-      point_element = sample.get_dictionary("my_point_sequence[1]")
-
-More generally, ``member_name`` must be one of the following types: array, sequence,
+``member_name`` must be one of the following types: array, sequence,
 struct, value or union. If not, the call to get_dictionary will fail:
 
 .. testcode::
@@ -261,8 +256,13 @@ a dictionary containing all of the elements of the array or sequence with name `
     for sample in input.valid_data_iterator:
         the_point_sequence = sample.get_dictionary("my_point_sequence")
 
-It is also possible to provide a ``member_name`` to :meth:`SampleIterator.get_dictionary` to obtain
-a dictionary containing the fields of that nested member only.
+It is also possible to supply ``member_name`` as an element of an array (if the
+type of the array is complex):
+
+.. testcode::
+
+   for sample in input.valid_data_iterator:
+      point_element = sample.get_dictionary("my_point_sequence[1]")
 
 In an Output, sequences are automatically resized:
 
