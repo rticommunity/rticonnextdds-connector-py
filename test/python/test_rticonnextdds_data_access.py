@@ -400,11 +400,16 @@ class TestDataAccess:
     assert the_union['my_int_sequence'] == [10, 20, 30]
     the_point_sequence = sample.get_dictionary("my_point_sequence")
     assert the_point_sequence == [{'x': 10, 'y': 20}, {'x': 11, 'y': 21}]
-    the_point_sequence_1 = sample.get_dictionary("my_point_sequence[1]")
-    assert the_point_sequence_1 == {'x': 10, 'y': 20}
+    the_point_sequence_0 = sample.get_dictionary("my_point_sequence[0]")
+    assert the_point_sequence_0 == {'x': 10, 'y': 20}
     the_array = sample.get_dictionary("my_point_array")
-    the_array_1 = sample.get_dictionary("my_point_array[1]")
-    assert the_array_1 == {'x': 0, 'y': 0}
+    the_array_0 = sample.get_dictionary("my_point_array[0]")
+    assert the_array_0 == {'x': 0, 'y': 0}
+
+    # Test get_dictoinary with an unset optional
+    unset_optional = sample.get_dictionary("my_optional_point")
+    # TODO requires binding changes to return NO_DATA for unset optional
+    # assert unset_optional is None
 
   def test_shrink_sequence(self, test_output, test_input, test_dictionary):
     """Tests that set_dictionary shrinks sequences when it receives a smaller one"""
