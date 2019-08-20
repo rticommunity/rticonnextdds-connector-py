@@ -35,6 +35,10 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                 <durability>
                     <kind> TRANSIENT_LOCAL_DURABILITY_QOS </kind>
                 </durability>
+                <resource_limits>
+                    <initial_instances>1</initial_instances>
+                    <max_instances>5</max_instances>
+                </resource_limits>
             </datawriter_qos>
             <datareader_qos>
                 <reliability>

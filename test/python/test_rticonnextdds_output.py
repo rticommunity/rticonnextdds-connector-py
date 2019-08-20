@@ -307,10 +307,10 @@ class TestInstance:
 
     """
     boolean_field="z"
-    with pytest.raises(TypeError) as execinfo:
+    with pytest.raises(TypeError) as excinfo:
       rtiOutputFixture.instance.set_boolean(boolean_field,{"color":1})
-    print("\nException of type:"+str(execinfo.type)+ \
-      "\nvalue:"+str(execinfo.value))
+    print("\nException of type:"+str(excinfo.type)+ \
+      "\nvalue:"+str(excinfo.value))
 
   @pytest.mark.xfail
   def test_setDictionary_with_incompatible_types(self,rtiOutputFixture,capfd):
@@ -336,3 +336,22 @@ class TestInstance:
     rtiOutputFixture.write()
     rtiOutputFixture.wait()
     rtiOutputFixture.wait(1) # Should return immediately
+
+  def test_write(self, rtiOutputFixture):
+    """
+    This function tests that :func:`rticonnectdds_connector.Output.write` call
+    fails (and an exception is raised) under a variety of circumstances.
+    """
+    json_write_params_invalid = "foo"
+    json_write_params_valid = "{ \"related_sample_identity\": {\"writer_guid\": {\"value\": [10, 30, 1, 66, 0, 0, 29, 180, 0, 0, 0, 1, 128, 0, 0, 3]}, \"sequence_number\": {\"high\": 0, \"low\": 0}}}"
+    with pytest.raises(rti.Error) as excinfo:
+      rtiOutputFixture.write(json_write_params_invalid)
+    rtiOutputFixture.write(json_write_params_valid)
+    rtiOutputFixture.instance["color"] = "1"
+    rtiOutputFixture.write()
+    rtiOutputFixture.instance["color"] = "2"
+    rtiOutputFixture.write()
+    rtiOutputFixture.instance["color"] = "3"
+    # Exception will be raised as we are about to hit max_instances
+    with pytest.raises(rti.Error) as excinfo:
+      rtiOutputFixture.write()

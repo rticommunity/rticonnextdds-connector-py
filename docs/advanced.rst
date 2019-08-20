@@ -6,4 +6,5 @@ Advanced topics
 
    data
    threading
+   errors
 
