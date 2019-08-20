@@ -439,3 +439,35 @@ class TestDataAccess:
     print("__setitem__ is {:2.2%} slower than set_number".format(
       (get_item_duration - get_number_duration) / get_number_duration))
 
+  def test_set_into_samples(self, test_output):
+    """
+    Test that the APIs to set data into samples behave as expected and raise the
+    appropriate exceptions.
+    """
+    # Pass None as the field_name
+    with pytest.raises(AttributeError) as excinfo:
+      test_output.instance[None] = 5
+    with pytest.raises(AttributeError) as excinfo:
+      test_output.instance.set_boolean(None, True)
+    with pytest.raises(AttributeError) as excinfo:
+      test_output.instance.set_number(None, 42)
+    # For set_string, TypeError is raised in this situation
+    with pytest.raises(TypeError) as excinfo:
+      test_output.instance.set_string(None, "Hello")
+
+    # Try to set a number with a string
+    with pytest.raises(TypeError) as excinfo:
+      test_output.instance.set_number("my_long", "hihewrke")
+    # Try to set a boolean with a string
+    with pytest.raises(TypeError) as excinfo:
+      test_output.instance.set_boolean("my_optional_bool", "hihewrke")
+
+    # Pass non-existent field names
+    with pytest.raises(rti.Error) as excinfo:
+      test_output.instance["NonExistent"] = 1
+    with pytest.raises(rti.Error) as excinfo:
+      test_output.instance.set_number("NonExistent", 1)
+    with pytest.raises(TypeError) as excinfo:
+      test_output.instance.set_string("NonExistent", 1)
+    with pytest.raises(rti.Error) as excinfo:
+      test_output.instance.set_boolean("NonExistent", 1)
