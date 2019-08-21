@@ -34,6 +34,8 @@ def tocstring(s):
 	return s
 
 def tocstring3(s):
+	if s == None:
+		return None
 	try:
 		return s.encode('utf8')
 	except AttributeError as e:
