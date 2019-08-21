@@ -130,6 +130,15 @@ To set any numeric type, including enumerations:
     output.instance.set_number("my_double", 2.14)
     output.instance.set_number("my_enum", 2)
 
+*Note:* The range of values for a numeric field is determined by the integer type
+used to define that field in the configuration file. However, ``set_number`` and
+``get_number`` may not be able to handle 64-bit integers (*int64* and *uint64*)
+whose absolute values are larger than 2^53. This is a *Connector* limitation
+due to the use of *double* as an intermediate representation. When ``set_number``
+or ``get_number`` detect this situation, they raise an :class:`Error`.
+``get_dictionary`` and ``set_dictionary`` do not have this limitation and can
+handle any 64-bit integer.
+
 To set booleans:
 
 .. testcode::
