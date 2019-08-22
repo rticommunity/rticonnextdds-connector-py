@@ -394,11 +394,19 @@ class TestDataAccess:
     assert sample["my_point_array[4].x"] == 14 # Retains value
 
 
-  def test_access_native_dynamic_data(self, populated_input):
+  def test_access_input_native_dynamic_data(self, populated_input):
     get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
     get_member_count.restype = ctypes.c_uint
     get_member_count.argtypes = [ctypes.c_void_p]
     count = get_member_count(populated_input[0].native)
+    assert count > 0
+
+  def test_access_output_native_dynamic_data(self, test_output, test_dictionary):
+    test_output.instance.set_dictionary(test_dictionary)
+    get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
+    get_member_count.restype = ctypes.c_uint
+    get_member_count.argtypes = [ctypes.c_void_p]
+    count = get_member_count(test_output.instance.native)
     assert count > 0
 
   def test_input_performance(self, populated_input):

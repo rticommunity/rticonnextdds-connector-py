@@ -820,7 +820,7 @@ class Instance:
 			tocstring(self.output.name),
 			ctypes.byref(dynamic_data_pointer))
 		_check_retcode(retcode)
-		return dynDataPtr
+		return dynamic_data_pointer
 
 	# Deprecated: use native property
 	def getNative(self):
