@@ -479,3 +479,6 @@ class TestDataAccess:
       test_output.instance.set_string("NonExistent", 1)
     with pytest.raises(rti.Error) as excinfo:
       test_output.instance.set_boolean("NonExistent", 1)
+
+  def test_get_any_from_info(self, populated_input):
+    assert populated_input[0].info['valid_data'] == True

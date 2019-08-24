@@ -101,6 +101,19 @@ using :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.get_bool()` and
 
 See more information in :ref:`Accessing the data`.
 
+Accessing the SampleInfo
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can access the meta-data of a sample, the SampleInfo, as follows:
+
+.. testcode::
+
+   for sample in input.data_iterator:
+      valid = sample.info["valid_data"]
+
+
+See :meth:`SampleIterator.info` for the list of meta-data fields available
+
 Class reference: Input, SampleIterator, ValidSampleIterator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
