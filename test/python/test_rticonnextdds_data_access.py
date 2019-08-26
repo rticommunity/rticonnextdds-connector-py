@@ -380,8 +380,9 @@ class TestDataAccess:
       sample.get_dictionary("my_double")
     with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_BOOLEAN.*") as excinfo:
       sample.get_dictionary("my_optional_bool")
-    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_LONG.*") as excinfo:
-      sample.get_dictionary("my_optional_long")
+    # We return None for unset optional members (that check is done before binding
+    # so this case will return None instead of failing as above).
+    assert None is sample.get_dictionary("my_optional_long")
     with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_STRING.*") as excinfo:
       sample.get_dictionary("my_string")
     with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_ENUM.*") as excinfo:
@@ -406,10 +407,9 @@ class TestDataAccess:
     the_array_0 = sample.get_dictionary("my_point_array[0]")
     assert the_array_0 == {'x': 0, 'y': 0}
 
-    # Test get_dictoinary with an unset optional
+    # Test get_dictionary with an unset optional
     unset_optional = sample.get_dictionary("my_optional_point")
-    # TODO Binding must return NO_DATA for unset optional
-    # assert unset_optional is None
+    assert unset_optional is None
 
   def test_shrink_sequence(self, test_output, test_input, test_dictionary):
     """Tests that set_dictionary shrinks sequences when it receives a smaller one"""
