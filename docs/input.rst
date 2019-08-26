@@ -75,15 +75,16 @@ It is possible to access an individual sample too:
       if input[0].valid_data:
          print(input[0].get_dictionary())
 
-Note that the equivalent method :meth:`Input.get_sample()` is also available.
+The method :meth:`Input.get_sample()` is also available; ``input[i]`` is equivalent
+to ``input.get_sample(i)``.
 
 .. warning::
+   All the methods described in this section return iterators to samples.
    Calling read/take again invalidates all iterators currently in
-   use. For that reason, it is not recommended to store the result of
-   ``get_sample()``.
+   use. For that reason, it is not recommended to store any iterator.
 
 In addition to ``get_dictionary``, you can get the values of specific fields
-using :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.get_bool()` and
+using :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.get_boolean()` and
 :meth:`SampleIterator.get_string()`, for example:
 
 .. testcode::

@@ -442,7 +442,7 @@ class SampleInfo:
 class SampleIterator:
 	"""Iterates and provides access to a data sample
 
-	A SampleIterator provides access to the data recieved by an input.
+	A SampleIterator provides access to the data received by an input.
 	SampleIterators are returned by :meth:`Input.data_iterator()`,
 	and :meth:`Input.get_sample()`; :meth:`Input.valid_data_iterator()` returns
 	a subclass, :class:`ValidSampleIterator`.
