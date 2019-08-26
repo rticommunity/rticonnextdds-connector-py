@@ -436,8 +436,9 @@ class TestDataAccess:
     assert sample.get_number("my_uint64") == max_int_set
     assert sample.get_number("my_int64") == -max_int_set
 
-    # largest integer allowed in get_number; ok in set_dictionary
-    test_output.instance.set_dictionary({"my_uint64":max_int_get})
+    # largest integer allowed in get_number; ok in set_dictionary, which
+    # __setitem__ will also use
+    test_output.instance["my_uint64"] = max_int_get
     test_output.instance.set_dictionary({"my_int64":-max_int_get})
     sample = self.send_data(test_output, test_input)
     assert sample.get_number("my_uint64") == max_int_get
@@ -446,7 +447,7 @@ class TestDataAccess:
     # too large for get_number, but ok in get_dictionary
     self.verify_large_integer(test_output, test_input, max_int_get + 1)
 
-    # 9007199254740999 -> 9007199254741000
+    # 9007199254740999 -> 9007199254741000.0
     self.verify_large_integer(test_output, test_input, 9007199254740999)
 
     # largest long long

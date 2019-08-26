@@ -34,7 +34,7 @@ def tocstring(s):
 	return s
 
 def tocstring3(s):
-	if s == None:
+	if s is None:
 		return None
 	try:
 		return s.encode('utf8')
@@ -236,6 +236,8 @@ class _ConnectorBinding:
 
 		self.freeString = self.library.RTI_Connector_free_string
 		self.freeString.argtypes = [POINTER(c_char)]
+
+		self.max_integer_as_double = 2**53
 
 connector_binding = _ConnectorBinding()
 
@@ -701,7 +703,11 @@ class Instance:
 		This is an alternative to :meth:`set_number`, :meth:`set_string` and :meth:`set_boolean`
 		"""
 		if isinstance(value, Number):
-			self.set_number(field_name, value)
+			if (value < connector_binding.max_integer_as_double):
+				self.set_number(field_name, value)
+			else:
+				# Work around set_number int-to-double conversion
+				self.set_dictionary({field_name:value})
 		elif isinstance(value, str):
 			self.set_string(field_name, value)
 		elif isinstance(value, bool):

@@ -98,7 +98,8 @@ Which corresponds to the following IDL definition::
         @optional long my_optional_long;
     };
 
-Note that you can get the XML definition of an IDL file with *rtiddsgen -convertToXml MyType.idl*.
+.. note::
+    You can get the XML definition of an IDL file with *rtiddsgen -convertToXml MyType.idl*.
 
 We will refer to an ``Output`` named ``output`` and
 ``Input`` named ``input`` such that ``input.sample_count > 0``.
@@ -130,14 +131,16 @@ To set any numeric type, including enumerations:
     output.instance.set_number("my_double", 2.14)
     output.instance.set_number("my_enum", 2)
 
-*Note:* The range of values for a numeric field is determined by the integer type
-used to define that field in the configuration file. However, ``set_number`` and
-``get_number`` may not be able to handle 64-bit integers (*int64* and *uint64*)
-whose absolute values are larger than 2^53. This is a *Connector* limitation
-due to the use of *double* as an intermediate representation. When ``set_number``
-or ``get_number`` detect this situation, they raise an :class:`Error`.
-``get_dictionary`` and ``set_dictionary`` do not have this limitation and can
-handle any 64-bit integer.
+.. warning::
+    The range of values for a numeric field is determined by the integer type
+    used to define that field in the configuration file. However, ``set_number`` and
+    ``get_number`` can't handle 64-bit integers (*int64* and *uint64*)
+    whose absolute values are larger than 2^53. This is a *Connector* limitation
+    due to the use of *double* as an intermediate representation. When ``set_number``
+    or ``get_number`` detect this situation, they raise an :class:`Error`.
+    ``get_dictionary`` and ``set_dictionary`` do not have this limitation and can
+    handle any 64-bit integer. ``Instance``'s ``__setitem__`` method doesn't have
+    this limitation either, but ``SampleIterator``'s ``__getitem__`` does.
 
 To set booleans:
 
@@ -184,11 +187,13 @@ with numeric fields, returning the number as a string. For example:
         # get number as string:
         value = sample.get_string("my_double")
 
-Note that the typed getters and setters perform better than ``__setitem__``
-and ``__getitem__`` in applications that write or read at high rates.
-Also ``__setitem__`` or ``__getitem__`` shouldn't be used as an alternative
-to ``get_dictionary`` or ``set_dictionary`` when the intention is to access
-most of the fields of the sample (see previous section).
+
+.. note::
+    The typed getters and setters perform better than ``__setitem__``
+    and ``__getitem__`` in applications that write or read at high rates.
+    Also ``__setitem__`` or ``__getitem__`` shouldn't be used as an alternative
+    to ``get_dictionary`` or ``set_dictionary`` when the intention is to access
+    most of the fields of the sample (see previous section).
 
 
 Accessing structs
