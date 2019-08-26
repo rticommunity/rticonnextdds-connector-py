@@ -440,11 +440,19 @@ class TestDataAccess:
     assert sample["my_point_array[4].x"] == 14 # Retains value
 
 
-  def test_access_native_dynamic_data(self, populated_input):
+  def test_access_input_native_dynamic_data(self, populated_input):
     get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
     get_member_count.restype = ctypes.c_uint
     get_member_count.argtypes = [ctypes.c_void_p]
     count = get_member_count(populated_input[0].native)
+    assert count > 0
+
+  def test_access_output_native_dynamic_data(self, test_output, test_dictionary):
+    test_output.instance.set_dictionary(test_dictionary)
+    get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
+    get_member_count.restype = ctypes.c_uint
+    get_member_count.argtypes = [ctypes.c_void_p]
+    count = get_member_count(test_output.instance.native)
     assert count > 0
 
   def test_input_performance(self, populated_input):
@@ -485,3 +493,35 @@ class TestDataAccess:
     print("__setitem__ is {:2.2%} slower than set_number".format(
       (get_item_duration - get_number_duration) / get_number_duration))
 
+  def test_set_into_samples(self, test_output):
+    """
+    Test that the APIs to set data into samples behave as expected and raise the
+    appropriate exceptions.
+    """
+    # Pass None as the field_name
+    with pytest.raises(AttributeError) as excinfo:
+      test_output.instance[None] = 5
+    with pytest.raises(AttributeError) as excinfo:
+      test_output.instance.set_boolean(None, True)
+    with pytest.raises(AttributeError) as excinfo:
+      test_output.instance.set_number(None, 42)
+    # For set_string, TypeError is raised in this situation
+    with pytest.raises(TypeError) as excinfo:
+      test_output.instance.set_string(None, "Hello")
+
+    # Try to set a number with a string
+    with pytest.raises(TypeError) as excinfo:
+      test_output.instance.set_number("my_long", "hihewrke")
+    # Try to set a boolean with a string
+    with pytest.raises(TypeError) as excinfo:
+      test_output.instance.set_boolean("my_optional_bool", "hihewrke")
+
+    # Pass non-existent field names
+    with pytest.raises(rti.Error) as excinfo:
+      test_output.instance["NonExistent"] = 1
+    with pytest.raises(rti.Error) as excinfo:
+      test_output.instance.set_number("NonExistent", 1)
+    with pytest.raises(TypeError) as excinfo:
+      test_output.instance.set_string("NonExistent", 1)
+    with pytest.raises(rti.Error) as excinfo:
+      test_output.instance.set_boolean("NonExistent", 1)
