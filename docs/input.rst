@@ -54,17 +54,13 @@ to retrieve all the fields in the sample:
    for sample in input.valid_data_iterator:
       print(sample.get_dictionary())
 
-*Connect DDS* can produce samples with invalid data, which contain meta-data only.
-For more information about this see `Valid Data Flag <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#receiving_2076951295_727613>`__
-in the *Connect DDS Core Libraries* User's Manual.
-
 Use :meth:`Input.data_iterator` to also access samples that contain
-meta-data only:
+meta-data only (see next section, :ref:`Accessing the SampleInfo`):
 
 .. testcode::
 
    for sample in input.data_iterator:
-      print(sample.getInfo())
+      # Access sample.info
       if sample.valid_data:
          print(sample.get_dictionary())
 
@@ -81,11 +77,10 @@ It is possible to access an individual sample too:
 
 Note that the equivalent method :meth:`Input.get_sample()` is also available.
 
-TODO: explain use-cases for getInfo() (not yet implemented)
-
-Important: calling read/take again invalidates all iterators currently in
-use. For that reason, it is not recommended to store the result of
-``get_sample()``.
+.. warning::
+   Calling read/take again invalidates all iterators currently in
+   use. For that reason, it is not recommended to store the result of
+   ``get_sample()``.
 
 In addition to ``get_dictionary``, you can get the values of specific fields
 using :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.get_bool()` and
@@ -104,7 +99,11 @@ See more information in :ref:`Accessing the data`.
 Accessing the SampleInfo
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can access the meta-data of a sample, the SampleInfo, as follows:
+*Connect DDS* can produce samples with invalid data, which contain meta-data only.
+For more information about this see `Valid Data Flag <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#receiving_2076951295_727613>`__
+in the *Connect DDS Core Libraries* User's Manual.
+
+You can access a field of the sample meta-data, the *SampleInfo*, as follows:
 
 .. testcode::
 
