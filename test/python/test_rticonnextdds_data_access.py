@@ -525,3 +525,39 @@ class TestDataAccess:
       test_output.instance.set_string("NonExistent", 1)
     with pytest.raises(rti.Error) as excinfo:
       test_output.instance.set_boolean("NonExistent", 1)
+
+  def test_get_complex_with_getitem(self, populated_input):
+    sample = populated_input[0]
+
+    point = sample["my_point"]
+    # Structs converted to dict
+    assert isinstance(point, dict)
+    assert point['x'] == 3
+    assert point['y'] == 4
+
+    point_sequence = sample["my_point_sequence"]
+    # Sequences converted to list
+    assert isinstance(point_sequence, list)
+    assert point_sequence[0] == {'x': 10, 'y': 20}
+    assert point_sequence[1] == {'x': 11, 'y': 21}
+
+    point_array = sample["my_point_array"]
+    # Arrays converted to list
+    assert isinstance(point_array, list)
+    assert point_array[0] == {'x': 0, 'y': 0}
+    assert point_array[4] == {'x': 5, 'y': 15}
+
+    point_alias = sample["my_point_alias"]
+    # Alias should be resolved (so in this case become a struct -> dict)
+    assert isinstance(point_alias, dict)
+    assert point_alias['x'] == 30
+    assert point_alias['y'] == 40
+
+    optional_point = sample["my_optional_point"]
+    # Unset optional should return None
+    assert optional_point is None
+
+    union = sample["my_union"]
+    # If no trailing '#' is supplied should obtain the union as a struct -> dict
+    assert isinstance(union, dict)
+    assert union == {'my_int_sequence': [10, 20, 30]}

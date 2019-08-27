@@ -86,6 +86,13 @@ def _check_retcode(retcode):
 		else:
 			raise Error("DDS Exception: " + _get_last_dds_error_message())
 
+# Definition of this class must match the RTI_Connecot_AnyValueKind enum in ddsConnector.ifc
+class _AnyValueKind:
+	connector_none = 0
+	connector_number = 1
+	connector_boolean = 2
+	connector_string = 3
+
 class _ConnectorBinding:
 	def __init__(self):
 		(bits, linkage) = platform.architecture()
@@ -464,12 +471,16 @@ class SampleIterator:
 		if retcode == _ReturnCode.no_data:
 			return None
 
-		if selection.value == 1:
+		if selection.value == _AnyValueKind.connector_number:
 			return number_value.value
-		elif selection.value == 2:
+		elif selection.value == _AnyValueKind.connector_boolean:
 			return bool_value.value
-		elif selection.value == 3:
-			return _move_native_string(string_value)
+		elif selection.value == _AnyValueKind.connector_string:
+			python_string = _move_native_string(string_value)
+			try:
+				return json.loads(python_string)
+			except ValueError as e:
+				return python_string
 		else:
 			# This shouldn't happen
 			raise Error("Unexpected connector_binding.getAnyValueFromSamples result")
