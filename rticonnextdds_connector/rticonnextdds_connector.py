@@ -224,6 +224,10 @@ class _ConnectorBinding:
 		self.getJSONSample.restype = ctypes.c_int
 		self.getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, POINTER(c_char_p)]
 
+		self.getJSONMember = self.library.RTI_Connector_get_json_member
+		self.getJSONMember.restype = ctypes.c_int
+		self.getJSONMember.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, POINTER(c_char_p)]
+
 		self.setJSONInstance = self.library.RTI_Connector_set_json_instance
 		self.setJSONInstance.restype = ctypes.c_int
 		self.setJSONInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
@@ -325,20 +329,33 @@ class Samples:
 
 		return _move_native_string(c_value)
 
-	def getDictionary(self, index):
+	def getDictionary(self, index, member_name = None):
 		if type(index) is not int:
 			raise ValueError("index must be an integer")
 		if index < 0:
 			raise ValueError("index must be positive")
-		#Adding 1 to index because the C API was based on Lua where indexes start from 1
+		# Adding 1 to index because the C API was based on Lua where indexes start from 1
 		index = index + 1
-		native_json_str = ctypes.c_char_p()
-		retcode = connector_binding.getJSONSample(
-			self.input.connector.native,
-			tocstring(self.input.name),
-			index,
-			ctypes.byref(native_json_str))
+		if member_name is None:
+			native_json_str = ctypes.c_char_p()
+			retcode = connector_binding.getJSONSample(
+				self.input.connector.native,
+				tocstring(self.input.name),
+				index,
+				ctypes.byref(native_json_str))
+		elif not isinstance(member_name, str):
+			raise ValueError("member_name must be a string")
+		else:
+			native_json_str = ctypes.c_char_p()
+			retcode = connector_binding.getJSONMember(
+				self.input.connector.native,
+				tocstring(self.input.name),
+				index,
+				tocstring(member_name),
+				ctypes.byref(native_json_str))
 		_check_retcode(retcode)
+		if retcode == _ReturnCode.no_data:
+			return None
 		return json.loads(_move_native_string(native_json_str))
 
 	def getNative(self,index):
@@ -346,7 +363,6 @@ class Samples:
 		index = index + 1
 		dynDataPtr = connector_binding.getNativeSample(self.input.connector.native,tocstring(self.input.name),index)
 		return dynDataPtr
-
 
 class Infos:
 	def __init__(self,input):
@@ -512,17 +528,18 @@ class SampleIterator:
 			# This shouldn't happen
 			raise Error("Unexpected connector_binding.getAnyValueFromSamples result")
 
-	def get_dictionary(self):
+	def get_dictionary(self, member_name = None):
 		"""Gets a dictionary with the values of all the fields of this sample
 
 		The dictionary keys are the field names and the dictionary values correspond
 		to each field value. To see how nested types, sequences, and arrays are
 		represented, see :ref:`Accessing the data`.
 
-		:return: A dictionary containing all the fields of the sample.
+		:param str member_name: (Optional) The name of the complex member or field. The type of the member with name member_name must be an array, sequence, struct, value or union.
+		:return: A dictionary containing all the fields of the sample, or if a member_name is supplied, all the fields or elements of that member.
 		"""
 
-		return self.input.samples.getDictionary(self.index)
+		return self.input.samples.getDictionary(self.index, member_name)
 
 	def get_number(self, field_name):
 		"""Gets the value of a numeric field in this sample
@@ -752,7 +769,9 @@ class Instance:
 
 		This is an alternative to :meth:`set_number`, :meth:`set_string` and :meth:`set_boolean`
 		"""
-		if isinstance(value, Number):
+		if field_name is None:
+			raise AttributeError("field_name cannot be None")
+		elif isinstance(value, Number):
 			self.set_number(field_name, value)
 		elif isinstance(value, str):
 			self.set_string(field_name, value)
@@ -768,7 +787,9 @@ class Instance:
 		:param number value: A numeric value or ``None`` to unset an optional member
 		"""
 
-		if value is None:
+		if field_name is None:
+			raise AttributeError("field_name cannot be None")
+		elif value is None:
 			self.clear_member(field_name)
 		else:
 			try:
@@ -792,7 +813,9 @@ class Instance:
 		:param number value: ``True`` or ``False``, or ``None`` to unset an optional member
 		"""
 
-		if value is None:
+		if field_name is None:
+			raise AttributeError("field_name cannot be None")
+		elif value is None:
 			self.clear_member(field_name)
 		else:
 			try:
@@ -816,7 +839,9 @@ class Instance:
 		:param str value: The string value or ``None`` to unset an optional member
 		"""
 
-		if value is None:
+		if field_name is None:
+			raise AttributeError("field_name cannot be None")
+		elif value is None:
 			self.clear_member(field_name)
 		else:
 			try:

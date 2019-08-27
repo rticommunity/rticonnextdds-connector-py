@@ -83,9 +83,11 @@ to ``input.get_sample(i)``.
    Calling read/take again invalidates all iterators currently in
    use. For that reason, it is not recommended to store any iterator.
 
-In addition to ``get_dictionary``, you can get the values of specific fields
-using :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.get_boolean()` and
-:meth:`SampleIterator.get_string()`, for example:
+``get_dictionary`` can receive a ``field_name`` to only return the fields of a
+complex member. In addition to ``get_dictionary``, you can get the values of
+specific primitive fields using :meth:`SampleIterator.get_number()`,
+:meth:`SampleIterator.get_boolean()` and :meth:`SampleIterator.get_string()`,
+for example:
 
 .. testcode::
 
