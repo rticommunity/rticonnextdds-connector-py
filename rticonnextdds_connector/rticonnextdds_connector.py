@@ -715,7 +715,9 @@ class Instance:
 
 		This is an alternative to :meth:`set_number`, :meth:`set_string` and :meth:`set_boolean`
 		"""
-		if isinstance(value, Number):
+		if field_name is None:
+			raise AttributeError("field_name cannot be None")
+		elif isinstance(value, Number):
 			self.set_number(field_name, value)
 		elif isinstance(value, str):
 			self.set_string(field_name, value)
@@ -731,7 +733,9 @@ class Instance:
 		:param number value: A numeric value or ``None`` to unset an optional member
 		"""
 
-		if value is None:
+		if field_name is None:
+			raise AttributeError("field_name cannot be None")
+		elif value is None:
 			self.clear_member(field_name)
 		else:
 			try:
@@ -755,7 +759,9 @@ class Instance:
 		:param number value: ``True`` or ``False``, or ``None`` to unset an optional member
 		"""
 
-		if value is None:
+		if field_name is None:
+			raise AttributeError("field_name cannot be None")
+		elif value is None:
 			self.clear_member(field_name)
 		else:
 			try:
@@ -779,7 +785,9 @@ class Instance:
 		:param str value: The string value or ``None`` to unset an optional member
 		"""
 
-		if value is None:
+		if field_name is None:
+			raise AttributeError("field_name cannot be None")
+		elif value is None:
 			self.clear_member(field_name)
 		else:
 			try:
