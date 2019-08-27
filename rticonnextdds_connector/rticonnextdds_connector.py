@@ -216,6 +216,10 @@ class _ConnectorBinding:
 		self.getAnyValueFromSamples.restype = ctypes.c_int
 		self.getAnyValueFromSamples.argtypes = [ctypes.c_void_p, POINTER(c_double), POINTER(c_int), POINTER(c_char_p), POINTER(c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
 
+		self.getAnyValueFromInfo = self.library.RTI_Connector_get_any_from_info
+		self.getAnyValueFromInfo.restype = ctypes.c_int
+		self.getAnyValueFromInfo.argtypes = [ctypes.c_void_p, POINTER(c_double), POINTER(c_int), POINTER(c_char_p), POINTER(c_int), ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p]
+
 		self.getJSONSample = self.library.RTI_Connector_get_json_sample
 		self.getJSONSample.restype = ctypes.c_int
 		self.getJSONSample.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, POINTER(c_char_p)]
@@ -415,10 +419,46 @@ class Infos:
 		_check_retcode(retcode)
 		return json.loads(fromcstring(native_json_str))
 
+class SampleInfo:
+	"""The type of :attr:`SampleIterator.info`"""
+
+	def __init__(self, input, index):
+		self.input = input
+		self.index = index
+
+	def __getitem__(self, field_name):
+		number_value = ctypes.c_double()
+		bool_value = ctypes.c_int()
+		string_value = ctypes.c_char_p()
+		selection = ctypes.c_int()
+		retcode = connector_binding.getAnyValueFromInfo(
+			self.input.connector.native,
+			ctypes.byref(number_value),
+			ctypes.byref(bool_value),
+			ctypes.byref(string_value),
+			ctypes.byref(selection),
+			tocstring(self.input.name),
+			self.index + 1,
+			tocstring(field_name))
+		_check_retcode(retcode)
+
+		if retcode == _ReturnCode.no_data:
+			return None
+
+		if selection.value == 1:
+			return number_value.value
+		elif selection.value == 2:
+			return bool_value.value
+		elif selection.value == 3:
+			return _move_native_string(string_value)
+		else:
+			# This shouldn't happen
+			raise Error("Unexpected connector_binding.getAnyValueFromInfo result")
+
 class SampleIterator:
 	"""Iterates and provides access to a data sample
 
-	A SampleIterator provides access to the data recieved by an input.
+	A SampleIterator provides access to the data received by an input.
 	SampleIterators are returned by :meth:`Input.data_iterator()`,
 	and :meth:`Input.get_sample()`; :meth:`Input.valid_data_iterator()` returns
 	a subclass, :class:`ValidSampleIterator`.
@@ -444,6 +484,20 @@ class SampleIterator:
 		"""
 
 		return self.input.infos.isValid(self.index)
+
+	@property
+	def info(self):
+		"""Provides access to this sample's meta-data
+
+		The info object expects one of the **SampleInfo** field names::
+
+			value = sample_it.info[name]
+
+		The supported field names are:
+			* ``"valid_data"`` (equivalent to ``sample_it.valid_data``)
+			* TODO: add more
+		"""
+		return SampleInfo(self.input, self.index)
 
 	def __getitem__(self, field_name):
 		number_value = ctypes.c_double()
