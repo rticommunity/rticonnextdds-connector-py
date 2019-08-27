@@ -81,6 +81,10 @@ It is possible to access an individual sample too:
 
 Note that the equivalent method :meth:`Input.get_sample()` is also available.
 
+It is also possible to supply a ``member_name`` to :meth:`SampleIterator.get_dictionary()`,
+doing this will return a dictionary containing all the fields of the sample's complex member
+called ``member_name``.
+
 TODO: explain use-cases for getInfo() (not yet implemented)
 
 Important: calling read/take again invalidates all iterators currently in

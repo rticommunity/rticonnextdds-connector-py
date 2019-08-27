@@ -87,7 +87,7 @@ class TestDataAccess:
 
   @pytest.fixture(scope="class")
   def populated_input(self, test_connector, test_dictionary):
-    """Writes a default sample and receives it the input.
+    """Writes a default sample and receives it at the input.
     Some tests use this default sample. Others may write different data and
     won't use this fixture
     """
@@ -167,24 +167,24 @@ class TestDataAccess:
   @pytest.mark.xfail
   def test_bad_sequence_access(self, populated_input):
     sample = populated_input[0]
-    with pytest.raises(AttributeError) as execinfo:
+    with pytest.raises(AttributeError) as excinfo:
       sample.get_number("my_point_sequence[9].y")
-    with pytest.raises(AttributeError) as execinfo:
+    with pytest.raises(AttributeError) as excinfo:
       sample.get_number("my_int_sequence[9]")
 
   def test_bad_member_name(self, populated_input):
     sample = populated_input[0]
-    with pytest.raises(rti.Error, match=r".*Cannot find.*my_nonexistent_member.*") as execinfo:
+    with pytest.raises(rti.Error, match=r".*Cannot find.*my_nonexistent_member.*") as excinfo:
       sample.get_number("my_nonexistent_member")
 
   def test_bad_member_syntax(self, populated_input):
     sample = populated_input[0]
-    with pytest.raises(rti.Error) as execinfo:
+    with pytest.raises(rti.Error) as excinfo:
       sample.get_number("my_point_sequence[9[.y")
 
   def test_bad_sequence_index(self, populated_input):
     sample = populated_input[0]
-    with pytest.raises(rti.Error) as execinfo:
+    with pytest.raises(rti.Error) as excinfo:
       sample.get_number("my_point_sequence[-1].y")
 
   def test_unions(self, populated_input):
@@ -234,7 +234,7 @@ class TestDataAccess:
     sample = populated_input[0]
     assert sample.get_number("my_optional_long") is None
     assert sample["my_optional_long"] is None
-    with pytest.raises(KeyError) as execinfo:
+    with pytest.raises(KeyError) as excinfo:
       value = sample.get_dictionary()['my_optional_long']
 
   def test_unset_optional_string(self, populated_input):
@@ -351,7 +351,7 @@ class TestDataAccess:
     assert not "my_optional_point" in dictionary
 
   def test_bad_clear_member(self, test_output):
-    with pytest.raises(rti.Error) as execinfo:
+    with pytest.raises(rti.Error) as excinfo:
       test_output.instance.clear_member("my_nonexistent_member")
 
   @pytest.mark.xfail
@@ -374,6 +374,52 @@ class TestDataAccess:
     # The other fields are unchanged:
     assert sample.get_number("my_point.x") == 3
     assert sample.get_number("my_point_sequence#") == 2
+
+  def test_get_dictionary(self, populated_input):
+    # populated_input[0] contains test_dictionary
+    sample = populated_input[0]
+
+    # Attempt to get_dictionary for non existent member
+    with pytest.raises(rti.Error, match=r".*Cannot find.*IDoNotExist.*") as excinfo:
+      sample.get_dictionary("IDoNotExist")
+
+    # Attempt to get_dictionary for non-complex members
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_LONG.*") as excinfo:
+      sample.get_dictionary("my_long")
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_DOUBLE.*") as excinfo:
+      sample.get_dictionary("my_double")
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_BOOLEAN.*") as excinfo:
+      sample.get_dictionary("my_optional_bool")
+    # We return None for unset optional members (that check is done before binding
+    # so this case will return None instead of failing as above).
+    assert None is sample.get_dictionary("my_optional_long")
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_STRING.*") as excinfo:
+      sample.get_dictionary("my_string")
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_ENUM.*") as excinfo:
+      sample.get_dictionary("my_enum")
+    # It is possible to use get_dictionary to access nested members, but the nested
+    # member must be a complex type
+    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_LONG.*") as excinfo:
+      sample.get_dictionary("my_point.x")
+
+    # Valid values for member_name
+    the_point = sample.get_dictionary("my_point")
+    assert the_point['x'] == 3 and the_point['y'] == 4
+    the_point_alias = sample.get_dictionary("my_point_alias")
+    assert the_point_alias['x'] == 30 and the_point_alias['y'] == 40
+    the_union = sample.get_dictionary("my_union")
+    assert the_union['my_int_sequence'] == [10, 20, 30]
+    the_point_sequence = sample.get_dictionary("my_point_sequence")
+    assert the_point_sequence == [{'x': 10, 'y': 20}, {'x': 11, 'y': 21}]
+    the_point_sequence_0 = sample.get_dictionary("my_point_sequence[0]")
+    assert the_point_sequence_0 == {'x': 10, 'y': 20}
+    the_array = sample.get_dictionary("my_point_array")
+    the_array_0 = sample.get_dictionary("my_point_array[0]")
+    assert the_array_0 == {'x': 0, 'y': 0}
+
+    # Test get_dictionary with an unset optional
+    unset_optional = sample.get_dictionary("my_optional_point")
+    assert unset_optional is None
 
   def test_shrink_sequence(self, test_output, test_input, test_dictionary):
     """Tests that set_dictionary shrinks sequences when it receives a smaller one"""
@@ -453,11 +499,19 @@ class TestDataAccess:
     # largest long long
     self.verify_large_integer(test_output, test_input, 2**63 - 1)
 
-  def test_access_native_dynamic_data(self, populated_input):
+  def test_access_input_native_dynamic_data(self, populated_input):
     get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
     get_member_count.restype = ctypes.c_uint
     get_member_count.argtypes = [ctypes.c_void_p]
     count = get_member_count(populated_input[0].native)
+    assert count > 0
+
+  def test_access_output_native_dynamic_data(self, test_output, test_dictionary):
+    test_output.instance.set_dictionary(test_dictionary)
+    get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
+    get_member_count.restype = ctypes.c_uint
+    get_member_count.argtypes = [ctypes.c_void_p]
+    count = get_member_count(test_output.instance.native)
     assert count > 0
 
   def test_input_performance(self, populated_input):
@@ -510,8 +564,7 @@ class TestDataAccess:
       test_output.instance.set_boolean(None, True)
     with pytest.raises(rti.Error) as excinfo:
       test_output.instance.set_number(None, 42)
-    # For set_string, TypeError is raised in this situation
-    with pytest.raises(TypeError) as excinfo:
+    with pytest.raises(AttributeError) as excinfo:
       test_output.instance.set_string(None, "Hello")
 
     # Try to set a number with a string
