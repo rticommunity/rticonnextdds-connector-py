@@ -505,8 +505,7 @@ class TestDataAccess:
       test_output.instance.set_boolean(None, True)
     with pytest.raises(AttributeError) as excinfo:
       test_output.instance.set_number(None, 42)
-    # For set_string, TypeError is raised in this situation
-    with pytest.raises(TypeError) as excinfo:
+    with pytest.raises(AttributeError) as excinfo:
       test_output.instance.set_string(None, "Hello")
 
     # Try to set a number with a string
