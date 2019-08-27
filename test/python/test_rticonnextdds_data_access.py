@@ -558,11 +558,11 @@ class TestDataAccess:
     appropriate exceptions.
     """
     # Pass None as the field_name
-    with pytest.raises(rti.Error) as excinfo:
+    with pytest.raises(AttributeError) as excinfo:
       test_output.instance[None] = 5
-    with pytest.raises(rti.Error) as excinfo:
+    with pytest.raises(AttributeError) as excinfo:
       test_output.instance.set_boolean(None, True)
-    with pytest.raises(rti.Error) as excinfo:
+    with pytest.raises(AttributeError) as excinfo:
       test_output.instance.set_number(None, 42)
     with pytest.raises(AttributeError) as excinfo:
       test_output.instance.set_string(None, "Hello")
