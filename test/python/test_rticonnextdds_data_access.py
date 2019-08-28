@@ -505,8 +505,7 @@ class TestDataAccess:
       test_output.instance.set_boolean(None, True)
     with pytest.raises(AttributeError) as excinfo:
       test_output.instance.set_number(None, 42)
-    # For set_string, TypeError is raised in this situation
-    with pytest.raises(TypeError) as excinfo:
+    with pytest.raises(AttributeError) as excinfo:
       test_output.instance.set_string(None, "Hello")
 
     # Try to set a number with a string
@@ -561,3 +560,6 @@ class TestDataAccess:
     # If no trailing '#' is supplied should obtain the union as a struct -> dict
     assert isinstance(union, dict)
     assert union == {'my_int_sequence': [10, 20, 30]}
+
+  def test_get_any_from_info(self, populated_input):
+    assert populated_input[0].info['valid_data'] == True

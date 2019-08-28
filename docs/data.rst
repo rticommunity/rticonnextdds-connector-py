@@ -9,8 +9,8 @@ Accessing the data
    connector = rti.Connector("MyParticipantLibrary::DataAccessTest", "../test/xml/TestConnector.xml")
    output = connector.get_output("TestPublisher::TestWriter")
    input = connector.get_input("TestSubscriber::TestReader")
-   output.instance.set_number("my_int_sequence[10]", 10)
-   output.instance.set_number("my_point_sequence[10].x", 10)
+   output.instance.set_number("my_int_sequence[9]", 10)
+   output.instance.set_number("my_point_sequence[9].x", 10)
    output.instance.set_number("my_optional_long", 10)
    output.instance.set_number("my_optional_point.x", 10)
    output.write()
@@ -237,6 +237,18 @@ struct, value or union. If not, the call to get_dictionary will fail:
    # for sample in input.valid_data_iterator:
       # long = sample.get_dictionary("my_long") # ERROR, the_long is a basic type
 
+It is also possible to obtain the dictionary of a struct using the ``__getitem__``
+operator:
+
+.. testcode::
+
+    for sample in input.valid_data_iterator:
+        point = sample["my_point"]
+        # point is a dict
+
+The same limitations described in :ref:`Accessing basic members (numbers, strings and booleans)`
+of using ``__getitem__`` apply here.
+
 Accessing arrays and sequences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -263,6 +275,19 @@ type of the array is complex):
 
    for sample in input.valid_data_iterator:
       point_element = sample.get_dictionary("my_point_sequence[1]")
+
+The ``__getitem__`` operator can be used to obtain arrays and sequences:
+
+.. testcode::
+
+    for sample in input.valid_data_iterator:
+        point_sequence = sample["my_point_sequence"]
+        # point is a list
+
+The type returned by the ``__getitem__`` operator is a list for arrays and sequences.
+
+The same limitations described in :ref:`Accessing basic members (numbers, strings and booleans)`
+of using ``__getitem__`` apply here.
 
 In an Output, sequences are automatically resized:
 
@@ -396,3 +421,16 @@ In an Input, you can obtain the selected member as a string::
 
     if input[0].get_string("my_union#") == "point":
         value = input[0].get_number("my_union.point")
+
+The ``__getitem__`` operator can be used to obtain unions:
+
+.. testcode::
+
+    for sample in input.valid_data_iterator:
+        union = sample["my_union"]
+        # union is a dict
+
+The type returned by the operator is a dict for unions.
+
+The same limitations described in :ref:`Accessing basic members (numbers, strings and booleans)`
+of using ``__getitem__`` apply here.

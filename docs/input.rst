@@ -54,17 +54,13 @@ to retrieve all the fields in the sample:
    for sample in input.valid_data_iterator:
       print(sample.get_dictionary())
 
-*Connect DDS* can produce samples with invalid data, which contain meta-data only.
-For more information about this see `Valid Data Flag <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#receiving_2076951295_727613>`__
-in the *Connect DDS Core Libraries* User's Manual.
-
 Use :meth:`Input.data_iterator` to also access samples that contain
-meta-data only:
+meta-data only (see next section, :ref:`Accessing the SampleInfo`):
 
 .. testcode::
 
    for sample in input.data_iterator:
-      print(sample.getInfo())
+      # Access sample.info
       if sample.valid_data:
          print(sample.get_dictionary())
 
@@ -79,21 +75,19 @@ It is possible to access an individual sample too:
       if input[0].valid_data:
          print(input[0].get_dictionary())
 
-Note that the equivalent method :meth:`Input.get_sample()` is also available.
+The method :meth:`Input.get_sample()` is also available; ``input[i]`` is equivalent
+to ``input.get_sample(i)``.
 
-It is also possible to supply a ``member_name`` to :meth:`SampleIterator.get_dictionary()`,
-doing this will return a dictionary containing all the fields of the sample's complex member
-called ``member_name``.
+.. warning::
+   All the methods described in this section return iterators to samples.
+   Calling read/take again invalidates all iterators currently in
+   use. For that reason, it is not recommended to store any iterator.
 
-TODO: explain use-cases for getInfo() (not yet implemented)
-
-Important: calling read/take again invalidates all iterators currently in
-use. For that reason, it is not recommended to store the result of
-``get_sample()``.
-
-In addition to ``get_dictionary``, you can get the values of specific fields
-using :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.get_bool()` and
-:meth:`SampleIterator.get_string()`, for example:
+``get_dictionary`` can receive a ``field_name`` to only return the fields of a
+complex member. In addition to ``get_dictionary``, you can get the values of
+specific primitive fields using :meth:`SampleIterator.get_number()`,
+:meth:`SampleIterator.get_boolean()` and :meth:`SampleIterator.get_string()`,
+for example:
 
 .. testcode::
 
@@ -104,6 +98,23 @@ using :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.get_bool()` and
       color = sample.get_string("color") # or just sample["color"]
 
 See more information in :ref:`Accessing the data`.
+
+Accessing the SampleInfo
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+*Connect DDS* can produce samples with invalid data, which contain meta-data only.
+For more information about this see `Valid Data Flag <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#receiving_2076951295_727613>`__
+in the *Connect DDS Core Libraries* User's Manual.
+
+You can access a field of the sample meta-data, the *SampleInfo*, as follows:
+
+.. testcode::
+
+   for sample in input.data_iterator:
+      valid = sample.info["valid_data"]
+
+
+See :meth:`SampleIterator.info` for the list of meta-data fields available
 
 Class reference: Input, SampleIterator, ValidSampleIterator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
