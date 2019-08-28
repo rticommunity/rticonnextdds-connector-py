@@ -6,7 +6,7 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-import pytest,time,sys,os,ctypes
+import pytest,time,sys,os,ctypes,json
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
 
@@ -560,6 +560,23 @@ class TestDataAccess:
     # If no trailing '#' is supplied should obtain the union as a struct -> dict
     assert isinstance(union, dict)
     assert union == {'my_int_sequence': [10, 20, 30]}
+
+    # It should not be possible to obtain complex members with get_number API,
+    # though this should work with __getitem__ as shown above
+    with pytest.raises(rti.Error) as excinfo:
+      sample.get_number("my_point")
+    # Test the same thing with get_boolean
+    with pytest.raises(rti.Error) as excinfo:
+      sample.get_boolean("my_point")
+    # It should be possible to obtain complex members using get_string, but doing
+    # this they will be of type 'str' as opposed to 'list' and 'dict'. They should
+    # be in such a format that it is possible to convert them at a later point.
+    point_str = sample.get_string("my_point")
+    assert isinstance(point_str, str)
+    assert isinstance(json.loads(point_str), dict)
+    point_array_str = sample.get_string("my_point_array")
+    assert isinstance(point_array_str, str)
+    assert isinstance(json.loads(point_array_str), list)
 
   def test_get_any_from_info(self, populated_input):
     assert populated_input[0].info['valid_data'] == True
