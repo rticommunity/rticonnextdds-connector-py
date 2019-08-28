@@ -6,7 +6,7 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-import pytest,time,sys,os,ctypes
+import pytest,time,sys,os,ctypes,json
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
 
@@ -524,6 +524,59 @@ class TestDataAccess:
       test_output.instance.set_string("NonExistent", 1)
     with pytest.raises(rti.Error) as excinfo:
       test_output.instance.set_boolean("NonExistent", 1)
+
+  def test_get_complex_with_getitem(self, populated_input):
+    sample = populated_input[0]
+
+    point = sample["my_point"]
+    # Structs converted to dict
+    assert isinstance(point, dict)
+    assert point['x'] == 3
+    assert point['y'] == 4
+
+    point_sequence = sample["my_point_sequence"]
+    # Sequences converted to list
+    assert isinstance(point_sequence, list)
+    assert point_sequence[0] == {'x': 10, 'y': 20}
+    assert point_sequence[1] == {'x': 11, 'y': 21}
+
+    point_array = sample["my_point_array"]
+    # Arrays converted to list
+    assert isinstance(point_array, list)
+    assert point_array[0] == {'x': 0, 'y': 0}
+    assert point_array[4] == {'x': 5, 'y': 15}
+
+    point_alias = sample["my_point_alias"]
+    # Alias should be resolved (so in this case become a struct -> dict)
+    assert isinstance(point_alias, dict)
+    assert point_alias['x'] == 30
+    assert point_alias['y'] == 40
+
+    optional_point = sample["my_optional_point"]
+    # Unset optional should return None
+    assert optional_point is None
+
+    union = sample["my_union"]
+    # If no trailing '#' is supplied should obtain the union as a struct -> dict
+    assert isinstance(union, dict)
+    assert union == {'my_int_sequence': [10, 20, 30]}
+
+    # It should not be possible to obtain complex members with get_number API,
+    # though this should work with __getitem__ as shown above
+    with pytest.raises(rti.Error) as excinfo:
+      sample.get_number("my_point")
+    # Test the same thing with get_boolean
+    with pytest.raises(rti.Error) as excinfo:
+      sample.get_boolean("my_point")
+    # It should be possible to obtain complex members using get_string, but doing
+    # this they will be of type 'str' as opposed to 'list' and 'dict'. They should
+    # be in such a format that it is possible to convert them at a later point.
+    point_str = sample.get_string("my_point")
+    assert isinstance(point_str, str)
+    assert isinstance(json.loads(point_str), dict)
+    point_array_str = sample.get_string("my_point_array")
+    assert isinstance(point_array_str, str)
+    assert isinstance(json.loads(point_array_str), list)
 
   def test_get_any_from_info(self, populated_input):
     assert populated_input[0].info['valid_data'] == True
