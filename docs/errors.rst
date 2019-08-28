@@ -1,11 +1,30 @@
 Error Handling
 ===============
 
-When an error is from the any of the internal RTI Connext DDS APIs, the Python
-Connector will raise an ``rticonnextdds_connector.Error`` excpetion.
+.. py:currentmodule:: rticonnextdds_connector
 
-When an error is detected, the last error message from the middleware is obtained
-and printed to stdout.
+*Connector* reports internal errors in *RTI Connext DDS* by raising an
+:class:`rticonnextdds_connector.Error`. This exception may contain a description
+of the error.
 
-Other errors may be raised as ``TypeError``, ``ValueError``, ``AttributeError`` or other
-built-in Python exceptions.
+A subclass, :class:`TimeoutError`, indicates that an operation that can block
+has timed out.
+
+Other errors may be raised as ``TypeError``, ``ValueError``, ``AttributeError``,
+or other built-in Python exceptions.
+
+Class reference: Error, TimeoutError
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Error class
+^^^^^^^^^^^
+
+.. autoclass:: rticonnextdds_connector.Error
+   :members:
+
+
+TimeoutError class
+^^^^^^^^^^^^^^^^^^
+
+.. autoclass:: rticonnextdds_connector.TimeoutError
+   :members:

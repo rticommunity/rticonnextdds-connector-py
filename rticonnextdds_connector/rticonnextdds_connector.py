@@ -34,6 +34,8 @@ def tocstring(s):
 	return s
 
 def tocstring3(s):
+	if s is None:
+		return None
 	try:
 		return s.encode('utf8')
 	except AttributeError as e:
@@ -249,6 +251,8 @@ class _ConnectorBinding:
 
 		self.freeString = self.library.RTI_Connector_free_string
 		self.freeString.argtypes = [POINTER(c_char)]
+
+		self.max_integer_as_double = 2**53
 
 connector_binding = _ConnectorBinding()
 
@@ -782,8 +786,13 @@ class Instance:
 		"""
 		if field_name is None:
 			raise AttributeError("field_name cannot be None")
-		elif isinstance(value, Number):
-			self.set_number(field_name, value)
+
+		if isinstance(value, Number):
+			if (value < connector_binding.max_integer_as_double):
+				self.set_number(field_name, value)
+			else:
+				# Work around set_number int-to-double conversion
+				self.set_dictionary({field_name:value})
 		elif isinstance(value, str):
 			self.set_string(field_name, value)
 		elif isinstance(value, bool):

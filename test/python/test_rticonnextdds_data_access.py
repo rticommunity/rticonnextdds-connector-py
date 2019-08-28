@@ -80,6 +80,11 @@ class TestDataAccess:
     if do_take:
       input.take()
 
+  def send_data(self, output, input):
+    output.write()
+    self.wait_for_data(input)
+    return input[0]
+
   @pytest.fixture(scope="class")
   def populated_input(self, test_connector, test_dictionary):
     """Writes a default sample and receives it at the input.
@@ -113,10 +118,15 @@ class TestDataAccess:
     assert sample.get_boolean("my_optional_bool") == True
     assert sample["my_optional_bool"] == True
 
-  @pytest.mark.xfail
   def test_get_boolean_as_number(self, populated_input):
     sample = populated_input[0]
     assert sample.get_number("my_optional_bool") == 1
+
+  def test_set_boolean_as_number(self, test_output, test_input):
+    test_output.instance.set_number("my_optional_bool", 1)
+    test_output.write()
+    self.wait_for_data(test_input)
+    assert test_input[0]["my_optional_bool"] == True
 
   def test_get_enum(self, populated_input):
     sample = populated_input[0]
@@ -439,6 +449,55 @@ class TestDataAccess:
     assert sample["my_point_array[0].y"] == 20 # Retains value
     assert sample["my_point_array[4].x"] == 14 # Retains value
 
+  def test_too_large_uint64_output(self, test_output):
+    with pytest.raises(rti.Error, match=r".*value of my_uint64 is too large.*") as execinfo:
+      test_output.instance.set_number("my_uint64", 9007199254740992)
+    with pytest.raises(rti.Error, match=r".*value of my_int64 is too large.*") as execinfo:
+      test_output.instance.set_number("my_int64", -9007199254740992)
+
+  def verify_large_integer(self, output, input, number):
+    with pytest.raises(rti.Error, match=r".*value of my_uint64 is too large.*") as execinfo:
+      output.instance.set_number("my_uint64", number)
+    with pytest.raises(rti.Error, match=r".*value of my_int64 is too large.*") as execinfo:
+      output.instance.set_number("my_int64", -number)
+
+    output.instance.set_dictionary({"my_uint64": number, "my_int64":-number})
+    sample = self.send_data(output, input)
+    dictionary = sample.get_dictionary()
+    assert dictionary["my_uint64"] == number
+    assert dictionary["my_int64"] == -number
+    with pytest.raises(rti.Error, match=r".*value of my_uint64 is too large.*") as execinfo:
+      sample.get_number("my_uint64")
+    with pytest.raises(rti.Error, match=r".*value of my_int64 is too large.*") as execinfo:
+      sample.get_number("my_int64")
+
+  def test_large_uint64(self, test_output, test_input):
+    max_int_get = 2**53 # 9007199254740992
+    max_int_set = 2**53 - 1
+
+    # largest integer allowed in set_number
+    test_output.instance.set_number("my_uint64", max_int_set)
+    test_output.instance.set_number("my_int64", -max_int_set)
+    sample = self.send_data(test_output, test_input)
+    assert sample.get_number("my_uint64") == max_int_set
+    assert sample.get_number("my_int64") == -max_int_set
+
+    # largest integer allowed in get_number; ok in set_dictionary, which
+    # __setitem__ will also use
+    test_output.instance["my_uint64"] = max_int_get
+    test_output.instance.set_dictionary({"my_int64":-max_int_get})
+    sample = self.send_data(test_output, test_input)
+    assert sample.get_number("my_uint64") == max_int_get
+    assert sample.get_number("my_int64") == -max_int_get
+
+    # too large for get_number, but ok in get_dictionary
+    self.verify_large_integer(test_output, test_input, max_int_get + 1)
+
+    # 9007199254740999 -> 9007199254741000.0
+    self.verify_large_integer(test_output, test_input, 9007199254740999)
+
+    # largest long long
+    self.verify_large_integer(test_output, test_input, 2**63 - 1)
 
   def test_access_input_native_dynamic_data(self, populated_input):
     get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
