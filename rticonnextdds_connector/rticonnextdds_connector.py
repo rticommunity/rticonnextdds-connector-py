@@ -254,6 +254,39 @@ class _ConnectorBinding:
 
 		self.max_integer_as_double = 2**53
 
+	def get_any_value(self, getter_function, connector, input_name, index, field_name):
+		number_value = ctypes.c_double()
+		bool_value = ctypes.c_int()
+		string_value = ctypes.c_char_p()
+		selection = ctypes.c_int()
+		retcode = getter_function(
+			connector,
+			ctypes.byref(number_value),
+			ctypes.byref(bool_value),
+			ctypes.byref(string_value),
+			ctypes.byref(selection),
+			tocstring(input_name),
+			index + 1,
+			tocstring(field_name))
+		_check_retcode(retcode)
+
+		if retcode == _ReturnCode.no_data:
+			return None
+
+		if selection.value == _AnyValueKind.connector_number:
+			return number_value.value
+		elif selection.value == _AnyValueKind.connector_boolean:
+			return bool_value.value
+		elif selection.value == _AnyValueKind.connector_string:
+			python_string = _move_native_string(string_value)
+			try:
+				return json.loads(python_string)
+			except ValueError as e:
+				return python_string
+		else:
+			# This shouldn't happen
+			raise Error("Unexpected type returned by " + getter_function.__name__)
+
 connector_binding = _ConnectorBinding()
 
 class _ConnectorOptions(ctypes.Structure):
@@ -375,6 +408,7 @@ class Samples:
 		dynDataPtr = connector_binding.getNativeSample(self.input.connector.native,tocstring(self.input.name),index)
 		return dynDataPtr
 
+# Deprecated: use SampleIterator.info
 class Infos:
 	def __init__(self,input):
 		self.input = input
@@ -438,33 +472,12 @@ class SampleInfo:
 		self.index = index
 
 	def __getitem__(self, field_name):
-		number_value = ctypes.c_double()
-		bool_value = ctypes.c_int()
-		string_value = ctypes.c_char_p()
-		selection = ctypes.c_int()
-		retcode = connector_binding.getAnyValueFromInfo(
-			self.input.connector.native,
-			ctypes.byref(number_value),
-			ctypes.byref(bool_value),
-			ctypes.byref(string_value),
-			ctypes.byref(selection),
-			tocstring(self.input.name),
-			self.index + 1,
-			tocstring(field_name))
-		_check_retcode(retcode)
-
-		if retcode == _ReturnCode.no_data:
-			return None
-
-		if selection.value == 1:
-			return number_value.value
-		elif selection.value == 2:
-			return bool_value.value
-		elif selection.value == 3:
-			return _move_native_string(string_value)
-		else:
-			# This shouldn't happen
-			raise Error("Unexpected connector_binding.getAnyValueFromInfo result")
+		return connector_binding.get_any_value(
+			getter_function = connector_binding.getAnyValueFromInfo,
+			connector = self.input.connector.native,
+			input_name = self.input.name,
+			index = self.index,
+			field_name = field_name)
 
 class SampleIterator:
 	"""Iterates and provides access to a data sample
@@ -502,46 +515,28 @@ class SampleIterator:
 
 		The info object expects one of the **SampleInfo** field names::
 
-			value = sample_it.info[name]
+			value = sample_it.info[field]
 
-		The supported field names are:
-			* ``"valid_data"`` (equivalent to ``sample_it.valid_data``)
-			* TODO: add more
+		Supported fields:
+
+		* ``"source_timestamp"``, returns an integer representing nanoseconds
+		* ``"reception_timestamp"``, returns an integer representing nanoseconds
+		* ``"sample_identity"``, or ``"identity"`` returns a dictionary (see :meth:`Output.write`)
+		* ``"related_sample_identity"`` returns a dictionary (see :meth:`Output.write`)
+		* ``"valid_data"``, returns a boolean (equivalent to ``sample_it.valid_data``)
+
+		These fields are documented in `The SampleInfo Structure <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#7.4.6_The_SampleInfo_Structure%3FTocPath%3DPart%25202%253A%2520Core%2520Concepts%7C7.%2520Receiving%2520Data%7C7.4%2520Using%2520DataReaders%2520to%2520Access%2520Data%2520(Read%2520%2526%2520Take)%7C7.4.6%2520The%2520SampleInfo%2520Structure%7C_____0>`__
+		section in the *Connext DDS Core Libraries User's Manual*.
 		"""
 		return SampleInfo(self.input, self.index)
 
 	def __getitem__(self, field_name):
-		number_value = ctypes.c_double()
-		bool_value = ctypes.c_int()
-		string_value = ctypes.c_char_p()
-		selection = ctypes.c_int()
-		retcode = connector_binding.getAnyValueFromSamples(
-			self.input.connector.native,
-			ctypes.byref(number_value),
-			ctypes.byref(bool_value),
-			ctypes.byref(string_value),
-			ctypes.byref(selection),
-			tocstring(self.input.name),
-			self.index + 1,
-			tocstring(field_name))
-		_check_retcode(retcode)
-
-		if retcode == _ReturnCode.no_data:
-			return None
-
-		if selection.value == _AnyValueKind.connector_number:
-			return number_value.value
-		elif selection.value == _AnyValueKind.connector_boolean:
-			return bool_value.value
-		elif selection.value == _AnyValueKind.connector_string:
-			python_string = _move_native_string(string_value)
-			try:
-				return json.loads(python_string)
-			except ValueError as e:
-				return python_string
-		else:
-			# This shouldn't happen
-			raise Error("Unexpected connector_binding.getAnyValueFromSamples result")
+		return connector_binding.get_any_value(
+			getter_function = connector_binding.getAnyValueFromSamples,
+			connector = self.input.connector.native,
+			input_name = self.input.name,
+			index = self.index,
+			field_name = field_name)
 
 	def get_dictionary(self, member_name = None):
 		"""Gets a dictionary with the values of all the fields of this sample
@@ -910,7 +905,7 @@ class Instance:
 	def native(self):
 		"""Obtains the native C object
 
-		This allows accessing additional *Connect DDS* APIs in C.
+		This allows accessing additional *Connext DDS* APIs in C.
 		"""
 
 		dynamic_data_pointer = ctypes.c_void_p()
@@ -946,23 +941,40 @@ class Output:
 			raise ValueError("Invalid Publication::DataWriter name")
 		self.instance = Instance(self)
 
-	def write(self, options=None):
-		"""Publishes the values of the current``instance``
+	def write(self, **kwargs):
+		"""Publishes the values of the current ``instance``
 
-		Note that after writing the current ``instance``, its values remain
+		Note that after writing it, ``instance``'s values remain
 		unchanged. If for the next write you need to start from scratch, use
 		:meth:`clear_members()`
 
+		This method receives a number of optional parameters, a subset of those
+		documented in the `Writing Data section <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Writing_Data.htm?Highlight=DDS_WriteParams_t>`__. 
+		of the *Connext DDS Core Libraries** User's Manual.
+
+		The supported parameters are:
+
+		:param integer source_timestamp: The source timestamp, an integer representing the total number of nanoseconds
+		:param dict identity: A dictionary containing the keys ``"writer_guid"`` (a list of 16 bytes) and ``"sequence_number"`` (an integer) that uniquely identifies this sample.
+		:param dict related_sample_identity: Used for request-reply communications. It has the same format as ``identity``
+
+		For example::
+
+			output.write(
+				identity={"writer_guid":[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], "sequence_number":1},
+				timestamp=1000000000)
+
 		"""
 
-		if options is not None:
-			if isinstance(options, (dict)):
-				jsonStr = json.dumps(options)
-			else:
-				jsonStr = options
-			retcode = connector_binding.write(self.connector.native,tocstring(self.name), tocstring(jsonStr))
+		if len(kwargs) > 0:
+			json_str = tocstring(json.dumps(kwargs))
 		else:
-			retcode = connector_binding.write(self.connector.native,tocstring(self.name), None)
+			json_str = None
+
+		retcode = connector_binding.write(
+			self.connector.native,
+			tocstring(self.name),
+			json_str)
 		_check_retcode(retcode)
 
 	def wait(self, timeout=None):

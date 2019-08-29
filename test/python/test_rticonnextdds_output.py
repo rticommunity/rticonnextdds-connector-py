@@ -342,11 +342,6 @@ class TestInstance:
     This function tests that :func:`rticonnectdds_connector.Output.write` call
     fails (and an exception is raised) under a variety of circumstances.
     """
-    json_write_params_invalid = "foo"
-    json_write_params_valid = "{ \"related_sample_identity\": {\"writer_guid\": {\"value\": [10, 30, 1, 66, 0, 0, 29, 180, 0, 0, 0, 1, 128, 0, 0, 3]}, \"sequence_number\": {\"high\": 0, \"low\": 0}}}"
-    with pytest.raises(rti.Error) as excinfo:
-      rtiOutputFixture.write(json_write_params_invalid)
-    rtiOutputFixture.write(json_write_params_valid)
     rtiOutputFixture.instance["color"] = "1"
     rtiOutputFixture.write()
     rtiOutputFixture.instance["color"] = "2"
@@ -355,3 +350,40 @@ class TestInstance:
     # Exception will be raised as we are about to hit max_instances
     with pytest.raises(rti.Error) as excinfo:
       rtiOutputFixture.write()
+
+
+  def test_write_with_params(self, one_use_output):
+
+    related_id_long = {
+      "writer_guid": {"value": [10, 30, 1, 66, 0, 0, 29, 180, 0, 0, 0, 1, 128, 0, 0, 3]},
+      "sequence_number": {"high": 0, "low": 1}
+    }
+    one_use_output.write(identity=related_id_long)
+
+    related_id_short = {
+      "writer_guid": [10, 30, 1, 66, 0, 0, 29, 180, 0, 0, 0, 1, 128, 0, 0, 3],
+      "sequence_number": 2**53
+    }
+
+    one_use_output.write(source_timestamp=100)
+    one_use_output.write(related_sample_identity=related_id_short)
+    one_use_output.write(
+      source_timestamp=100,
+      related_sample_identity=related_id_long,
+      identity=related_id_short)
+
+    # sequence number must increase
+    with pytest.raises(rti.Error):
+      one_use_output.write(identity=related_id_short)
+
+    # nonexistent parameter
+    with pytest.raises(rti.Error, match=r".*invalid_param.*") as execinfo:
+      one_use_output.write(invalid_param="invalid")
+
+    # invalid format
+    with pytest.raises(rti.Error, match=r".*error parsing related_sample_identity.*") as execinfo:
+      one_use_output.write(related_sample_identity="invalid")
+    with pytest.raises(rti.Error, match=r".*error parsing identity.*") as execinfo:
+      one_use_output.write(identity="invalid")
+    with pytest.raises(rti.Error, match=r".*error parsing source_timestamp.*") as execinfo:
+      one_use_output.write(source_timestamp=3.4)

@@ -198,6 +198,10 @@ with numeric fields, returning the number as a string. For example:
     to ``get_dictionary`` or ``set_dictionary`` when the intention is to access
     most of the fields of the sample (see previous section).
 
+.. note::
+    If a field ``my_string``, defined as a string in the configuration file contains
+    a value that can be interpreted as a number, ``sample["my_string"]`` returns
+    a number, not a string.
 
 Accessing structs
 ^^^^^^^^^^^^^^^^^
