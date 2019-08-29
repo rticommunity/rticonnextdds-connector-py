@@ -278,10 +278,17 @@ class _ConnectorBinding:
 		elif selection.value == _AnyValueKind.connector_boolean:
 			return bool_value.value
 		elif selection.value == _AnyValueKind.connector_string:
+			# A string can represent three different things:
+			#  - An actual string value (handled in the except clause)
+			#  - A json string; we parse it and convert it to a dictionary
+			#  - An integer (larger than what number_value can represent precisely)
+			#    the same json parser returns the integer
 			python_string = _move_native_string(string_value)
 			try:
 				return json.loads(python_string)
 			except ValueError as e:
+				# This is the best way we have to detect that this is not a json
+				# string or an integer
 				return python_string
 		else:
 			# This shouldn't happen

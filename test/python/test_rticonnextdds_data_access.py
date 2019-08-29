@@ -627,7 +627,3 @@ class TestDataAccess:
     assert isinstance(point_array_str, str)
     assert isinstance(json.loads(point_array_str), list)
 
-  def test_get_any_from_info(self, populated_input):
-    assert populated_input[0].info['valid_data'] == True
-    assert populated_input[0].info['source_timestamp'] > 0
-    assert populated_input[0].info['reception_timestamp'] > 0
