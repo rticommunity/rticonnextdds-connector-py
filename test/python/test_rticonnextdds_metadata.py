@@ -7,15 +7,40 @@
 ###############################################################################
 
 import pytest,time,sys,os,ctypes
+from collections import namedtuple
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
 from test_utils import *
 
+Requester = namedtuple('Requester', 'writer reader')
+Replier = namedtuple('Replier', 'writer reader')
 
 class TestMetadata:
   """
   This class tests write with options and sample info
   """
+
+  @pytest.fixture(scope="class")
+  def requestreply_connector(self):
+    xml_path = os.path.join(
+      os.path.dirname(os.path.realpath(__file__)),
+      "../xml/TestConnector.xml")
+
+    participant_profile="MyParticipantLibrary::TestRequestReply"
+    with rti.open_connector(participant_profile, xml_path) as rti_connector:
+      yield rti_connector
+
+  @pytest.fixture(scope="class")
+  def requester(self, requestreply_connector):
+    return Requester(
+      writer=requestreply_connector.get_output("TestPublisher::RequestWriter"),
+      reader=requestreply_connector.get_input("TestSubscriber::ReplyReader"))
+
+  @pytest.fixture(scope="class")
+  def replier(self, requestreply_connector):
+    return Replier(
+      writer=requestreply_connector.get_output("TestPublisher::ReplyWriter"),
+      reader=requestreply_connector.get_input("TestSubscriber::RequestReader"))
 
   def test_bad_info_field(self, one_use_output, one_use_input):
     sample = send_data(one_use_output, one_use_input)
@@ -82,3 +107,24 @@ class TestMetadata:
     bad_octet_type = {"writer_guid": [1] * 15 + ["Hi"], "sequence_number": 10}
     with pytest.raises(rti.Error, match=r".*invalid type in octet array, index: 15.*") as excinfo:
       one_use_output.write(identity=bad_octet_type)
+
+  def test_request_reply(self, requester, replier):
+
+    request_id = {"writer_guid": [3]*16, "sequence_number": 10}
+    requester.writer.instance['x'] = 10
+    requester.writer.instance['y'] = 20
+    request = send_data(
+      requester.writer,
+      replier.reader,
+      identity=request_id)
+
+    assert request.info['identity'] == request_id
+    replier.writer.instance['x'] = request['y']
+    replier.writer.instance['y'] = request['x']
+    reply = send_data(
+      replier.writer,
+      requester.reader,
+      related_sample_identity=request.info['identity'])
+
+    assert reply.info['related_sample_identity'] == request_id
+

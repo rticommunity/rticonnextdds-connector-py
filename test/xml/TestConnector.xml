@@ -136,6 +136,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
         <domain name="MyDomain" domain_id="0">
             <register_type name="ShapeType" type_ref="ShapeType" />
             <topic name="Square" register_type_ref="ShapeType"/>
+            <topic name="Circle" register_type_ref="ShapeType"/>
         </domain>
         <domain name="DataAccessDomain" domain_id="0">
             <register_type name="MyType" type_ref="MyType" />
@@ -165,6 +166,18 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <subscriber name="TestSubscriber">
                 <data_reader name="TestReader" topic_ref="TestTopic" />
                 <data_reader name="TestReader2" topic_ref="TestTopic2" />
+            </subscriber>
+        </domain_participant>
+
+        <domain_participant name="TestRequestReply" domain_ref="MyDomainLibrary::MyDomain">
+            <publisher name="TestPublisher">
+                <data_writer name="RequestWriter" topic_ref="Square" />
+                <data_writer name="ReplyWriter" topic_ref="Circle" />
+            </publisher>
+
+            <subscriber name="TestSubscriber">
+                <data_reader name="RequestReader" topic_ref="Square" />
+                <data_reader name="ReplyReader" topic_ref="Circle" />
             </subscriber>
         </domain_participant>
     </domain_participant_library>
