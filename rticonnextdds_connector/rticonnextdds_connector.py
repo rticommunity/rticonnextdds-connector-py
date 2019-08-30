@@ -186,11 +186,11 @@ class _ConnectorBinding:
 
 		self.wait_for_matched_output = self.library.RTI_Connector_wait_for_matched_output
 		self.wait_for_matched_output.restype = ctypes.c_int
-		self.wait_for_matched_output.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_char_p]
+		self.wait_for_matched_output.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
 		self.wait_for_matched_input = self.library.RTI_Connector_wait_for_matched_input
 		self.wait_for_matched_input.restype = ctypes.c_int
-		self.wait_for_matched_input.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_char_p]
+		self.wait_for_matched_input.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
 		self.clear = self.library.RTI_Connector_clear
 		self.clear.restype = ctypes.c_int
@@ -659,23 +659,16 @@ class Input:
 	def wait(self,timeout):
 		return connector_binding.wait(self.connector.native,timeout)
 
-	def wait_for_matched_output(self, timeout = None, output_names = None):
+	def wait_for_match(self, timeout = None):
 		"""Waits until this input has a matched output.
 
 		If the operation times out, it will raise :class:`TimeoutError`.
 
 		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
-		:param string output_names: The name (or names, in a comma separated list) of the outputs
-		which this method should explicitly wait to match with. These names can be the entity names
-		or the role names of the desired outputs. If no output_names is supplied, the method will
-		return upon matching with any output.
 		"""
-		if timeout = None:
+		if timeout is None:
 			timeout = -1
-		retcode = connector_binding.wait_for_matched_output(
-			self.connector.native,
-			timeout,
-			tocstring(output_names))
+		retcode = connector_binding.wait_for_matched_output(self.native, timeout)
 		_check_retcode(retcode)
 
 	def __getitem__(self, index):
@@ -988,20 +981,17 @@ class Output:
 		retcode = connector_binding.waitForAcknowledgments(self.native, timeout)
 		_check_retcode(retcode)
 
-	def wait_for_matched_input(self, timeout = None, input_names = None):
+	def wait_for_match(self, timeout = None):
 		"""Waits until this output has a matched input.
 
 		If the operation times out, it will raise :class:`TimeoutError`.
 
 		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
-		:param string input_names: The name (or names, in a comma separated list) of the inputs
-		which this method should explicitly wait to match with. These names can be the entity names
-		or the role names of the desired inputs. If no input_names is supplied, the method will
-		return upon matching with any input
 		"""
 		if timeout is None:
 			timeout = -1
-		
+		retcode = connector_binding.wait_for_matched_input(self.native, timeout)
+		_check_retcode(retcode)
 
 	def clear_members(self):
 		"""Resets the values of the members of this ``Output.instance``
