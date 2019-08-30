@@ -59,3 +59,21 @@ class TestMetadata:
 
     assert sample.info["sample_identity"] == sample_id
     assert sample.info["related_sample_identity"] == related_sample_id
+
+    short_guid = {"writer_guid": [111], "sequence_number": 212}
+    expected_id = {"writer_guid": [111] + [0] * 15, "sequence_number": 212}
+    sample = send_data(one_use_output, one_use_input, identity=short_guid)
+    assert sample.info["sample_identity"] == expected_id
+
+  def test_bad_guid(self, one_use_output):
+    too_long = {"writer_guid": [1] * 17, "sequence_number": 10}
+    with pytest.raises(rti.Error, match=r".*octet array exceeds maximum length of 16.*") as excinfo:
+      one_use_output.write(identity=too_long)
+
+    bad_octet = {"writer_guid": [1] * 15 + [256], "sequence_number": 10}
+    with pytest.raises(rti.Error, match=r".*invalid octet value; expected 0-255, got: 256.*") as excinfo:
+      one_use_output.write(identity=bad_octet)
+
+    bad_octet_type = {"writer_guid": [1] * 15 + ["Hi"], "sequence_number": 10}
+    with pytest.raises(rti.Error, match=r".*invalid type in octet array, index: 15.*") as excinfo:
+      one_use_output.write(identity=bad_octet_type)
