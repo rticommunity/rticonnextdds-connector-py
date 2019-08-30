@@ -66,6 +66,11 @@ class TestMetadata:
     assert sample.info["sample_identity"] == expected_id
 
   def test_bad_guid(self, one_use_output):
+
+    not_an_array = {"writer_guid": 3, "sequence_number": 10}
+    with pytest.raises(rti.Error, match=r".*error parsing GUID.*") as excinfo:
+      one_use_output.write(identity=not_an_array)
+
     too_long = {"writer_guid": [1] * 17, "sequence_number": 10}
     with pytest.raises(rti.Error, match=r".*octet array exceeds maximum length of 16.*") as excinfo:
       one_use_output.write(identity=too_long)
