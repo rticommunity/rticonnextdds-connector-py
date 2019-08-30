@@ -22,11 +22,16 @@ with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../S
 
     dds_input = connector.get_input("MySubscriber::MySquareReader")
 
-    dds_input.wait_for_match()
+    matches = dds_input.wait_for_match()
     print("match found 1")
-    dds_input.wait_for_match()
+    print("current matches: " + str(matches))
+    matches = dds_input.wait_for_match()
     print("match found 2")
-    dds_input.wait_for_match()
+    print("current matches: " + str(matches))
+    matches = dds_input.wait_for_match()
     print("match found 3")
+    print("current matches: " + str(matches))
+    matches = dds_input.get_matched_outputs()
+    print("matches: " + str(matches) + " (" + str(type(matches)) + ")")
 
     sleep(2)

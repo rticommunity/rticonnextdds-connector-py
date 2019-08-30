@@ -186,11 +186,19 @@ class _ConnectorBinding:
 
 		self.wait_for_matched_output = self.library.RTI_Connector_wait_for_matched_output
 		self.wait_for_matched_output.restype = ctypes.c_int
-		self.wait_for_matched_output.argtypes = [ctypes.c_void_p, ctypes.c_int]
+		self.wait_for_matched_output.argtypes = [ctypes.c_void_p, ctypes.c_int, POINTER(ctypes.c_int)]
 
 		self.wait_for_matched_input = self.library.RTI_Connector_wait_for_matched_input
 		self.wait_for_matched_input.restype = ctypes.c_int
-		self.wait_for_matched_input.argtypes = [ctypes.c_void_p, ctypes.c_int]
+		self.wait_for_matched_input.argtypes = [ctypes.c_void_p, ctypes.c_int, POINTER(ctypes.c_int)]
+
+		self.get_matched_inputs = self.library.RTI_Connector_get_matched_inputs
+		self.get_matched_inputs.restype = ctypes.c_int
+		self.get_matched_inputs.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_char_p)]
+
+		self.get_matched_outputs = self.library.RTI_Connector_get_matched_outputs
+		self.get_matched_outputs.restype = ctypes.c_int
+		self.get_matched_outputs.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_char_p)]
 
 		self.clear = self.library.RTI_Connector_clear
 		self.clear.restype = ctypes.c_int
@@ -660,16 +668,29 @@ class Input:
 		return connector_binding.wait(self.connector.native,timeout)
 
 	def wait_for_match(self, timeout = None):
-		"""Waits until this input has a matched output.
+		"""Waits until this input matches or unmatches an output.
 
 		If the operation times out, it will raise :class:`TimeoutError`.
 
 		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
+		:return: The change in the current number of matched outputs. If a positive number is returned,
+		the input has matched with new publishers. If a negative number is returned the input has unmatched
+		from an output. It is possible for multiple matches and/or unmatches to be returned (e.g., 0 could
+		be returned, indicating that the input matched the same number of writers as it unmatched).
 		"""
 		if timeout is None:
 			timeout = -1
-		retcode = connector_binding.wait_for_matched_output(self.native, timeout)
+		current_count_change = ctypes.c_int()
+		retcode = connector_binding.wait_for_matched_output(self.native, timeout, byref(current_count_change))
 		_check_retcode(retcode)
+		return current_count_change.value
+
+	def get_matched_outputs(self):
+		"""Returns a JSON list of the publication names of all matched outputs"""
+		native_json_str = ctypes.c_char_p()
+		retcode = connector_binding.get_matched_outputs(self.native, byref(native_json_str))
+		_check_retcode(retcode)
+		return json.loads(_move_native_string(native_json_str))
 
 	def __getitem__(self, index):
 		"""Equivalent to :meth:`get_sample()`"""
@@ -987,11 +1008,24 @@ class Output:
 		If the operation times out, it will raise :class:`TimeoutError`.
 
 		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
+		:return: The change in the current number of matched outputs. If a positive number is returned,
+		the input has matched with new publishers. If a negative number is returned the input has unmatched
+		from an output. It is possible for multiple matches and/or unmatches to be returned (e.g., 0 could
+		be returned, indicating that the input matched the same number of writers as it unmatched).
 		"""
 		if timeout is None:
 			timeout = -1
-		retcode = connector_binding.wait_for_matched_input(self.native, timeout)
+		current_count_change = ctypes.c_int()
+		retcode = connector_binding.wait_for_matched_input(self.native, timeout, byref(current_count_change))
 		_check_retcode(retcode)
+		return current_count_change.value
+
+	def get_matched_inputs(self):
+		"""Returns a JSON list of the subscription names of all matched inputs"""
+		native_json_str = ctypes.c_char_p()
+		retcode = connector_binding.get_matched_inputs(self.native, byref(native_json_str))
+		_check_retcode(retcode)
+		return json.loads(_move_native_string(native_json_str))
 
 	def clear_members(self):
 		"""Resets the values of the members of this ``Output.instance``
