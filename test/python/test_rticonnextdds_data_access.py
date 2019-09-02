@@ -9,6 +9,7 @@
 import pytest,time,sys,os,ctypes,json
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
+from test_utils import *
 
 
 class TestDataAccess:
@@ -67,24 +68,6 @@ class TestDataAccess:
   def test_input(self, test_connector):
     return test_connector.get_input("TestSubscriber::TestReader2")
 
-  def wait_for_data(self, input, count = 1, do_take = True):
-    """Waits until input has count samples"""
-
-    for i in range(1, 5):
-      input.read()
-      if input.sample_count == count:
-        break
-      input.wait(1000)
-
-    assert input.sample_count == count
-    if do_take:
-      input.take()
-
-  def send_data(self, output, input):
-    output.write()
-    self.wait_for_data(input)
-    return input[0]
-
   @pytest.fixture(scope="class")
   def populated_input(self, test_connector, test_dictionary):
     """Writes a default sample and receives it at the input.
@@ -96,7 +79,7 @@ class TestDataAccess:
     output.write()
 
     test_input = test_connector.get_input("TestSubscriber::TestReader")
-    self.wait_for_data(input = test_input, count = 1, do_take = True)
+    wait_for_data(input = test_input, count = 1, do_take = True)
 
     assert test_input.sample_count == 1
     assert test_input[0].valid_data
@@ -125,8 +108,15 @@ class TestDataAccess:
   def test_set_boolean_as_number(self, test_output, test_input):
     test_output.instance.set_number("my_optional_bool", 1)
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     assert test_input[0]["my_optional_bool"] == True
+
+  def test_numeric_string(self, test_output, test_input):
+    test_output.instance["my_string"] = "1234"
+    sample = send_data(test_output, test_input)
+    # A side effect of CON-139: __getitem__ automatically parses strings and
+    # returns them as numbers if they represent a number
+    assert sample["my_string"] == 1234
 
   def test_get_enum(self, populated_input):
     sample = populated_input[0]
@@ -155,7 +145,7 @@ class TestDataAccess:
     test_output.instance["my_int_sequence[1]"] = 2
     test_output.instance["my_point_array[4].x"] = 5
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample["my_point_sequence[0].y"] == 20
@@ -208,13 +198,13 @@ class TestDataAccess:
   def test_change_union_member(self, test_output, test_input):
     test_output.instance.set_number("my_union.my_int_sequence[1]", 3)
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     sample = test_input[0]
     assert sample.get_string("my_union#") == "my_int_sequence"
 
     test_output.instance.set_number("my_union.my_long", 3)
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample.get_string("my_union#") == "my_long"
@@ -224,7 +214,7 @@ class TestDataAccess:
     test_output.instance.set_number("my_optional_point.x", 101)
     test_output.instance["my_point_alias.x"] = 202
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample.get_number("my_optional_point.x") == 101
@@ -243,7 +233,7 @@ class TestDataAccess:
 
   def test_unset_optional_boolean(self, test_output, test_input):
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     assert test_input[0].get_boolean("my_optional_bool") is None
 
   def test_unset_complex_optional(self, populated_input):
@@ -263,7 +253,7 @@ class TestDataAccess:
     test_output.instance.set_number("my_optional_long", 33)
     test_output.instance.set_number("my_optional_long", None)
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     assert test_input[0].get_number("my_optional_long") is None
     assert not "my_optional_long" in test_input[0].get_dictionary()
 
@@ -271,7 +261,7 @@ class TestDataAccess:
     test_output.instance.set_boolean("my_optional_bool", True)
     test_output.instance.set_boolean("my_optional_bool", None)
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     sample = test_input[0]
     assert sample.get_boolean("my_optional_bool") is None
     assert sample["my_optional_bool"] is None
@@ -283,7 +273,7 @@ class TestDataAccess:
     test_output.instance.clear_member("my_optional_point")
     test_output.instance.clear_member("my_point_alias")
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     assert test_input[0].get_number("my_optional_point.x") is None
     assert test_input[0].get_number("my_point_alias.x") is None
     assert test_input[0]["my_optional_point.x"] is None
@@ -292,7 +282,7 @@ class TestDataAccess:
     test_output.instance.set_number("my_point.x", 44)
     test_output.instance.clear_member("my_point")
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     assert test_input[0].get_number("my_point.x") == 0
 
   def test_clear_sequence(self, test_output, test_input):
@@ -301,7 +291,7 @@ class TestDataAccess:
     test_output.instance.clear_member("my_union.my_int_sequence")
     test_output.write()
 
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     assert test_input[0].get_number("my_union.my_int_sequence#") == 0
     assert test_input[0].get_number("my_point.x") == 3
 
@@ -327,7 +317,7 @@ class TestDataAccess:
       'my_enum': None,
     })
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample.get_number("my_optional_point.x") is None
@@ -344,7 +334,7 @@ class TestDataAccess:
     assert sample.get_number("my_enum") == 2
     assert sample.get_number("my_double") == test_dictionary['my_double']
     dictionary = sample.get_dictionary()
-    print(dictionary)
+
     assert not "my_optional_bool" in dictionary
     assert not "my_optional_long" in dictionary
     assert not "my_point_alias" in dictionary
@@ -359,14 +349,14 @@ class TestDataAccess:
     test_output.instance.set_number("my_union.my_int_sequence[2]", 10)
     test_output.instance.set_number("my_point.x", 3)
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     assert test_input[0].get_number("my_point.x") == 3
     assert test_input[0].get_number("my_union.my_int_sequence#") == 3
 
     test_output.instance.set_dictionary({'my_int_sequence':[]})
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample.get_number("my_int_sequence#") == 0
@@ -437,7 +427,7 @@ class TestDataAccess:
       "my_point_sequence":[{"y":2}],
       "my_point_array":[{"x":100}, {"y":200}]})
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample["my_int_sequence#"] == 1 # Length reduced
@@ -462,7 +452,7 @@ class TestDataAccess:
       output.instance.set_number("my_int64", -number)
 
     output.instance.set_dictionary({"my_uint64": number, "my_int64":-number})
-    sample = self.send_data(output, input)
+    sample = send_data(output, input)
     dictionary = sample.get_dictionary()
     assert dictionary["my_uint64"] == number
     assert dictionary["my_int64"] == -number
@@ -478,7 +468,7 @@ class TestDataAccess:
     # largest integer allowed in set_number
     test_output.instance.set_number("my_uint64", max_int_set)
     test_output.instance.set_number("my_int64", -max_int_set)
-    sample = self.send_data(test_output, test_input)
+    sample = send_data(test_output, test_input)
     assert sample.get_number("my_uint64") == max_int_set
     assert sample.get_number("my_int64") == -max_int_set
 
@@ -486,7 +476,7 @@ class TestDataAccess:
     # __setitem__ will also use
     test_output.instance["my_uint64"] = max_int_get
     test_output.instance.set_dictionary({"my_int64":-max_int_get})
-    sample = self.send_data(test_output, test_input)
+    sample = send_data(test_output, test_input)
     assert sample.get_number("my_uint64") == max_int_get
     assert sample.get_number("my_int64") == -max_int_get
 
@@ -637,5 +627,3 @@ class TestDataAccess:
     assert isinstance(point_array_str, str)
     assert isinstance(json.loads(point_array_str), list)
 
-  def test_get_any_from_info(self, populated_input):
-    assert populated_input[0].info['valid_data'] == True

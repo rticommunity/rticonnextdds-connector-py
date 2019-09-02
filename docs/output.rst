@@ -72,6 +72,13 @@ data sample::
 
     output.wait()
 
+The write method can receive several options. For example, to
+write with a specific timestamp:
+
+.. testcode::
+
+  output.write(source_timestamp=100000)
+
 Class reference: Output, Instance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
