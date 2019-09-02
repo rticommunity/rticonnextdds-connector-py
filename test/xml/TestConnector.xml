@@ -180,5 +180,16 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                 <data_reader name="ReplyReader" topic_ref="Circle" />
             </subscriber>
         </domain_participant>
+
+        <domain_participant name="TestReaderOnly">
+            <subscriber name="TestSubscriber">
+                <data_reader name="TestReader" topic_ref="Square"/>
+            </subscriber>
+        </domain_participant>
+        <domain_participant name="TestWriterOnly">
+            <publisher name="TestPublisher">
+                <data_writer name="TestWriter" topic_ref="Square"/>
+            </subscriber>
+        </domain_participant>
     </domain_participant_library>
 </dds>

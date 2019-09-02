@@ -114,3 +114,31 @@ def one_use_output(one_use_connector):
 @pytest.fixture
 def one_use_input(one_use_connector):
   return one_use_connector.get_input("MySubscriber::MySquareReader")  
+
+@pytest.fixture(scope="session")
+def reader_only_connector(self):
+    xml_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "../xml/TestConnector.xml")
+
+    participant_profile="MyParticipantLibrary::TestReaderOnly"
+    with rti.open_connector(participant_profile, xml_path) as rti_connector:
+        yield rti_connector
+
+@pytest.fixture(scope="session")
+def writer_only_connector(self):
+    xml_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        "../xml/TestConnector.xml")
+
+    participant_profile="MyParticipantLibrary::TestWriterOnly"
+    with rti.open_connector(participant_profile, xml_path) as rti_connector:
+        yield rti_connector
+
+@pytest.fixture(scope="session")
+def reader_only_input(self, reader_only_connector):
+  return reader_only_connector.get_input("TestSubscriber::TestReader")
+
+@pytest.fixture(scope="session")
+def writer_only_output(self, writer_only_connector):
+  return writer_only_connector.get_output("TestPublisher::TestWriter")
