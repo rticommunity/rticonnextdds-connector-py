@@ -193,19 +193,19 @@ class _ConnectorBinding:
 		self.wait.restype = ctypes.c_int
 		self.wait.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
-		self.wait_for_matched_output = self.library.RTI_Connector_wait_for_matched_output
+		self.wait_for_matched_output = self.library.RTI_Connector_wait_for_matched_publisher
 		self.wait_for_matched_output.restype = ctypes.c_int
 		self.wait_for_matched_output.argtypes = [ctypes.c_void_p, ctypes.c_int, POINTER(ctypes.c_int)]
 
-		self.wait_for_matched_input = self.library.RTI_Connector_wait_for_matched_input
+		self.wait_for_matched_input = self.library.RTI_Connector_wait_for_matched_subscriber
 		self.wait_for_matched_input.restype = ctypes.c_int
 		self.wait_for_matched_input.argtypes = [ctypes.c_void_p, ctypes.c_int, POINTER(ctypes.c_int)]
 
-		self.get_matched_inputs = self.library.RTI_Connector_get_matched_inputs
+		self.get_matched_inputs = self.library.RTI_Connector_get_matched_subscribers
 		self.get_matched_inputs.restype = ctypes.c_int
 		self.get_matched_inputs.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_char_p)]
 
-		self.get_matched_outputs = self.library.RTI_Connector_get_matched_outputs
+		self.get_matched_outputs = self.library.RTI_Connector_get_matched_publishers
 		self.get_matched_outputs.restype = ctypes.c_int
 		self.get_matched_outputs.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_char_p)]
 
@@ -707,6 +707,8 @@ class Input:
 		native_json_str = ctypes.c_char_p()
 		retcode = connector_binding.get_matched_outputs(self.native, byref(native_json_str))
 		_check_retcode(retcode)
+		if retcode == _ReturnCode.no_data:
+			return None
 		return json.loads(_move_native_string(native_json_str))
 
 	def __getitem__(self, index):
@@ -1064,6 +1066,8 @@ class Output:
 		native_json_str = ctypes.c_char_p()
 		retcode = connector_binding.get_matched_inputs(self.native, byref(native_json_str))
 		_check_retcode(retcode)
+		if retcode == _ReturnCode.no_data:
+			return None
 		return json.loads(_move_native_string(native_json_str))
 
 	def clear_members(self):
