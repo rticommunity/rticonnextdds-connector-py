@@ -6,9 +6,10 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-import pytest,time,sys,os,ctypes
+import pytest,time,sys,os,ctypes,json
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
+from test_utils import *
 
 
 class TestDataAccess:
@@ -67,19 +68,6 @@ class TestDataAccess:
   def test_input(self, test_connector):
     return test_connector.get_input("TestSubscriber::TestReader2")
 
-  def wait_for_data(self, input, count = 1, do_take = True):
-    """Waits until input has count samples"""
-
-    for i in range(1, 5):
-      input.read()
-      if input.sample_count == count:
-        break
-      input.wait(1000)
-
-    assert input.sample_count == count
-    if do_take:
-      input.take()
-
   @pytest.fixture(scope="class")
   def populated_input(self, test_connector, test_dictionary):
     """Writes a default sample and receives it at the input.
@@ -91,7 +79,7 @@ class TestDataAccess:
     output.write()
 
     test_input = test_connector.get_input("TestSubscriber::TestReader")
-    self.wait_for_data(input = test_input, count = 1, do_take = True)
+    wait_for_data(input = test_input, count = 1, do_take = True)
 
     assert test_input.sample_count == 1
     assert test_input[0].valid_data
@@ -113,10 +101,22 @@ class TestDataAccess:
     assert sample.get_boolean("my_optional_bool") == True
     assert sample["my_optional_bool"] == True
 
-  @pytest.mark.xfail
   def test_get_boolean_as_number(self, populated_input):
     sample = populated_input[0]
     assert sample.get_number("my_optional_bool") == 1
+
+  def test_set_boolean_as_number(self, test_output, test_input):
+    test_output.instance.set_number("my_optional_bool", 1)
+    test_output.write()
+    wait_for_data(test_input)
+    assert test_input[0]["my_optional_bool"] == True
+
+  def test_numeric_string(self, test_output, test_input):
+    test_output.instance["my_string"] = "1234"
+    sample = send_data(test_output, test_input)
+    # A side effect of CON-139: __getitem__ automatically parses strings and
+    # returns them as numbers if they represent a number
+    assert sample["my_string"] == 1234
 
   def test_get_enum(self, populated_input):
     sample = populated_input[0]
@@ -145,7 +145,7 @@ class TestDataAccess:
     test_output.instance["my_int_sequence[1]"] = 2
     test_output.instance["my_point_array[4].x"] = 5
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample["my_point_sequence[0].y"] == 20
@@ -198,13 +198,13 @@ class TestDataAccess:
   def test_change_union_member(self, test_output, test_input):
     test_output.instance.set_number("my_union.my_int_sequence[1]", 3)
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     sample = test_input[0]
     assert sample.get_string("my_union#") == "my_int_sequence"
 
     test_output.instance.set_number("my_union.my_long", 3)
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample.get_string("my_union#") == "my_long"
@@ -214,7 +214,7 @@ class TestDataAccess:
     test_output.instance.set_number("my_optional_point.x", 101)
     test_output.instance["my_point_alias.x"] = 202
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample.get_number("my_optional_point.x") == 101
@@ -233,7 +233,7 @@ class TestDataAccess:
 
   def test_unset_optional_boolean(self, test_output, test_input):
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     assert test_input[0].get_boolean("my_optional_bool") is None
 
   def test_unset_complex_optional(self, populated_input):
@@ -253,7 +253,7 @@ class TestDataAccess:
     test_output.instance.set_number("my_optional_long", 33)
     test_output.instance.set_number("my_optional_long", None)
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     assert test_input[0].get_number("my_optional_long") is None
     assert not "my_optional_long" in test_input[0].get_dictionary()
 
@@ -261,7 +261,7 @@ class TestDataAccess:
     test_output.instance.set_boolean("my_optional_bool", True)
     test_output.instance.set_boolean("my_optional_bool", None)
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     sample = test_input[0]
     assert sample.get_boolean("my_optional_bool") is None
     assert sample["my_optional_bool"] is None
@@ -273,7 +273,7 @@ class TestDataAccess:
     test_output.instance.clear_member("my_optional_point")
     test_output.instance.clear_member("my_point_alias")
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     assert test_input[0].get_number("my_optional_point.x") is None
     assert test_input[0].get_number("my_point_alias.x") is None
     assert test_input[0]["my_optional_point.x"] is None
@@ -282,7 +282,7 @@ class TestDataAccess:
     test_output.instance.set_number("my_point.x", 44)
     test_output.instance.clear_member("my_point")
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     assert test_input[0].get_number("my_point.x") == 0
 
   def test_clear_sequence(self, test_output, test_input):
@@ -291,7 +291,7 @@ class TestDataAccess:
     test_output.instance.clear_member("my_union.my_int_sequence")
     test_output.write()
 
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
     assert test_input[0].get_number("my_union.my_int_sequence#") == 0
     assert test_input[0].get_number("my_point.x") == 3
 
@@ -317,7 +317,7 @@ class TestDataAccess:
       'my_enum': None,
     })
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample.get_number("my_optional_point.x") is None
@@ -334,7 +334,7 @@ class TestDataAccess:
     assert sample.get_number("my_enum") == 2
     assert sample.get_number("my_double") == test_dictionary['my_double']
     dictionary = sample.get_dictionary()
-    print(dictionary)
+
     assert not "my_optional_bool" in dictionary
     assert not "my_optional_long" in dictionary
     assert not "my_point_alias" in dictionary
@@ -349,14 +349,14 @@ class TestDataAccess:
     test_output.instance.set_number("my_union.my_int_sequence[2]", 10)
     test_output.instance.set_number("my_point.x", 3)
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     assert test_input[0].get_number("my_point.x") == 3
     assert test_input[0].get_number("my_union.my_int_sequence#") == 3
 
     test_output.instance.set_dictionary({'my_int_sequence':[]})
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample.get_number("my_int_sequence#") == 0
@@ -427,7 +427,7 @@ class TestDataAccess:
       "my_point_sequence":[{"y":2}],
       "my_point_array":[{"x":100}, {"y":200}]})
     test_output.write()
-    self.wait_for_data(test_input)
+    wait_for_data(test_input)
 
     sample = test_input[0]
     assert sample["my_int_sequence#"] == 1 # Length reduced
@@ -439,6 +439,55 @@ class TestDataAccess:
     assert sample["my_point_array[0].y"] == 20 # Retains value
     assert sample["my_point_array[4].x"] == 14 # Retains value
 
+  def test_too_large_uint64_output(self, test_output):
+    with pytest.raises(rti.Error, match=r".*value of my_uint64 is too large.*") as execinfo:
+      test_output.instance.set_number("my_uint64", 9007199254740992)
+    with pytest.raises(rti.Error, match=r".*value of my_int64 is too large.*") as execinfo:
+      test_output.instance.set_number("my_int64", -9007199254740992)
+
+  def verify_large_integer(self, output, input, number):
+    with pytest.raises(rti.Error, match=r".*value of my_uint64 is too large.*") as execinfo:
+      output.instance.set_number("my_uint64", number)
+    with pytest.raises(rti.Error, match=r".*value of my_int64 is too large.*") as execinfo:
+      output.instance.set_number("my_int64", -number)
+
+    output.instance.set_dictionary({"my_uint64": number, "my_int64":-number})
+    sample = send_data(output, input)
+    dictionary = sample.get_dictionary()
+    assert dictionary["my_uint64"] == number
+    assert dictionary["my_int64"] == -number
+    with pytest.raises(rti.Error, match=r".*value of my_uint64 is too large.*") as execinfo:
+      sample.get_number("my_uint64")
+    with pytest.raises(rti.Error, match=r".*value of my_int64 is too large.*") as execinfo:
+      sample.get_number("my_int64")
+
+  def test_large_uint64(self, test_output, test_input):
+    max_int_get = 2**53 # 9007199254740992
+    max_int_set = 2**53 - 1
+
+    # largest integer allowed in set_number
+    test_output.instance.set_number("my_uint64", max_int_set)
+    test_output.instance.set_number("my_int64", -max_int_set)
+    sample = send_data(test_output, test_input)
+    assert sample.get_number("my_uint64") == max_int_set
+    assert sample.get_number("my_int64") == -max_int_set
+
+    # largest integer allowed in get_number; ok in set_dictionary, which
+    # __setitem__ will also use
+    test_output.instance["my_uint64"] = max_int_get
+    test_output.instance.set_dictionary({"my_int64":-max_int_get})
+    sample = send_data(test_output, test_input)
+    assert sample.get_number("my_uint64") == max_int_get
+    assert sample.get_number("my_int64") == -max_int_get
+
+    # too large for get_number, but ok in get_dictionary
+    self.verify_large_integer(test_output, test_input, max_int_get + 1)
+
+    # 9007199254740999 -> 9007199254741000.0
+    self.verify_large_integer(test_output, test_input, 9007199254740999)
+
+    # largest long long
+    self.verify_large_integer(test_output, test_input, 2**63 - 1)
 
   def test_access_input_native_dynamic_data(self, populated_input):
     get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
@@ -525,5 +574,56 @@ class TestDataAccess:
     with pytest.raises(rti.Error) as excinfo:
       test_output.instance.set_boolean("NonExistent", 1)
 
-  def test_get_any_from_info(self, populated_input):
-    assert populated_input[0].info['valid_data'] == True
+  def test_get_complex_with_getitem(self, populated_input):
+    sample = populated_input[0]
+
+    point = sample["my_point"]
+    # Structs converted to dict
+    assert isinstance(point, dict)
+    assert point['x'] == 3
+    assert point['y'] == 4
+
+    point_sequence = sample["my_point_sequence"]
+    # Sequences converted to list
+    assert isinstance(point_sequence, list)
+    assert point_sequence[0] == {'x': 10, 'y': 20}
+    assert point_sequence[1] == {'x': 11, 'y': 21}
+
+    point_array = sample["my_point_array"]
+    # Arrays converted to list
+    assert isinstance(point_array, list)
+    assert point_array[0] == {'x': 0, 'y': 0}
+    assert point_array[4] == {'x': 5, 'y': 15}
+
+    point_alias = sample["my_point_alias"]
+    # Alias should be resolved (so in this case become a struct -> dict)
+    assert isinstance(point_alias, dict)
+    assert point_alias['x'] == 30
+    assert point_alias['y'] == 40
+
+    optional_point = sample["my_optional_point"]
+    # Unset optional should return None
+    assert optional_point is None
+
+    union = sample["my_union"]
+    # If no trailing '#' is supplied should obtain the union as a struct -> dict
+    assert isinstance(union, dict)
+    assert union == {'my_int_sequence': [10, 20, 30]}
+
+    # It should not be possible to obtain complex members with get_number API,
+    # though this should work with __getitem__ as shown above
+    with pytest.raises(rti.Error) as excinfo:
+      sample.get_number("my_point")
+    # Test the same thing with get_boolean
+    with pytest.raises(rti.Error) as excinfo:
+      sample.get_boolean("my_point")
+    # It should be possible to obtain complex members using get_string, but doing
+    # this they will be of type 'str' as opposed to 'list' and 'dict'. They should
+    # be in such a format that it is possible to convert them at a later point.
+    point_str = sample.get_string("my_point")
+    assert isinstance(point_str, str)
+    assert isinstance(json.loads(point_str), dict)
+    point_array_str = sample.get_string("my_point_array")
+    assert isinstance(point_array_str, str)
+    assert isinstance(json.loads(point_array_str), list)
+

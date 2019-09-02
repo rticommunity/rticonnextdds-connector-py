@@ -98,7 +98,8 @@ Which corresponds to the following IDL definition::
         @optional long my_optional_long;
     };
 
-Note that you can get the XML definition of an IDL file with *rtiddsgen -convertToXml MyType.idl*.
+.. note::
+    You can get the XML definition of an IDL file with *rtiddsgen -convertToXml MyType.idl*.
 
 We will refer to an ``Output`` named ``output`` and
 ``Input`` named ``input`` such that ``input.sample_count > 0``.
@@ -132,6 +133,17 @@ To set any numeric type, including enumerations:
     output.instance.set_number("my_long", 2)
     output.instance.set_number("my_double", 2.14)
     output.instance.set_number("my_enum", 2)
+
+.. warning::
+    The range of values for a numeric field is determined by the integer type
+    used to define that field in the configuration file. However, ``set_number`` and
+    ``get_number`` can't handle 64-bit integers (*int64* and *uint64*)
+    whose absolute values are larger than 2^53. This is a *Connector* limitation
+    due to the use of *double* as an intermediate representation. When ``set_number``
+    or ``get_number`` detect this situation, they raise an :class:`Error`.
+    ``get_dictionary`` and ``set_dictionary`` do not have this limitation and can
+    handle any 64-bit integer. ``Instance``'s ``__setitem__`` method doesn't have
+    this limitation either, but ``SampleIterator``'s ``__getitem__`` does.
 
 To set booleans:
 
@@ -178,12 +190,18 @@ with numeric fields, returning the number as a string. For example:
         # get number as string:
         value = sample.get_string("my_double")
 
-Note that the typed getters and setters perform better than ``__setitem__``
-and ``__getitem__`` in applications that write or read at high rates.
-Also ``__setitem__`` or ``__getitem__`` shouldn't be used as an alternative
-to ``get_dictionary`` or ``set_dictionary`` when the intention is to access
-most of the fields of the sample (see previous section).
 
+.. note::
+    The typed getters and setters perform better than ``__setitem__``
+    and ``__getitem__`` in applications that write or read at high rates.
+    Also ``__setitem__`` or ``__getitem__`` shouldn't be used as an alternative
+    to ``get_dictionary`` or ``set_dictionary`` when the intention is to access
+    most of the fields of the sample (see previous section).
+
+.. note::
+    If a field ``my_string``, defined as a string in the configuration file contains
+    a value that can be interpreted as a number, ``sample["my_string"]`` returns
+    a number, not a string.
 
 Accessing structs
 ^^^^^^^^^^^^^^^^^
@@ -237,6 +255,18 @@ struct, value or union. If not, the call to get_dictionary will fail:
    # for sample in input.valid_data_iterator:
       # long = sample.get_dictionary("my_long") # ERROR, the_long is a basic type
 
+It is also possible to obtain the dictionary of a struct using the ``__getitem__``
+operator:
+
+.. testcode::
+
+    for sample in input.valid_data_iterator:
+        point = sample["my_point"]
+        # point is a dict
+
+The same limitations described in :ref:`Accessing basic members (numbers, strings and booleans)`
+of using ``__getitem__`` apply here.
+
 Accessing arrays and sequences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -263,6 +293,19 @@ type of the array is complex):
 
    for sample in input.valid_data_iterator:
       point_element = sample.get_dictionary("my_point_sequence[1]")
+
+The ``__getitem__`` operator can be used to obtain arrays and sequences:
+
+.. testcode::
+
+    for sample in input.valid_data_iterator:
+        point_sequence = sample["my_point_sequence"]
+        # point is a list
+
+The type returned by the ``__getitem__`` operator is a list for arrays and sequences.
+
+The same limitations described in :ref:`Accessing basic members (numbers, strings and booleans)`
+of using ``__getitem__`` apply here.
 
 In an Output, sequences are automatically resized:
 
@@ -396,3 +439,16 @@ In an Input, you can obtain the selected member as a string::
 
     if input[0].get_string("my_union#") == "point":
         value = input[0].get_number("my_union.point")
+
+The ``__getitem__`` operator can be used to obtain unions:
+
+.. testcode::
+
+    for sample in input.valid_data_iterator:
+        union = sample["my_union"]
+        # union is a dict
+
+The type returned by the operator is a dict for unions.
+
+The same limitations described in :ref:`Accessing basic members (numbers, strings and booleans)`
+of using ``__getitem__`` apply here.

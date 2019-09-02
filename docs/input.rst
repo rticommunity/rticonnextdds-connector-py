@@ -111,7 +111,7 @@ You can access a field of the sample meta-data, the *SampleInfo*, as follows:
 .. testcode::
 
    for sample in input.data_iterator:
-      valid = sample.info["valid_data"]
+      source_timestamp = sample.info["source_timestamp"]
 
 
 See :meth:`SampleIterator.info` for the list of meta-data fields available

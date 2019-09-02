@@ -93,3 +93,24 @@ def rtiOutputFixture(rtiConnectorFixture):
   """
 
   return rtiConnectorFixture.getOutput("MyPublisher::MySquareWriter")
+
+@pytest.fixture
+def one_use_connector(request):
+    """Creates a Connector only for one test. Use this when
+       the test can't reuse a previously created connector"""
+
+    xml_path = os.path.join(
+      os.path.dirname(os.path.realpath(__file__)),
+      "../xml/TestConnector.xml")
+
+    participant_profile="MyParticipantLibrary::Zero"
+    with rti.open_connector(participant_profile, xml_path) as rti_connector:
+      yield rti_connector
+
+@pytest.fixture
+def one_use_output(one_use_connector):
+  return one_use_connector.get_output("MyPublisher::MySquareWriter")
+
+@pytest.fixture
+def one_use_input(one_use_connector):
+  return one_use_connector.get_input("MySubscriber::MySquareReader")  
