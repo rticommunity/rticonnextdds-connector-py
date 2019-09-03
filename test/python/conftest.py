@@ -113,5 +113,4 @@ def one_use_output(one_use_connector):
 
 @pytest.fixture
 def one_use_input(one_use_connector):
-  return one_use_connector.get_input("MySubscriber::MySquareReader")  
-
+  return one_use_connector.get_input("MySubscriber::MySquareReader")

@@ -29,7 +29,7 @@ class TestDiscovery:
 
     with rti.open_connector(participant_profile, xml_path) as rti_connector:
         yield rti_connector
-  
+
   @pytest.fixture(scope="function")
   def discovery_reader_only_connector(self):
     xml_path = os.path.join(
