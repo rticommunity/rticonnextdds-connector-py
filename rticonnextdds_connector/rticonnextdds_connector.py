@@ -690,10 +690,9 @@ class Input:
 		If the operation times out, it will raise :class:`TimeoutError`.
 
 		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
-		:return: The change in the current number of matched outputs. If a positive number is returned,
-		the input has matched with new publishers. If a negative number is returned the input has unmatched
-		from an output. It is possible for multiple matches and/or unmatches to be returned (e.g., 0 could
-		be returned, indicating that the input matched the same number of writers as it unmatched).
+
+		:return: The change in the current number of matched outputs. If a positive number is returned, the input has matched with new publishers. If a negative number is returned the input has unmatched from an output. It is possible for multiple matches and/or unmatches to be returned (e.g., 0 could be returned, indicating that the input matched the same number of writers as it unmatched).
+
 		"""
 		if timeout is None:
 			timeout = -1
@@ -1049,10 +1048,9 @@ class Output:
 		If the operation times out, it will raise :class:`TimeoutError`.
 
 		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
-		:return: The change in the current number of matched outputs. If a positive number is returned,
-		the input has matched with new publishers. If a negative number is returned the input has unmatched
-		from an output. It is possible for multiple matches and/or unmatches to be returned (e.g., 0 could
-		be returned, indicating that the input matched the same number of writers as it unmatched).
+
+		:return: The change in the current number of matched outputs. If a positive number is returned, the input has matched with new publishers. If a negative number is returned the input has unmatched from an output. It is possible for multiple matches and/or unmatches to be returned (e.g., 0 could be returned, indicating that the input matched the same number of writers as it unmatched).
+
 		"""
 		if timeout is None:
 			timeout = -1
