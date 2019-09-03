@@ -193,6 +193,10 @@ class _ConnectorBinding:
 		self.wait.restype = ctypes.c_int
 		self.wait.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
+		self.wait_for_data = self.library.RTI_Connector_wait_for_data_on_input
+		self.wait_for_data.restype = ctypes.c_int
+		self.wait_for_data.argtypes = [ctypes.c_void_p, ctypes.c_int]
+
 		self.clear = self.library.RTI_Connector_clear
 		self.clear.restype = ctypes.c_int
 		self.clear.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
@@ -665,8 +669,19 @@ class Input:
 
 		_check_retcode(connector_binding.take(self.connector.native,tocstring(self.name)))
 
-	def wait(self,timeout):
-		return connector_binding.wait(self.connector.native,timeout)
+	def wait(self,timeout = None):
+		"""Wait for this Input to receive data.
+
+		This method waits for the specified timeout for data to be received by
+		this input.
+		If the operation times out, it raises :class:`TimeoutError`.
+
+		:param number timeout: The timeout in milliseconds to wait for data to be received. The default value, -1, indicates to wait forever.
+		"""
+		if timeout is None:
+			timeout = -1
+		retcode = connector_binding.wait_for_data(self.native, timeout)
+		_check_retcode(retcode)
 
 	def __getitem__(self, index):
 		"""Equivalent to :meth:`get_sample()`"""
