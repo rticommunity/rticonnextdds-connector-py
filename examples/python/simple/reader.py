@@ -22,16 +22,18 @@ with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../S
 
     dds_input = connector.get_input("MySubscriber::MySquareReader")
 
-    matches = dds_input.wait_for_match()
-    print("match found 1")
-    print("current matches: " + str(matches))
-    matches = dds_input.wait_for_match()
-    print("match found 2")
-    print("current matches: " + str(matches))
-    matches = dds_input.wait_for_match()
-    print("match found 3")
-    print("current matches: " + str(matches))
-    matches = dds_input.get_matched_outputs()
-    print("matches: " + str(matches) + " (" + str(type(matches)) + ")")
+    for i in range(1, 500):
+        dds_input.take()
+        for sample in dds_input.valid_data_iterator:
+                # You can get all the fields in a get_dictionary()
+                data = sample.get_dictionary()
+                x = data['x']
+                y = data['y']
 
-    sleep(2)
+                # Or you can access the field individually
+                size = sample.get_number("shapesize")
+                color = sample.get_string("color")
+                print("Received x: " + repr(x) + " y: " + repr(y) + \
+                        " size: " + repr(size) + " color: " + repr(color))
+
+        sleep(2)

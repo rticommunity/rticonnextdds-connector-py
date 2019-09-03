@@ -19,7 +19,7 @@ connector = rti.Connector("MyParticipantLibrary::MyParticipant",
                           filepath + "/../ShapeExample.xml")
 outputDDS = connector.get_output("MyPublisher::MySquareWriter")
 
-for i in range(1, 5):
+for i in range(1, 500):
     outputDDS.instance.set_number("x", i)
     outputDDS.instance.set_number("y", i*2)
     outputDDS.instance.set_number("shapesize", 30)
