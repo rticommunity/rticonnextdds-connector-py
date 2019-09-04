@@ -9,6 +9,7 @@
 import pytest,time,sys,os,ctypes,json
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
+from numbers import Number
 from test_utils import *
 
 
@@ -56,7 +57,10 @@ class TestDataAccess:
       'my_int_union': {'my_long': 222},
       'my_point_sequence': [{'x': 10, 'y': 20}, {'x': 11, 'y': 21}],
       'my_int_sequence': [1, 2, 3],
-      'my_point_array': [{'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 5, 'y': 15}]}
+      'my_point_array': [{'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 5, 'y': 15}],
+      'my_boolean': False,
+      'my_int64': -18014398509481984,
+      'my_uint64': 18014398509481984}
 
   @pytest.fixture
   def test_output(self, test_connector):
@@ -154,13 +158,10 @@ class TestDataAccess:
     assert sample["my_int_sequence#"] == 2
     assert sample["my_point_array[4].x"] == 5
 
-  @pytest.mark.xfail
   def test_bad_sequence_access(self, populated_input):
     sample = populated_input[0]
-    with pytest.raises(AttributeError) as excinfo:
-      sample.get_number("my_point_sequence[9].y")
-    with pytest.raises(AttributeError) as excinfo:
-      sample.get_number("my_int_sequence[9]")
+    assert sample.get_number("my_point_sequence[9].y") is None
+    assert sample.get_number("my_int_sequence[9]") is None
 
   def test_bad_member_name(self, populated_input):
     sample = populated_input[0]
@@ -627,3 +628,33 @@ class TestDataAccess:
     assert isinstance(point_array_str, str)
     assert isinstance(json.loads(point_array_str), list)
 
+  def test_convert_from_string_in_dict(self, test_output, test_input, test_dictionary):
+    test_output.instance.set_dictionary({
+      'my_long': "10",
+      'my_double': "3.3",
+      'my_optional_bool':True,
+      'my_enum': "1",
+      'my_string': 'hello',
+      'my_point': {'x': "3", 'y': "4"},
+      'my_point_alias': {'x': "30", 'y': "40"},
+      'my_union': {'my_int_sequence': ["10", "20", "30"]},
+      'my_int_union': {'my_long': "222"},
+      'my_point_sequence': [{'x': "10", 'y': 20}, {'x': "11", 'y': "21"}],
+      'my_int_sequence': ["1", 2, 3],
+      'my_point_array': [{'x': "0", 'y': 0}, {'x': 0, 'y': "0"}, {'x': 0, 'y': 0}, {'x': 0, 'y': 0}, {'x': 5, 'y': 15}],
+      'my_boolean': False,
+      'my_int64': "-18014398509481984",
+      'my_uint64': "18014398509481984"
+    })
+    sample = send_data(test_output, test_input)
+    assert sample.get_dictionary() == test_dictionary
+
+  def test_bad_conversion_from_string_in_dict(self, test_output, test_dictionary):
+    # For each numeric field, test that set_dictionary fails when the value we
+    # try to set is a string that doesn't represent a number
+    field_names = ["my_long", "my_int64", "my_double",
+      "my_point_array[1].x", "my_int_sequence[1], my_enum"] # TODO: add "my_uint64" when CORE-9768 is fixed
+    for name in field_names:
+        with pytest.raises(rti.Error, match=r".*cannot convert field to string.*") as excinfo:
+          test_output.instance.set_dictionary({name:"not a number"})
+          print("Field " + name + " did not raise an exception")
