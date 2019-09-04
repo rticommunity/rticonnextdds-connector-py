@@ -374,22 +374,21 @@ class TestDataAccess:
       sample.get_dictionary("IDoNotExist")
 
     # Attempt to get_dictionary for non-complex members
-    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_LONG.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*TypeCodeKind must be one of the following.*") as excinfo:
       sample.get_dictionary("my_long")
-    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_DOUBLE.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*TypeCodeKind must be one of the following.*") as excinfo:
       sample.get_dictionary("my_double")
-    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_BOOLEAN.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*TypeCodeKind must be one of the following.*") as excinfo:
       sample.get_dictionary("my_optional_bool")
-    # We return None for unset optional members (that check is done before binding
-    # so this case will return None instead of failing as above).
-    assert None is sample.get_dictionary("my_optional_long")
-    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_STRING.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*TypeCodeKind must be one of the following.*") as excinfo:
+      sample.get_dictionary("my_optional_long")
+    with pytest.raises(rti.Error, match=r".*TypeCodeKind must be one of the following.*") as excinfo:
       sample.get_dictionary("my_string")
-    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_ENUM.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*TypeCodeKind must be one of the following.*") as excinfo:
       sample.get_dictionary("my_enum")
     # It is possible to use get_dictionary to access nested members, but the nested
     # member must be a complex type
-    with pytest.raises(rti.Error, match=r".*invalid TypeCode kind DDS_TK_LONG.*") as excinfo:
+    with pytest.raises(rti.Error, match=r".*TypeCodeKind must be one of the following.*") as excinfo:
       sample.get_dictionary("my_point.x")
 
     # Valid values for member_name
