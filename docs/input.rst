@@ -32,15 +32,15 @@ this ``connector`` (see :ref:`Create a new *Connector*`).
 Matching with an Output
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The method :meth:`Input.wait_for_match()` can be used to detect when a compatible
-:class:`Output` is matched or unmatched. It returns the change in the number of matched outputs
-since the last time it was called::
+The method :meth:`Input.wait_for_publications()` can be used to detect when a compatible
+DDS publication is matched or unmatched. It returns the change in the number of
+matched outputs since the last time it was called::
 
-   change_in_matches = Input.wait_for_match()
+   change_in_matches = Input.wait_for_publications()
 
 For example, if a new :class:`Output` was matched within the
 specified ``timeout``, the function would return 1. If, at a later point, this :class:`Output`
-left the network, a subsequent call to :meth:`Input.wait_for_match()` would return
+left the network, a subsequent call to :meth:`Input.wait_for_publications()` would return
 -1.
 The optional ``timeout`` argument can be used to specify the maximum amount of time in
 milliseconds to wait for a new match. If no match is found within the ``timeout``, :class:`TimeoutError`
@@ -48,12 +48,12 @@ is raised. By default the timeout is infinite.
 
 
 In order to ascertain whether or not an :class:`Input` is matched with a specific :class:`Output`, you
-should use the :meth:`Input.get_matched_outputs()` method. This method returns a list
+should use the :meth:`Input.get_matched_publications()` method. This method returns a list
 of the *Publication Names* of all of the matched :class:`Output`.
 
 .. testcode::
 
-   matched_outputs = input.get_matched_outputs()
+   matched_outputs = input.get_matched_publications()
 
 Reading or taking the data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

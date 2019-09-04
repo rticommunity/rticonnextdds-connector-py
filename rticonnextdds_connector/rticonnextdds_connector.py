@@ -193,21 +193,21 @@ class _ConnectorBinding:
 		self.wait.restype = ctypes.c_int
 		self.wait.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
-		self.wait_for_matched_output = self.library.RTI_Connector_wait_for_matched_publisher
-		self.wait_for_matched_output.restype = ctypes.c_int
-		self.wait_for_matched_output.argtypes = [ctypes.c_void_p, ctypes.c_int, POINTER(ctypes.c_int)]
+		self.wait_for_matched_publication = self.library.RTI_Connector_wait_for_matched_publication
+		self.wait_for_matched_publication.restype = ctypes.c_int
+		self.wait_for_matched_publication.argtypes = [ctypes.c_void_p, ctypes.c_int, POINTER(ctypes.c_int)]
 
-		self.wait_for_matched_input = self.library.RTI_Connector_wait_for_matched_subscriber
-		self.wait_for_matched_input.restype = ctypes.c_int
-		self.wait_for_matched_input.argtypes = [ctypes.c_void_p, ctypes.c_int, POINTER(ctypes.c_int)]
+		self.wait_for_matched_subscription = self.library.RTI_Connector_wait_for_matched_subscription
+		self.wait_for_matched_subscription.restype = ctypes.c_int
+		self.wait_for_matched_subscription.argtypes = [ctypes.c_void_p, ctypes.c_int, POINTER(ctypes.c_int)]
 
-		self.get_matched_inputs = self.library.RTI_Connector_get_matched_subscribers
-		self.get_matched_inputs.restype = ctypes.c_int
-		self.get_matched_inputs.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_char_p)]
+		self.get_matched_subscriptions = self.library.RTI_Connector_get_matched_subscriptions
+		self.get_matched_subscriptions.restype = ctypes.c_int
+		self.get_matched_subscriptions.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_char_p)]
 
-		self.get_matched_outputs = self.library.RTI_Connector_get_matched_publishers
-		self.get_matched_outputs.restype = ctypes.c_int
-		self.get_matched_outputs.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_char_p)]
+		self.get_matched_publications = self.library.RTI_Connector_get_matched_publications
+		self.get_matched_publications.restype = ctypes.c_int
+		self.get_matched_publications.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_char_p)]
 
 		self.clear = self.library.RTI_Connector_clear
 		self.clear.restype = ctypes.c_int
@@ -684,8 +684,8 @@ class Input:
 	def wait(self,timeout):
 		return connector_binding.wait(self.connector.native,timeout)
 
-	def wait_for_match(self, timeout = None):
-		"""Waits until this input matches or unmatches an output.
+	def wait_for_publications(self, timeout = None):
+		"""Waits until this input matches or unmatches a compatible DDS subscription.
 
 		If the operation times out, it will raise :class:`TimeoutError`.
 
@@ -697,17 +697,15 @@ class Input:
 		if timeout is None:
 			timeout = -1
 		current_count_change = ctypes.c_int()
-		retcode = connector_binding.wait_for_matched_output(self.native, timeout, byref(current_count_change))
+		retcode = connector_binding.wait_for_matched_publication(self.native, timeout, byref(current_count_change))
 		_check_retcode(retcode)
 		return current_count_change.value
 
-	def get_matched_outputs(self):
+	def get_matched_publications(self):
 		"""Returns a JSON list of the publication names of all matched outputs"""
 		native_json_str = ctypes.c_char_p()
-		retcode = connector_binding.get_matched_outputs(self.native, byref(native_json_str))
+		retcode = connector_binding.get_matched_publications(self.native, byref(native_json_str))
 		_check_retcode(retcode)
-		if retcode == _ReturnCode.no_data:
-			return None
 		return json.loads(_move_native_string(native_json_str))
 
 	def __getitem__(self, index):
@@ -1042,8 +1040,8 @@ class Output:
 		retcode = connector_binding.waitForAcknowledgments(self.native, timeout)
 		_check_retcode(retcode)
 
-	def wait_for_match(self, timeout = None):
-		"""Waits until this output has a matched input.
+	def wait_for_subscriptions(self, timeout = None):
+		"""Waits until this output matches or unmatches with a compatible DDS subscription.
 
 		If the operation times out, it will raise :class:`TimeoutError`.
 
@@ -1055,17 +1053,15 @@ class Output:
 		if timeout is None:
 			timeout = -1
 		current_count_change = ctypes.c_int()
-		retcode = connector_binding.wait_for_matched_input(self.native, timeout, byref(current_count_change))
+		retcode = connector_binding.wait_for_matched_subscription(self.native, timeout, byref(current_count_change))
 		_check_retcode(retcode)
 		return current_count_change.value
 
-	def get_matched_inputs(self):
+	def get_matched_subscriptions(self):
 		"""Returns a JSON list of the subscription names of all matched inputs"""
 		native_json_str = ctypes.c_char_p()
-		retcode = connector_binding.get_matched_inputs(self.native, byref(native_json_str))
+		retcode = connector_binding.get_matched_subscriptions(self.native, byref(native_json_str))
 		_check_retcode(retcode)
-		if retcode == _ReturnCode.no_data:
-			return None
 		return json.loads(_move_native_string(native_json_str))
 
 	def clear_members(self):
