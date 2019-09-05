@@ -154,11 +154,11 @@ class TestDiscovery:
     assert the_input is not None
 
     # Check that matching occurs
-    change_in_matches = discovery_writer_only_output.wait_for_subscriptions()
+    change_in_matches = discovery_writer_only_output.wait_for_subscriptions(5000)
     assert change_in_matches == 1
     matches = discovery_writer_only_output.get_matched_subscriptions()
     assert {'name': 'TestReader'} in matches
-    change_in_matches = the_input.wait_for_publications()
+    change_in_matches = the_input.wait_for_publications(5000)
     assert change_in_matches == 1
     matches = the_input.get_matched_publications()
     assert {'name': 'TestWriter'} in matches
@@ -166,7 +166,7 @@ class TestDiscovery:
     # If we now delete the reader_connector object which we created above, they
     # will unmatch
     reader_connector.close()
-    change_in_matches = discovery_writer_only_output.wait_for_subscriptions()
+    change_in_matches = discovery_writer_only_output.wait_for_subscriptions(5000)
     assert change_in_matches == -1
     matches = discovery_writer_only_output.get_matched_subscriptions()
     assert len(matches) == 0
@@ -190,7 +190,7 @@ class TestDiscovery:
     assert change_in_matches == 1
     matches = discovery_reader_only_input.get_matched_publications()
     assert {'name': 'TestWriter'} in matches
-    change_in_matches = the_output.wait_for_subscriptions()
+    change_in_matches = the_output.wait_for_subscriptions(5000)
     assert change_in_matches == 1
     matches = the_output.get_matched_subscriptions()
     assert {'name': 'TestReader'} in matches
@@ -198,7 +198,7 @@ class TestDiscovery:
     # If we now delete the reader_connector object which we created above, they
     # will unmatch
     writer_connector.close()
-    change_in_matches = discovery_reader_only_input.wait_for_publications()
+    change_in_matches = discovery_reader_only_input.wait_for_publications(5000)
     assert change_in_matches == -1
     matches = discovery_reader_only_input.get_matched_publications()
     assert len(matches) == 0
@@ -206,7 +206,7 @@ class TestDiscovery:
   def test_empty_entity_names(self, discovery_connector_no_entity_names):
     the_output = discovery_connector_no_entity_names.get_output("MyPublisher::MyWriter")
     # Ensure that the entities match
-    change_in_subs = the_output.wait_for_subscriptions(-1)
+    change_in_subs = the_output.wait_for_subscriptions(5000)
     assert change_in_subs == 1
 
     # Get the entity names from the matched subscriptions
@@ -224,7 +224,7 @@ class TestDiscovery:
     assert retcode == 0
 
     # Wait to match with the new reader
-    discovery_writer_only_output.wait_for_subscriptions(-1)
+    discovery_writer_only_output.wait_for_subscriptions(5000)
     # Check that we can handle getting entity_name when it is NULL
     matches = discovery_writer_only_output.get_matched_subscriptions()
     assert isinstance(matches, list)

@@ -85,6 +85,12 @@ of the *Subscription Names* of all of the matched :class:`Input`.
 
    matched_inputs = output.get_matched_subscriptions()
 
+.. note::
+    The list returned will contain the name of each matched subscription.
+    If one of them didn't specify a name, the list will contain a None element
+    instead. In any case, the size of the list reflects the current number of
+    matched subscriptions.
+
 Writing the data sample
 ~~~~~~~~~~~~~~~~~~~~~~~
 

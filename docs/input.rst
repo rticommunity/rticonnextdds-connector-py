@@ -55,6 +55,12 @@ of the *Publication Names* of all of the matched :class:`Output`.
 
    matched_outputs = input.get_matched_publications()
 
+.. note::
+    The list returned will contain the name of each matched publication.
+    If one of them didn't specify a name, the list will contain a None element
+    instead. In any case, the size of the list reflects the current number of
+    matched publication.
+
 Reading or taking the data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
