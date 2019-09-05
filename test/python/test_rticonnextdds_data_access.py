@@ -660,8 +660,8 @@ class TestDataAccess:
     # Now we write some data using output1 (which is matched with input1)
     output1.write()
     # Both the Connector-level wait and a wait on input1 should return
-    test_connector.wait(-1)
-    input1.wait()
+    test_connector.wait(5000)
+    input1.wait(5000)
     # But a wait on input2 should timeout
     with pytest.raises(rti.TimeoutError) as excinfo:
       input2.wait(500)
@@ -672,7 +672,7 @@ class TestDataAccess:
     output2.write()
     # Both the Connector-level wait and a wait on input2 should return
     test_connector.wait(-1)
-    input2.wait()
+    input2.wait(5000)
     # But a wait on input1 should timeout
     with pytest.raises(rti.TimeoutError) as excinfo:
       input1.wait(500)
