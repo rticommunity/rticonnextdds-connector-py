@@ -1140,7 +1140,7 @@ class Connector:
 	def getInput(self, input_name):
 		return self.get_input(input_name)
 
-	def wait(self,timeout = None):q
+	def wait(self,timeout = None):
 		"""Waits for data to be received on any input
 
 		If the operation times out, it raises :class:`TimeoutError`.
