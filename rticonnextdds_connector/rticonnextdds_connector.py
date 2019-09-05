@@ -193,7 +193,7 @@ class _ConnectorBinding:
 		self.wait.restype = ctypes.c_int
 		self.wait.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
-		self.wait_for_data = self.library.RTI_Connector_wait_for_data_on_input
+		self.wait_for_data = self.library.RTI_Connector_wait_for_data_on_reader
 		self.wait_for_data.restype = ctypes.c_int
 		self.wait_for_data.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
@@ -669,14 +669,14 @@ class Input:
 
 		_check_retcode(connector_binding.take(self.connector.native,tocstring(self.name)))
 
-	def wait(self,timeout = None):
-		"""Wait for this Input to receive data.
+	def wait(self, timeout = None):
+		"""Wait for this input to receive data.
 
 		This method waits for the specified timeout for data to be received by
 		this input.
 		If the operation times out, it raises :class:`TimeoutError`.
 
-		:param number timeout: The timeout in milliseconds to wait for data to be received. The default value, -1, indicates to wait forever.
+		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
 		"""
 		if timeout is None:
 			timeout = -1
@@ -1140,10 +1140,18 @@ class Connector:
 	def getInput(self, input_name):
 		return self.get_input(input_name)
 
-	def wait(self,timeout):
-		"""TODO: document this function"""
+	def wait(self,timeout = None):q
+		"""Waits for data to be received on any input
 
-		return connector_binding.wait(self.native,timeout)
+		If the operation times out, it raises :class:`TimeoutError`.
+
+		:param number timeout: The maximum to wait in milliseconds. By default, infinite.
+		"""
+
+		if timeout is None:
+			timeout = -1
+		retcode = connector_binding.wait(self.native,timeout)
+		_check_retcode(retcode)
 
 @contextmanager
 def open_connector(configName, url):
