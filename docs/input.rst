@@ -29,12 +29,12 @@ the *subscriber* named *MySubscriber*::
 This *subscriber* is defined inside the *domain_participant* selected to create
 this ``connector`` (see :ref:`Create a new *Connector*`).
 
-Matching with an Output
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Matching with a Publication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The method :meth:`Input.wait_for_publications()` can be used to detect when a compatible
 DDS publication is matched or unmatched. It returns the change in the number of
-matched outputs since the last time it was called::
+matched publications since the last time it was called::
 
    change_in_matches = Input.wait_for_publications()
 

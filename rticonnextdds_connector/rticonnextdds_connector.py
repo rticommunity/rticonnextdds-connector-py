@@ -88,7 +88,7 @@ def _check_retcode(retcode):
 		else:
 			raise Error("DDS Exception: " + _get_last_dds_error_message())
 
-# Definition of this class must match the RTI_Connecot_AnyValueKind enum in ddsConnector.ifc
+# Definition of this class must match the RTI_Connector_AnyValueKind enum in ddsConnector.ifc
 class _AnyValueKind:
 	connector_none = 0
 	connector_number = 1
@@ -269,6 +269,15 @@ class _ConnectorBinding:
 		self.freeString.argtypes = [POINTER(c_char)]
 
 		self.max_integer_as_double = 2**53
+
+		# This API is only used internally to extend the testing capabilities of
+		# Connector. It can be called from the unit tests (and for this reason isn't
+		# directly exposed in any classes below) and is used to create various
+		# test scenarios in the binding (where we have access to the full DDS API
+		# giving us more flexibility).
+		self._createTestScenario = self.library.RTI_Connector_create_test_scenario
+		self._createTestScenario.restype = ctypes.c_int
+		self._createTestScenario.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p]
 
 	def get_any_value(self, getter_function, connector, input_name, index, field_name):
 		number_value = ctypes.c_double()

@@ -59,12 +59,12 @@ For example::
 
 See :class:`Instance` and :ref:`Accessing the data` for more information.
 
-Matching with an Input
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Matching with a Subscription
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The method :meth:`Output.wait_for_subscriptions()` can be used to detect when a compatible
 DDS subscription is matched or unmatched. It returns the change in the number of
-matched inputs since the last time it was called::
+matched subscriptions since the last time it was called::
 
    change_in_matches = Output.wait_for_subscriptions()
 

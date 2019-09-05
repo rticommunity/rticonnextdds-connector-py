@@ -203,13 +203,35 @@ class TestDiscovery:
     matches = discovery_reader_only_input.get_matched_publications()
     assert len(matches) == 0
 
-  def test_no_entity_names(self, discovery_connector_no_entity_names):
+  def test_empty_entity_names(self, discovery_connector_no_entity_names):
     the_output = discovery_connector_no_entity_names.get_output("MyPublisher::MyWriter")
     # Ensure that the entities match
     change_in_subs = the_output.wait_for_subscriptions(-1)
     assert change_in_subs == 1
 
-    # Get the entity names from the matched publication and subscriptions
+    # Get the entity names from the matched subscriptions
     matched_subs = the_output.get_matched_subscriptions()
-    # Since the entities used in this test do not set a entity_name QoS, check that no name is present
+    # The entity names set in the input are empty
     assert matched_subs == [{'name': ''}]
+
+  def test_no_entity_names(self, discovery_writer_only_output):
+    # We call the _createTestScenario API to create a remote matching reader which
+    # will not set any entity name.
+    retcode = rti.connector_binding._createTestScenario(
+      discovery_writer_only_output.connector.native,
+      0, # RTI_Connector_testScenario_createReader
+      discovery_writer_only_output.native)
+    assert retcode == 0
+
+    # Wait to match with the new reader
+    discovery_writer_only_output.wait_for_subscriptions(-1)
+    # Check that we can handle getting entity_name when it is NULL
+    matches = discovery_writer_only_output.get_matched_subscriptions()
+    assert isinstance(matches, list)
+    assert len(matches) == 1
+    assert isinstance(matches[0], dict)
+    assert matches[0]['name'] is None
+
+    # It is not necessary to delete the entites created by the call to createTestScenario
+    # since they were all created from the same DomainParticipant as discovery_writer_only_output
+    # which will have delete_contained_entities called on it.
