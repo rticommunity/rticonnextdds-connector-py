@@ -9,7 +9,6 @@
 import pytest,time,sys,os,ctypes,json
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
-from numbers import Number
 from test_utils import *
 
 
