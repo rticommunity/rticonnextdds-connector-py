@@ -103,7 +103,7 @@ def one_use_connector(request):
       os.path.dirname(os.path.realpath(__file__)),
       "../xml/TestConnector.xml")
 
-    participant_profile="MyParticipantLibrary::Zero"
+    participant_profile="MyParticipantLibrary::SingleUseParticipant"
     with rti.open_connector(participant_profile, xml_path) as rti_connector:
       yield rti_connector
 
