@@ -872,7 +872,7 @@ class Instance:
 					tocstring(self.output.name),
 					tocstring(field_name),
 					tocstring(value)))
-			except AttributeError | ctypes.ArgumentError as e:
+			except (AttributeError, ctypes.ArgumentError) as e:
 				raise TypeError("value for field '{0}' must be of type str"\
 					.format(field_name))
 
