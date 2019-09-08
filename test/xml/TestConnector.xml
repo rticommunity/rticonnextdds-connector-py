@@ -191,5 +191,27 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                 <data_reader name="ReplyReader" topic_ref="Circle" />
             </subscriber>
         </domain_participant>
+
+        <domain_participant name="TestNoAutoenableSubscriber"
+                            domain_ref="MyDomainLibrary::MyDomain">
+            <subscriber name="TestSubscriber">
+                <subscriber_qos>
+                    <entity_factory>
+                        <autoenable_created_entities>false</autoenable_created_entities>
+                    </entity_factory>
+                </subscriber_qos>
+                <data_reader name="TestReader" topic_ref="Square">
+                    <datareader_qos>
+                        <durability>
+                            <kind>VOLATILE_DURABILITY_QOS</kind>
+                        </durability>
+                    </datareader_qos>
+                </data_reader>
+            </subscriber>
+
+            <publisher name="TestPublisher">
+                <data_writer name="TestWriter" topic_ref="Square" />
+            </publisher>
+        </domain_participant>
     </domain_participant_library>
 </dds>

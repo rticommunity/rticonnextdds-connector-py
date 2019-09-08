@@ -9,6 +9,7 @@
 import pytest,sys,os,ctypes
 sys.path.append(os.path.dirname(os.path.realpath(__file__))+ "/../../")
 import rticonnextdds_connector as rti
+from test_utils import open_test_connector, wait_for_data
 
 class TestInput:
   """
@@ -33,7 +34,7 @@ class TestInput:
 
     """
     invalid_DR = "InvalidDR"
-    with pytest.raises(ValueError):
+    with pytest.raises(rti.Error):
        rtiConnectorFixture.getInput(invalid_DR)
 
   def test_creation_DR(self,rtiInputFixture):
@@ -60,3 +61,24 @@ class TestInput:
     get_name.restype = ctypes.c_char_p
     get_name.argtypes = [ctypes.c_void_p]
     assert rti.fromcstring(get_name(topic)) == "Square"
+
+  def test_no_autoenable(self):
+    with open_test_connector("MyParticipantLibrary::TestNoAutoenableSubscriber") as connector:
+      output = connector.get_output("TestPublisher::TestWriter")
+      connector.wait(1000) # TODO
+
+      # The input is not enabled yet because the subscriber sets
+      # autoenable_created_entities to false
+      output.instance['x'] = 1
+      output.write()
+
+      # Connector enables the DataReader when it's first looked up
+      input = connector.get_input("TestSubscriber::TestReader")
+      connector.wait(1000) # TODO wait for discovery
+      output.instance['x'] = 2
+      output.write()
+
+      # The input will receive only the second sample
+      wait_for_data(input)
+      assert input.sample_count == 1
+      assert input[0]['x'] == 2
