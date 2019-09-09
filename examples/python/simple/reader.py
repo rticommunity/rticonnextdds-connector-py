@@ -36,4 +36,4 @@ with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../S
                 print("Received x: " + repr(x) + " y: " + repr(y) + \
                         " size: " + repr(size) + " color: " + repr(color))
 
-        sleep(2)
+        sleep(0.5)
