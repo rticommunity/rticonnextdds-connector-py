@@ -47,7 +47,6 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <member name="x" type="long"/>
             <member name="y" type="long"/>
             <member name="shapesize" type="long"/>
-            <member name="z" type="boolean"/>
         </struct>
         <enum name="ShapeFillKind" extensibility="extensible">
             <enumerator name="SOLID_FILL" value="0"/>
