@@ -21,6 +21,17 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                     <name>Connector ShapeExample</name>
                 </participant_name>
             </participant_qos>
+            <!-- This QoS is necessary since the data_writer and data_reader are
+            defined in the same domain_participant. This means that both the reader
+            application and writer application will have both entities. We don't want
+            the data_reader to be enabled (since we won't be calling write). It will
+            automatically be enabled when we call get_input. The other option is
+            to put the data_reader and data_writer in separate domain_participants. -->
+            <subscriber_qos>
+                <entity_factory>
+                    <autoenable_created_entities>false</autoenable_created_entities>
+                </entity_factory>
+            </subscriber_qos>
         </qos_profile>
     </qos_library>
 
@@ -31,7 +42,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <member name="x" type="long"/>
             <member name="y" type="long"/>
             <member name="shapesize" type="long"/>
-            <member name="z" type="boolean"/>
+            <!-- <member name="z" type="boolean"/> -->
         </struct>
         <enum name="ShapeFillKind" extensibility="extensible">
             <enumerator name="SOLID_FILL" value="0"/>
@@ -55,23 +66,10 @@ This code contains trade secrets of Real-Time Innovations, Inc.
 
     <!-- Participant library -->
     <domain_participant_library name="MyParticipantLibrary">
-        <!--
-            We put MySquareWriter and MySquareReader in separate domain_participants.
-            This is because by default we create and enable all entities in the
-            Connector object (meaning the writer application will also have a reader
-            running). The other option is to add the following QoS:
-            <subscriber_qos>
-                <entity_factory>
-                    <autoenable_created_entities>false</autoenable_created_entities>
-                </entity_factory>
-            </subscriber_qos>
-        -->
-        <domain_participant name="MyOutputParticipant" domain_ref="MyDomainLibrary::MyDomain">
+        <domain_participant name="MyParticipant" domain_ref="MyDomainLibrary::MyDomain">
             <publisher name="MyPublisher">
                 <data_writer name="MySquareWriter" topic_ref="Square" />
             </publisher>
-        </domain_participant>
-        <domain_participant name="MyInputParticipant" domain_ref="MyDomainLibrary::MyDomain">
             <subscriber name="MySubscriber">
                 <data_reader name="MySquareReader" topic_ref="Square" />
             </subscriber>

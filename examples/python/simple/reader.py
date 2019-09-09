@@ -13,7 +13,7 @@ filepath = osPath.dirname(osPath.realpath(__file__))
 sysPath.append(filepath + "/../../../")
 import rticonnextdds_connector as rti
 
-with rti.open_connector("MyParticipantLibrary::MyInputParticipant", filepath + "/../ShapeExample.xml") as connector:
+with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../ShapeExample.xml") as connector:
 
     # Waits until the_input matches with a publication named publication_name
     def wait_for_discovery(the_input, publication_name):
