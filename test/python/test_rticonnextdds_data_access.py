@@ -631,23 +631,14 @@ class TestDataAccess:
   # within it
   def test_wait_for_data(self, test_connector):
     input1 = test_connector.get_input("TestSubscriber::TestReader")
-    assert input1 is not None
     input2 = test_connector.get_input("TestSubscriber::TestReader2")
-    assert input2 is not None
     output1 = test_connector.get_output("TestPublisher::TestWriter")
-    assert output1 is not None
     output2 = test_connector.get_output("TestPublisher::TestWriter2")
-    assert output2 is not None
 
     # Ensure matching between all entities occurs
     # TODO after merging CON-108
     with pytest.raises(rti.TimeoutError) as excinfo:
       input2.wait(2000)
-
-    # Since the test_connector fixture has a scope of "class" we should take
-    # any data now to ensure we have a clean testing environment
-    # input1.take()
-    # input2.take()
 
     # All variations of wait_for_data will timeout
     with pytest.raises(rti.TimeoutError) as excinfo:

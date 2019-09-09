@@ -26,13 +26,26 @@ the *subscriber* named *MySubscriber*::
      <data_reader name="MySquareReader" topic_ref="Square" />
    </subscriber>
 
-This *publisher* is defined inside the *domain_participant* selected to create
+This *subscriber* is defined inside the *domain_participant* selected to create
 this ``connector`` (see :ref:`Create a new *Connector*`).
 
 Reading or taking the data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Then call :meth:`Input.take()` to access and remove the samples::
+The method :meth:`Input.wait()` can be used to identify when there is new data
+available on a specific :class:`Input`. It will block until either the supplied
+timeout expires (in which case it will raise :class:`TimeoutError`) or until new
+data is available::
+
+  input.wait()
+
+The method :meth:`Connector.wait()` has the same behaviour as :meth:`Input.wait()`,
+but will block until data is available on any of the :class:`Input` objects within
+the :class:`Connector`::
+
+  connector.wait()
+
+Call :meth:`Input.take()` to access and remove the samples::
 
    input.take()
 
