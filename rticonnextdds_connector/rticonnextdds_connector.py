@@ -88,7 +88,7 @@ def _check_retcode(retcode):
 		else:
 			raise Error("DDS Exception: " + _get_last_dds_error_message())
 
-# Definition of this class must match the RTI_Connecot_AnyValueKind enum in ddsConnector.ifc
+# Definition of this class must match the RTI_Connector_AnyValueKind enum in ddsConnector.ifc
 class _AnyValueKind:
 	connector_none = 0
 	connector_number = 1
@@ -193,6 +193,22 @@ class _ConnectorBinding:
 		self.wait.restype = ctypes.c_int
 		self.wait.argtypes = [ctypes.c_void_p, ctypes.c_int]
 
+		self.wait_for_matched_publication = self.library.RTI_Connector_wait_for_matched_publication
+		self.wait_for_matched_publication.restype = ctypes.c_int
+		self.wait_for_matched_publication.argtypes = [ctypes.c_void_p, ctypes.c_int, POINTER(ctypes.c_int)]
+
+		self.wait_for_matched_subscription = self.library.RTI_Connector_wait_for_matched_subscription
+		self.wait_for_matched_subscription.restype = ctypes.c_int
+		self.wait_for_matched_subscription.argtypes = [ctypes.c_void_p, ctypes.c_int, POINTER(ctypes.c_int)]
+
+		self.get_matched_subscriptions = self.library.RTI_Connector_get_matched_subscriptions
+		self.get_matched_subscriptions.restype = ctypes.c_int
+		self.get_matched_subscriptions.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_char_p)]
+
+		self.get_matched_publications = self.library.RTI_Connector_get_matched_publications
+		self.get_matched_publications.restype = ctypes.c_int
+		self.get_matched_publications.argtypes = [ctypes.c_void_p, POINTER(ctypes.c_char_p)]
+
 		self.clear = self.library.RTI_Connector_clear
 		self.clear.restype = ctypes.c_int
 		self.clear.argtypes = [ctypes.c_void_p,ctypes.c_char_p]
@@ -253,6 +269,15 @@ class _ConnectorBinding:
 		self.freeString.argtypes = [POINTER(c_char)]
 
 		self.max_integer_as_double = 2**53
+
+		# This API is only used internally to extend the testing capabilities of
+		# Connector. It can be called from the unit tests (and for this reason isn't
+		# directly exposed in any classes below) and is used to create various
+		# test scenarios in the binding (where we have access to the full DDS API
+		# giving us more flexibility).
+		self._createTestScenario = self.library.RTI_Connector_create_test_scenario
+		self._createTestScenario.restype = ctypes.c_int
+		self._createTestScenario.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p]
 
 	def get_any_value(self, getter_function, connector, input_name, index, field_name):
 		number_value = ctypes.c_double()
@@ -668,6 +693,30 @@ class Input:
 	def wait(self,timeout):
 		return connector_binding.wait(self.connector.native,timeout)
 
+	def wait_for_publications(self, timeout = None):
+		"""Waits until this input matches or unmatches a compatible DDS subscription.
+
+		If the operation times out, it will raise :class:`TimeoutError`.
+
+		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
+
+		:return: The change in the current number of matched outputs. If a positive number is returned, the input has matched with new publishers. If a negative number is returned the input has unmatched from an output. It is possible for multiple matches and/or unmatches to be returned (e.g., 0 could be returned, indicating that the input matched the same number of writers as it unmatched).
+
+		"""
+		if timeout is None:
+			timeout = -1
+		current_count_change = ctypes.c_int()
+		retcode = connector_binding.wait_for_matched_publication(self.native, timeout, byref(current_count_change))
+		_check_retcode(retcode)
+		return current_count_change.value
+
+	def get_matched_publications(self):
+		"""Returns a JSON list of the publication names of all matched outputs"""
+		native_json_str = ctypes.c_char_p()
+		retcode = connector_binding.get_matched_publications(self.native, byref(native_json_str))
+		_check_retcode(retcode)
+		return json.loads(_move_native_string(native_json_str))
+
 	def __getitem__(self, index):
 		"""Equivalent to :meth:`get_sample()`"""
 
@@ -999,6 +1048,30 @@ class Output:
 			timeout = -1
 		retcode = connector_binding.waitForAcknowledgments(self.native, timeout)
 		_check_retcode(retcode)
+
+	def wait_for_subscriptions(self, timeout = None):
+		"""Waits until this output matches or unmatches with a compatible DDS subscription.
+
+		If the operation times out, it will raise :class:`TimeoutError`.
+
+		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
+
+		:return: The change in the current number of matched outputs. If a positive number is returned, the input has matched with new publishers. If a negative number is returned the input has unmatched from an output. It is possible for multiple matches and/or unmatches to be returned (e.g., 0 could be returned, indicating that the input matched the same number of writers as it unmatched).
+
+		"""
+		if timeout is None:
+			timeout = -1
+		current_count_change = ctypes.c_int()
+		retcode = connector_binding.wait_for_matched_subscription(self.native, timeout, byref(current_count_change))
+		_check_retcode(retcode)
+		return current_count_change.value
+
+	def get_matched_subscriptions(self):
+		"""Returns a JSON list of the subscription names of all matched inputs"""
+		native_json_str = ctypes.c_char_p()
+		retcode = connector_binding.get_matched_subscriptions(self.native, byref(native_json_str))
+		_check_retcode(retcode)
+		return json.loads(_move_native_string(native_json_str))
 
 	def clear_members(self):
 		"""Resets the values of the members of this ``Output.instance``
