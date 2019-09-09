@@ -1,5 +1,5 @@
 ###############################################################################
-# (c) 2005-2015 Copyright, Real-Time Innovations.  All rights reserved.       #
+# (c) 2005-2019 Copyright, Real-Time Innovations.  All rights reserved.       #
 # No duplications, whole or partial, manual or electronic, may be made        #
 # without express written permission.  Any such copies, or revisions thereof, #
 # must display this notice unaltered.                                         #
@@ -103,7 +103,7 @@ def one_use_connector(request):
       os.path.dirname(os.path.realpath(__file__)),
       "../xml/TestConnector.xml")
 
-    participant_profile="MyParticipantLibrary::Zero"
+    participant_profile="MyParticipantLibrary::SingleUseParticipant"
     with rti.open_connector(participant_profile, xml_path) as rti_connector:
       yield rti_connector
 
@@ -113,4 +113,4 @@ def one_use_output(one_use_connector):
 
 @pytest.fixture
 def one_use_input(one_use_connector):
-  return one_use_connector.get_input("MySubscriber::MySquareReader")  
+  return one_use_connector.get_input("MySubscriber::MySquareReader")

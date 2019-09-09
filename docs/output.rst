@@ -59,6 +59,38 @@ For example::
 
 See :class:`Instance` and :ref:`Accessing the data` for more information.
 
+Matching with a Subscription
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The method :meth:`Output.wait_for_subscriptions()` can be used to detect when a compatible
+DDS subscription is matched or unmatched. It returns the change in the number of
+matched subscriptions since the last time it was called::
+
+   change_in_matches = Output.wait_for_subscriptions()
+
+For example, if a new :class:`Input` was matched within the
+specified ``timeout``, the function would return 1. If, at a later point, this :class:`Input`
+left the network, a subsequent call to :meth:`Output.wait_for_subscriptions()` would return
+-1.
+The optional ``timeout`` argument can be used to specify the maximum amount of time in
+milliseconds to wait for a new match. If no match is found within the ``timeout``, :class:`TimeoutError`
+is raised. By default the timeout is infinite.
+
+
+In order to ascertain whether or not an :class:`Output` is matched with a specific :class:`Input`, you
+should use the :meth:`Output.get_matched_subscriptions()` method. This method returns a list
+of the *Subscription Names* of all of the matched :class:`Input`.
+
+.. testcode::
+
+   matched_inputs = output.get_matched_subscriptions()
+
+.. note::
+    The list returned will contain the name of each matched subscription.
+    If one of them didn't specify a name, the list will contain a None element
+    instead. In any case, the size of the list reflects the current number of
+    matched subscriptions.
+
 Writing the data sample
 ~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -25,4 +25,4 @@ for i in range(1, 500):
     outputDDS.instance.set_number("shapesize", 30)
     outputDDS.instance.set_string("color", "BLUE")
     outputDDS.write()
-    sleep(2)
+    sleep(0.5)
