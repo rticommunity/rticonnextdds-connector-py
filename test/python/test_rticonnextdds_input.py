@@ -65,20 +65,13 @@ class TestInput:
   def test_no_autoenable(self):
     with open_test_connector("MyParticipantLibrary::TestNoAutoenableSubscriber") as connector:
       output = connector.get_output("TestPublisher::TestWriter")
-      connector.wait(1000) # TODO
-
       # The input is not enabled yet because the subscriber sets
       # autoenable_created_entities to false
-      output.instance['x'] = 1
-      output.write()
+      with pytest.raises(rti.Error) as excinfo:
+        output.wait_for_subscriptions(200)
 
       # Connector enables the DataReader when it's first looked up
       input = connector.get_input("TestSubscriber::TestReader")
-      connector.wait(1000) # TODO wait for discovery
-      output.instance['x'] = 2
-      output.write()
-
-      # The input will receive only the second sample
-      wait_for_data(input)
-      assert input.sample_count == 1
-      assert input[0]['x'] == 2
+      output.wait_for_subscriptions(5000)
+      matched_subs = output.get_matched_subscriptions()
+      assert {"name":"TestReader"} in matched_subs
