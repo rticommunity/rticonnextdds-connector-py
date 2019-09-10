@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-(c) 2005-2015 Copyright, Real-Time Innovations.  All rights reserved.
+(c) 2005-2019 Copyright, Real-Time Innovations.  All rights reserved.
 No duplications, whole or partial, manual or electronic, may be made
 without express written permission.  Any such copies, or revisions thereof,
 must display this notice unaltered.
@@ -144,6 +144,13 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <topic name="TestTopic" register_type_ref="MyType"/>
             <topic name="TestTopic2" register_type_ref="MyType"/>
         </domain>
+        <!-- Since the Discovery Tests check how many matches etc. have occurred
+             we perform the tests in a separate domain, to avoid interference
+             from other tests -->
+        <domain name="DiscoveryDomain" domain_id="1">
+            <register_type name="ShapeType" type_ref="ShapeType" />
+            <topic name="Square" register_type_ref="ShapeType"/>
+        </domain>
     </domain_library>
 
     <!-- Participant library -->
@@ -190,6 +197,41 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                 <data_reader name="RequestReader" topic_ref="Square" />
                 <data_reader name="ReplyReader" topic_ref="Circle" />
             </subscriber>
+        </domain_participant>
+
+        <domain_participant name="DiscoveryTest" domain_ref="MyDomainLibrary::DiscoveryDomain">
+            <subscriber name="MySubscriber">
+                <data_reader name="MyReader" topic_ref="Square"/>
+            </subscriber>
+            <publisher name="MyPublisher">
+                <data_writer name="MyWriter" topic_ref="Square"/>
+            </publisher>
+        </domain_participant>
+
+        <domain_participant name="DiscoveryTestNoEntityName" domain_ref="MyDomainLibrary::DiscoveryDomain">
+            <subscriber name="MySubscriber">
+                <data_reader name="" topic_ref="Square">
+                    <datareader_qos>
+                        <subscription_name>
+                            <name xsi:nil="true"/>
+                        </subscription_name>
+                    </datareader_qos>
+                </data_reader>
+            </subscriber>
+            <publisher name="MyPublisher">
+                <data_writer name="MyWriter" topic_ref="Square"/>
+            </publisher>
+        </domain_participant>
+
+        <domain_participant name="DiscoveryTestReaderOnly" domain_ref="MyDomainLibrary::DiscoveryDomain">
+            <subscriber name="TestSubscriber">
+                <data_reader name="TestReader" topic_ref="Square"/>
+            </subscriber>
+        </domain_participant>
+        <domain_participant name="DiscoveryTestWriterOnly" domain_ref="MyDomainLibrary::DiscoveryDomain">
+            <publisher name="TestPublisher">
+                <data_writer name="TestWriter" topic_ref="Square"/>
+            </publisher>
         </domain_participant>
 
         <domain_participant name="TestNoAutoenableSubscriber"
