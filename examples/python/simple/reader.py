@@ -40,6 +40,7 @@ with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../S
         # Take the data, removing it from the queue
         dds_input.take()
         for sample in dds_input.valid_data_iterator:
+<<<<<<< HEAD
             # There are a variety of methods available for obtaining the data:
             # 1. Index the sample using the field name
             x = sample['x']
@@ -50,3 +51,17 @@ with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../S
             # 3. Obtain the value directly use the get_X APIs
             size = sample.get_number("shapesize")
             print("Received x: %d, y: %d, size: %d, color: %s" % (x, y, size, color))
+=======
+                # You can get all the fields in a get_dictionary()
+                data = sample.get_dictionary()
+                x = data['x']
+                y = data['y']
+
+                # Or you can access the field individually
+                size = sample.get_number("shapesize")
+                color = sample.get_string("color")
+                print("Received x: " + repr(x) + " y: " + repr(y) + \
+                        " size: " + repr(size) + " color: " + repr(color))
+
+        sleep(0.5)
+>>>>>>> origin/develop

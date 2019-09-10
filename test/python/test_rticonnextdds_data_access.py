@@ -626,6 +626,49 @@ class TestDataAccess:
     assert isinstance(point_array_str, str)
     assert isinstance(json.loads(point_array_str), list)
 
+  # Using the test_connector fixture as we want to get all 4 entities contained
+  # within it
+  def test_wait_for_data(self, test_connector):
+    input1 = test_connector.get_input("TestSubscriber::TestReader")
+    input2 = test_connector.get_input("TestSubscriber::TestReader2")
+    output1 = test_connector.get_output("TestPublisher::TestWriter")
+    output2 = test_connector.get_output("TestPublisher::TestWriter2")
+
+    # Ensure matching between all entities occurs
+    # TODO after merging CON-108
+    with pytest.raises(rti.TimeoutError) as excinfo:
+      input2.wait(2000)
+
+    # All variations of wait_for_data will timeout
+    with pytest.raises(rti.TimeoutError) as excinfo:
+      test_connector.wait(500)
+    with pytest.raises(rti.TimeoutError) as excinfo:
+      input1.wait(500)
+    with pytest.raises(rti.TimeoutError) as excinfo:
+      input2.wait(500)
+
+    # Now we write some data using output1 (which is matched with input1)
+    output1.write()
+    # Both the Connector-level wait and a wait on input1 should return
+    test_connector.wait(5000)
+    input1.wait(5000)
+    # But a wait on input2 should timeout
+    with pytest.raises(rti.TimeoutError) as excinfo:
+      input2.wait(500)
+    # Take the sample
+    input1.take()
+
+    # Now the same with output2
+    output2.write()
+    # Both the Connector-level wait and a wait on input2 should return
+    test_connector.wait(-1)
+    input2.wait(5000)
+    # But a wait on input1 should timeout
+    with pytest.raises(rti.TimeoutError) as excinfo:
+      input1.wait(500)
+    # Take the sample
+    input2.take()
+
   def test_convert_from_string_in_dict(self, test_output, test_input, test_dictionary):
     test_output.instance.set_dictionary({
       'my_long': "10",
