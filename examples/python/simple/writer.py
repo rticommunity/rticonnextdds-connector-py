@@ -6,6 +6,14 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
+"""A simple writer application.
+
+This example shows how to create a simple writer application using RTI Connector.
+This script is written to send data to the matching subscription defined
+in the reader.py script. It is also possible to send data to rtishapesdemo where
+it can be visualised.
+"""
+
 from sys import path as sysPath
 from os import path as osPath
 from time import sleep

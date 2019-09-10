@@ -7,11 +7,16 @@
 ###############################################################################
 
 """Read a sample and write a new one.
-   This example is designed to be used with rtishapesdemo.
-   Launch an instance of shapes demo and publish a square (any color other
-   than purple) and subscribe to squares.
-   This example will read the samples published by the instance of rtishapesdemo,
-   modify the data and re-publish them."""
+
+This example reads a sample from a remote writer (either writer.py or rtishapesdemo),
+modifies some of the fields in the data and writes it back out. To visualise what
+is happening it is suggested to use rtishapesdemo:
+Launch an instance of rtishapesdemo and subscribe to Squares.
+In the same instance of rtishapesdemo publish Squares (with any color other than
+Purple).
+Run this example. You will see that we are modifying the position and color of
+the received data.
+"""
 
 from sys import path as sysPath
 from os import path as osPath
@@ -60,7 +65,7 @@ with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../S
                 dictionary['x'], dictionary['y'] = dictionary['y'], dictionary['x']
                 dictionary['color'] = "PURPLE" 
                 dds_output.instance.set_dictionary(dictionary)
-                dds_output.write(writer)
+                dds_output.write()
 
     # Wait for all matched readers to acknowledge the sample
     dds_output.wait(2000)

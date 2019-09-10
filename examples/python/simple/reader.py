@@ -6,6 +6,14 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
+"""A simple reader application.
+
+This example shows how to create a simple reader application using RTI Connector.
+This script is written to receive data from the matching publication defined
+in the writer.py script. It is also possible to receive data from rtishapesdemo
+using this script.
+"""
+
 from sys import path as sysPath
 from os import path as osPath
 filepath = osPath.dirname(osPath.realpath(__file__))
