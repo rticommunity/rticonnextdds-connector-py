@@ -88,6 +88,11 @@ def _check_retcode(retcode):
 		else:
 			raise Error("DDS Exception: " + _get_last_dds_error_message())
 
+def _check_entity_creation(object, entity_name):
+	if object is None:
+		raise Error("Failed to create " + entity_name + ": "
+			+ _get_last_dds_error_message())
+
 # Definition of this class must match the RTI_Connector_AnyValueKind enum in ddsConnector.ifc
 class _AnyValueKind:
 	connector_none = 0
@@ -669,8 +674,7 @@ class Input:
 		self.connector = connector
 		self.name = name
 		self.native = connector_binding.getReader(self.connector.native,tocstring(self.name))
-		if self.native is None:
-			raise ValueError("Invalid Subscription::DataReader name")
+		_check_entity_creation(self.native, "Input")
 		self.samples = Samples(self)
 		self.infos = Infos(self)
 
@@ -1008,8 +1012,7 @@ class Output:
 		self.connector = connector
 		self.name = name
 		self.native= connector_binding.getWriter(self.connector.native,tocstring(self.name))
-		if self.native ==None:
-			raise ValueError("Invalid Publication::DataWriter name")
+		_check_entity_creation(self.native, "Output")
 		self.instance = Instance(self)
 
 	def write(self, **kwargs):
@@ -1132,8 +1135,7 @@ class Connector:
 			tocstring(configName),
 			tocstring(url),
 			ctypes.byref(options))
-		if self.native is None:
-			raise ValueError("Invalid participant profile, xml path or xml profile")
+		_check_entity_creation(self.native, "Connector")
 
 	def close(self):
 		"""Frees all the resources created by this Connector instance"""

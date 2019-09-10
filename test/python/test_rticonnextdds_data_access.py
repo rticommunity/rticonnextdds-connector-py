@@ -34,12 +34,8 @@ class TestDataAccess:
   def test_connector(self):
     """Creates the connector shared among all the tests in this class"""
 
-    xml_path = os.path.join(
-      os.path.dirname(os.path.realpath(__file__)),
-      "../xml/TestConnector.xml")
-
     participant_profile="MyParticipantLibrary::DataAccessTest"
-    with rti.open_connector(participant_profile, xml_path) as rti_connector:
+    with open_test_connector(participant_profile) as rti_connector:
       yield rti_connector
 
   @pytest.fixture(scope="class")

@@ -11,6 +11,12 @@ import sys, os, pytest, threading, time
 sys.path.append(os.path.dirname(os.path.realpath(__file__))+ "/../../")
 import rticonnextdds_connector as rti
 
+def open_test_connector(config_name):
+    xml_path = os.path.join(
+      os.path.dirname(os.path.realpath(__file__)),
+      "../xml/TestConnector.xml")
+
+    return rti.open_connector(config_name, xml_path)
 
 def wait_for_data(input, count = 1, do_take = True):
   """Waits until input has count samples"""

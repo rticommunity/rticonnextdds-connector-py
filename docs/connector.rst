@@ -73,6 +73,17 @@ Once you have created a ``Connector`` instance, :meth:`Connector.get_output()`
 returns the :class:`Output` that allows writing data, and :meth:`Connector.get_input()`
 returns the :class:`Input` that allows reading data.
 
+.. note::
+
+  If the *domain_participant* you load contains both *data_writers* (Outputs) and
+  *data_readers* (Inputs) for the same topics and matching Qos, when you write
+  data, the Inputs will receive the data even before you call
+  :meth:`Connector.get_input()`. To avoid that, you can configure the
+  *subscriber* that contains the *data_reader* with
+  ``<subscriber_qos>/<entity_factory>/<autoenable_created_entities>`` set to
+  ``false``. In that case, the Inputs will only receive data after you call
+  :meth:`Connector.get_input()`.
+
 For more information see:
 
     * :ref:`Writing data (Output)`

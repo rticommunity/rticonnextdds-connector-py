@@ -27,7 +27,7 @@ class TestOutput:
 
     """
     invalid_DW = "InvalidDW"
-    with pytest.raises(ValueError) as execinfo:
+    with pytest.raises(rti.Error) as execinfo:
       op= rtiConnectorFixture.get_output(invalid_DW)
     print("\nException of type:"+str(execinfo.type)+ \
       "\nvalue:"+str(execinfo.value))
