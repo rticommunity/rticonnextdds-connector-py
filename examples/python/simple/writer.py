@@ -8,10 +8,12 @@
 
 from sys import path as sysPath
 from os import path as osPath
+from time import sleep
 filepath = osPath.dirname(osPath.realpath(__file__))
 sysPath.append(filepath + "/../../../")
 import rticonnextdds_connector as rti
 
+# The Connector object will be automatically deleted
 with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../ShapeExample.xml") as connector:
 
     # Waits until the_output matches with a subscription named subscription_name
@@ -29,19 +31,20 @@ with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../S
 
     dds_output = connector.get_output("MyPublisher::MySquareWriter")
 
-    # Wait for discovery to occur
     wait_for_discovery(dds_output, "MySquareReader")
 
     for i in range(1, 500):
         print("Writing sample %d" % i)
         # We can set the data into the sample in a variety of ways:
         # 1. Indexing it directly:
-        dds_output.instance['x'] = i
-        dds_output.instance['shapesize'] = 30
+        dds_output.instance['x'] = 50 + (i % 100) # 50 -> 150
+        dds_output.instance['y'] = 25 + (i % 200) # 25 -> 225
         # 2. Using the set_X APIs:
-        dds_output.instance.set_number("y", i*2)
         dds_output.instance.set_string("color", "BLUE")
+        dds_output.instance.set_number("shapesize", 30)
         # Write the data using the write() API
         dds_output.write()
-        # Wait for all the matched subscriptions to acknowledge the sample
-        dds_output.wait(2000)
+        sleep(0.2)
+
+    # Wait for all the matched subscriptions to acknowledge the samples before exiting
+    dds_output.wait(2000)

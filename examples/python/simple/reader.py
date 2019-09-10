@@ -6,13 +6,13 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-from __future__ import print_function
 from sys import path as sysPath
 from os import path as osPath
 filepath = osPath.dirname(osPath.realpath(__file__))
 sysPath.append(filepath + "/../../../")
 import rticonnextdds_connector as rti
 
+# The Connector object will be automatically deleted
 with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../ShapeExample.xml") as connector:
 
     # Waits until the_input matches with a publication named publication_name
@@ -31,7 +31,6 @@ with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../S
     # Obtain the input which we use to receive data
     dds_input = connector.get_input("MySubscriber::MySquareReader")
 
-    # Wait for the input and output to discover each other
     wait_for_discovery(dds_input, "MySquareWriter")
 
     for i in range(1, 500):
@@ -40,7 +39,6 @@ with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../S
         # Take the data, removing it from the queue
         dds_input.take()
         for sample in dds_input.valid_data_iterator:
-<<<<<<< HEAD
             # There are a variety of methods available for obtaining the data:
             # 1. Index the sample using the field name
             x = sample['x']
@@ -51,17 +49,3 @@ with rti.open_connector("MyParticipantLibrary::MyParticipant", filepath + "/../S
             # 3. Obtain the value directly use the get_X APIs
             size = sample.get_number("shapesize")
             print("Received x: %d, y: %d, size: %d, color: %s" % (x, y, size, color))
-=======
-                # You can get all the fields in a get_dictionary()
-                data = sample.get_dictionary()
-                x = data['x']
-                y = data['y']
-
-                # Or you can access the field individually
-                size = sample.get_number("shapesize")
-                color = sample.get_string("color")
-                print("Received x: " + repr(x) + " y: " + repr(y) + \
-                        " size: " + repr(size) + " color: " + repr(color))
-
-        sleep(0.5)
->>>>>>> origin/develop
