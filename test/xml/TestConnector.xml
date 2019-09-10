@@ -242,7 +242,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                         <autoenable_created_entities>false</autoenable_created_entities>
                     </entity_factory>
                 </subscriber_qos>
-                <data_reader name="TestReader" topic_ref="Square">
+                <data_reader name="TestReader" topic_ref="SingleUseShape">
                     <datareader_qos>
                         <durability>
                             <kind>VOLATILE_DURABILITY_QOS</kind>
@@ -252,7 +252,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             </subscriber>
 
             <publisher name="TestPublisher">
-                <data_writer name="TestWriter" topic_ref="Square" />
+                <data_writer name="TestWriter" topic_ref="SingleUseShape" />
             </publisher>
         </domain_participant>
     </domain_participant_library>
