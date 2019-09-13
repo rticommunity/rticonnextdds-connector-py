@@ -135,7 +135,7 @@ To set any numeric type, including enumerations:
     output.instance.set_number("my_enum", 2)
 
 .. warning::
-    The range of values for a numeric field is determined by the integer type
+    The range of values for a numeric field is determined by the type
     used to define that field in the configuration file. However, ``set_number`` and
     ``get_number`` can't handle 64-bit integers (*int64* and *uint64*)
     whose absolute values are larger than 2^53. This is a *Connector* limitation
@@ -194,12 +194,12 @@ with numeric fields, returning the number as a string. For example:
 .. note::
     The typed getters and setters perform better than ``__setitem__``
     and ``__getitem__`` in applications that write or read at high rates.
-    Also ``__setitem__`` or ``__getitem__`` shouldn't be used as an alternative
-    to ``get_dictionary`` or ``set_dictionary`` when the intention is to access
-    most of the fields of the sample (see previous section).
+    Also prefer ``get_dictionary`` or ``set_dictionary`` over ``__setitem__``
+    or ``__getitem__`` when accessing all or most of the fields of a sample
+    (see previous section).
 
 .. note::
-    If a field ``my_string``, defined as a string in the configuration file contains
+    If a field *my_string*, defined as a string in the configuration file contains
     a value that can be interpreted as a number, ``sample["my_string"]`` returns
     a number, not a string.
 

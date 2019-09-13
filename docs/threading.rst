@@ -1,33 +1,42 @@
 Threading model
 ===============
 
-The *Connector* API does not implement any mechanism for
-thread safety. Applications are responsible for protecting concurrent calls to
-the Connector API. In Python, you will have to protect the calls to
-*Connector* if you are using different threads.
+.. py:currentmodule:: rticonnextdds_connector
 
-The following section shows an example.
+.. testsetup:: *
 
-TODO: review, complete section
+   import rticonnextdds_connector as rti
+
+RTI Connector only allows the concurrent use of different :class:`Connector`
+instances. Method calls to the same :class:`Connector` instance or any of its contained
+entities are not thread safe, and the application is responsible to protect them
+if they're used concurrently.
 
 Protecting calls to *Connector*
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The following example shows how to use the Python ``threading`` package to
-protect calls to *Connector*, one of multiple ways to do so::
+protect calls to the same :class:`Connector`:
+
+.. testcode::
 
    import threading
 
-   sem = threading.Semaphore()
+   connector = rti.Connector("MyParticipantLibrary::MyParticipant", "ShapeExample.xml")
+   lock = threading.RLock()
 
-   sem.acquire(True)
+   def read_thread():
+      with lock: # Protect access to ALL methods on the same Connector
+         input = connector.get_input("MySubscriber::MySquareReader")
+         input.take();
+         for sample in input.valid_data_iterator:
+            print(sample.get_dictionary())
 
-   # Use the Connector API
-   input.take();
-   sampleCount = input.samples.getLength()
-   # ...
+   def write_thread():
+      with lock: # Protect access to ALL methods on the same Connector
+         output = connector.get_output("MyPublisher::MySquareWriter")
+         output.instance['x'] = 10
+         output.write()
 
-   sem.release()
-   ...
-   ...
+   # Spawn read_thread and write_thread...
 

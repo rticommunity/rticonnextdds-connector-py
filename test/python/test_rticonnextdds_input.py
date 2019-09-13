@@ -73,5 +73,5 @@ class TestInput:
       # Connector enables the DataReader when it's first looked up
       input = connector.get_input("TestSubscriber::TestReader")
       output.wait_for_subscriptions(5000)
-      matched_subs = output.get_matched_subscriptions()
+      matched_subs = output.matched_subscriptions
       assert {"name":"TestReader"} in matched_subs

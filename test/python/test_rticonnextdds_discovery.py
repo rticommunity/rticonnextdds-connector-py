@@ -70,7 +70,7 @@ class TestDiscovery:
 
   def test_no_matches_input(self, discovery_reader_only_input):
     # We should not match with any outputs at this point
-    matches = discovery_reader_only_input.get_matched_publications()
+    matches = discovery_reader_only_input.matched_publications
     assert len(matches) == 0
 
     # We should timeout if we attempt to wait for a match
@@ -80,7 +80,7 @@ class TestDiscovery:
 
   def test_no_matches_output(self, discovery_writer_only_output):
     # We should not match with any outputs at this point
-    matches = discovery_writer_only_output.get_matched_subscriptions()
+    matches = discovery_writer_only_output.matched_subscriptions
     assert len(matches) == 0
 
     # We should timeout if we attempt to wait for a match
@@ -93,12 +93,12 @@ class TestDiscovery:
 
     # Both the input and output should match each other (and nothing else)
     change_in_matches = the_input.wait_for_publications(2000)
-    matches = the_input.get_matched_publications()
+    matches = the_input.matched_publications
     assert change_in_matches == 1
     assert isinstance(matches, list)
     assert {'name': 'MyWriter'} in matches
     change_in_matches = the_output.wait_for_subscriptions(2000)
-    matches = the_output.get_matched_subscriptions()
+    matches = the_output.matched_subscriptions
     assert change_in_matches == 1
     assert isinstance(matches, list)
     assert {'name': 'MyReader'} in matches
@@ -117,7 +117,7 @@ class TestDiscovery:
     with pytest.raises(rti.TimeoutError) as excinfo:
       the_output.wait_for_subscriptions(1000)
 
-    matches = the_output.get_matched_subscriptions()
+    matches = the_output.matched_subscriptions
     assert {'name': 'MyReader'} in matches
     assert {'name': 'TestReader'} in matches
 
@@ -135,7 +135,7 @@ class TestDiscovery:
     with pytest.raises(rti.TimeoutError) as excinfo:
       the_input.wait_for_publications(1000)
 
-    matches = the_input.get_matched_publications()
+    matches = the_input.matched_publications
     assert {'name': 'MyWriter'} in matches
     assert {'name': 'TestWriter'} in matches
 
@@ -144,7 +144,7 @@ class TestDiscovery:
   # test function
   def test_unmatched_input(self, discovery_writer_only_output):
     # To begin with, no matching occurs
-    assert len(discovery_writer_only_output.get_matched_subscriptions()) == 0
+    assert len(discovery_writer_only_output.matched_subscriptions) == 0
 
     # Create the Connector object containing the matching input
     reader_connector = rti.Connector(
@@ -156,11 +156,11 @@ class TestDiscovery:
     # Check that matching occurs
     change_in_matches = discovery_writer_only_output.wait_for_subscriptions(5000)
     assert change_in_matches == 1
-    matches = discovery_writer_only_output.get_matched_subscriptions()
+    matches = discovery_writer_only_output.matched_subscriptions
     assert {'name': 'TestReader'} in matches
     change_in_matches = the_input.wait_for_publications(5000)
     assert change_in_matches == 1
-    matches = the_input.get_matched_publications()
+    matches = the_input.matched_publications
     assert {'name': 'TestWriter'} in matches
 
     # If we now delete the reader_connector object which we created above, they
@@ -168,7 +168,7 @@ class TestDiscovery:
     reader_connector.close()
     change_in_matches = discovery_writer_only_output.wait_for_subscriptions(5000)
     assert change_in_matches == -1
-    matches = discovery_writer_only_output.get_matched_subscriptions()
+    matches = discovery_writer_only_output.matched_subscriptions
     assert len(matches) == 0
 
   # Even though we are going to use the discovery_writer_only_output, don't use the
@@ -176,7 +176,7 @@ class TestDiscovery:
   # test function
   def test_unmatched_output(self, discovery_reader_only_input):
     # To begin with, no matching occurs
-    assert len(discovery_reader_only_input.get_matched_publications()) == 0
+    assert len(discovery_reader_only_input.matched_publications) == 0
 
     # Create the Connector object containing the matching input
     writer_connector = rti.Connector(
@@ -188,11 +188,11 @@ class TestDiscovery:
     # Check that matching occurs
     change_in_matches = discovery_reader_only_input.wait_for_publications()
     assert change_in_matches == 1
-    matches = discovery_reader_only_input.get_matched_publications()
+    matches = discovery_reader_only_input.matched_publications
     assert {'name': 'TestWriter'} in matches
     change_in_matches = the_output.wait_for_subscriptions(5000)
     assert change_in_matches == 1
-    matches = the_output.get_matched_subscriptions()
+    matches = the_output.matched_subscriptions
     assert {'name': 'TestReader'} in matches
 
     # If we now delete the reader_connector object which we created above, they
@@ -200,7 +200,7 @@ class TestDiscovery:
     writer_connector.close()
     change_in_matches = discovery_reader_only_input.wait_for_publications(5000)
     assert change_in_matches == -1
-    matches = discovery_reader_only_input.get_matched_publications()
+    matches = discovery_reader_only_input.matched_publications
     assert len(matches) == 0
 
   def test_empty_entity_names(self, discovery_connector_no_entity_names):
@@ -210,7 +210,7 @@ class TestDiscovery:
     assert change_in_subs == 1
 
     # Get the entity names from the matched subscriptions
-    matched_subs = the_output.get_matched_subscriptions()
+    matched_subs = the_output.matched_subscriptions
     # The entity names set in the input are empty
     assert matched_subs == [{'name': ''}]
 
@@ -226,12 +226,12 @@ class TestDiscovery:
     # Wait to match with the new reader
     discovery_writer_only_output.wait_for_subscriptions(5000)
     # Check that we can handle getting entity_name when it is NULL
-    matches = discovery_writer_only_output.get_matched_subscriptions()
+    matches = discovery_writer_only_output.matched_subscriptions
     assert isinstance(matches, list)
     assert len(matches) == 1
     assert isinstance(matches[0], dict)
     assert matches[0]['name'] is None
 
-    # It is not necessary to delete the entites created by the call to createTestScenario
+    # It is not necessary to delete the entities created by the call to createTestScenario
     # since they were all created from the same DomainParticipant as discovery_writer_only_output
     # which will have delete_contained_entities called on it.

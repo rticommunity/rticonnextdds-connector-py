@@ -729,8 +729,20 @@ class Input:
 		_check_retcode(retcode)
 		return current_count_change.value
 
-	def get_matched_publications(self):
-		"""Returns a JSON list of the publication names of all matched outputs"""
+	@property
+	def matched_publications(self):
+		"""Returns information about the matched publications
+
+		This property returns a list where each element is a dictionary with
+		information about a publication matched with this Input.
+
+		Currently, the only key in the dictionaries is ``"name"``,
+		containing the publication name. If a publication doesn't have name,
+		the value for the key ``name`` is ``None``.
+
+		Note that Connector Outputs are automatically assigned a name from the
+		*data_writer name* in the XML configuration.
+		"""
 		native_json_str = ctypes.c_char_p()
 		retcode = connector_binding.get_matched_publications(self.native, byref(native_json_str))
 		_check_retcode(retcode)
@@ -1024,7 +1036,7 @@ class Output:
 
 		This method receives a number of optional parameters, a subset of those
 		documented in the `Writing Data section <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Writing_Data.htm?Highlight=DDS_WriteParams_t>`__. 
-		of the *Connext DDS Core Libraries** User's Manual.
+		of the *Connext DDS Core Libraries* User's Manual.
 
 		The supported parameters are:
 
@@ -1038,6 +1050,10 @@ class Output:
 				identity={"writer_guid":[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], "sequence_number":1},
 				timestamp=1000000000)
 
+		The write method can block under multiple circumstances (see
+		*Blocking During a write()* in the *Connext DDS Core Libraries* User's
+		Manual). If the blocking time exceeds the *max_blocking_time*, this
+		method raises :class:`TimeoutError`.
 		"""
 
 		if len(kwargs) > 0:
@@ -1068,13 +1084,15 @@ class Output:
 		_check_retcode(retcode)
 
 	def wait_for_subscriptions(self, timeout = None):
-		"""Waits until this output matches or unmatches with a compatible DDS subscription.
+		"""Waits until the number of matched DDS subscription changes
 
-		If the operation times out, it will raise :class:`TimeoutError`.
+		This method waits until new compatible subscriptions are discovered or
+		existing subscriptions no longer match.
 
 		:param number timeout: The maximum time to wait in milliseconds. By default, infinite.
-
 		:return: The change in the current number of matched outputs. If a positive number is returned, the input has matched with new publishers. If a negative number is returned the input has unmatched from an output. It is possible for multiple matches and/or unmatches to be returned (e.g., 0 could be returned, indicating that the input matched the same number of writers as it unmatched).
+
+		This method raises :class:`TimeoutError` if the ``timeout`` elapses.
 
 		"""
 		if timeout is None:
@@ -1084,8 +1102,21 @@ class Output:
 		_check_retcode(retcode)
 		return current_count_change.value
 
-	def get_matched_subscriptions(self):
-		"""Returns a JSON list of the subscription names of all matched inputs"""
+	@property
+	def matched_subscriptions(self):
+		"""Returns information about the matched subscriptions
+
+		This property returns a list where each element is a dictionary with
+		information about a subscription matched with this Output.
+
+		Currently, the only key in the dictionaries is ``"name"``,
+		containing the subscription name. If a subscription doesn't have name,
+		the value is ``None``.
+
+		Note that Connector Inputs are automatically assigned a name from the
+		*data_reader name* in the XML configuration.
+		"""
+
 		native_json_str = ctypes.c_char_p()
 		retcode = connector_binding.get_matched_subscriptions(self.native, byref(native_json_str))
 		_check_retcode(retcode)
