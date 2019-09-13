@@ -43,6 +43,12 @@ and all its contained entities (*Topics*, *Subscribers*, *DataReaders*,
 For more information about the DDS entities, see `Part 2 - Core Concepts <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/PartCoreConcepts.htm#partcoreconcepts_4109331811_915546%3FTocPath%3DPart%25202%253A%2520Core%2520Concepts%7C_____0>`__
 from the *RTI Connext DDS Core Libraries User's Manual*.
 
+.. note::
+
+  Operations on the same ``Connector`` instance or its contained entities are
+  not protected for multi-threaded access. See :ref:`Threading model` for more
+  information.
+
 Closing a *Connector*
 ~~~~~~~~~~~~~~~~~~~~~
 

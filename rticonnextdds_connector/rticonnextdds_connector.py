@@ -12,7 +12,7 @@ To use this package, import it as follows::
 
    import rticonnextdds_connector as rti
 
-The entry point is the class :class:`Connector`, which creates :class:`Input` 
+The entry point is the class :class:`Connector`, which creates :class:`Input`
 and :class:`Output` objects.
 """
 
@@ -691,7 +691,7 @@ class Input:
 		"""Accesses the sample received by this Input
 
 		After calling this method, the samples are accessible with
-		:attr:`data_iterator`, :attr:`valid_data_iterator`, 
+		:attr:`data_iterator`, :attr:`valid_data_iterator`,
 		or :meth:`get_sample()`.
 
 		"""
@@ -793,8 +793,8 @@ class Input:
 		This iterator may return samples with invalid data. Use :attr:`valid_data_iterator`
 		to access only samples with valid data.
 
-		The `Input` class also provides ``__iter__``, making it possible to 
-		interchangeably write ``for sample in input`` or 
+		The `Input` class also provides ``__iter__``, making it possible to
+		interchangeably write ``for sample in input`` or
 		``for sample in input.data_iterator``.
 
 		:return: An iterator to the samples
@@ -1035,7 +1035,7 @@ class Output:
 		:meth:`clear_members()`
 
 		This method receives a number of optional parameters, a subset of those
-		documented in the `Writing Data section <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Writing_Data.htm?Highlight=DDS_WriteParams_t>`__. 
+		documented in the `Writing Data section <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Writing_Data.htm?Highlight=DDS_WriteParams_t>`__.
 		of the *Connext DDS Core Libraries* User's Manual.
 
 		The supported parameters are:
@@ -1126,10 +1126,10 @@ class Output:
 		"""Resets the values of the members of this ``Output.instance``
 
 		If the member is defined with the ``default`` attribute in the configuration
-		file, it gets that value. Otherwise numbers are set to 0, and strings 
+		file, it gets that value. Otherwise numbers are set to 0, and strings
 		are set to empty. Sequences are cleared. Optional members are set to ``None``.
 
-		For example, if this ``Output``'s type is `ShapeType` (from the previous 
+		For example, if this ``Output``'s type is `ShapeType` (from the previous
 		example), then ``clear_members()`` sets `color` to "RED", `shapesize`
 		to 30, and `x` and `y` to 0.
 		"""
@@ -1152,18 +1152,18 @@ class Connector:
 
 	A ``Connector`` instance must be deleted with :meth:`close()`.
 
-	:param str configName: The configuration to load. 	The ``configName`` format is ``"LibraryName::ParticipantName"``, where ``LibraryName`` is the ``name`` attribute of a ``<domain_participant_library>`` tag, and ``ParticipantName`` is the ``name`` attribute of a ``<domain_participant>`` tag inside the library.
+	:param str config_name: The configuration to load. 	The ``config_name`` format is ``"LibraryName::ParticipantName"``, where ``LibraryName`` is the ``name`` attribute of a ``<domain_participant_library>`` tag, and ``ParticipantName`` is the ``name`` attribute of a ``<domain_participant>`` tag inside the library.
 	:param str url: An URL locating the XML document. The ``url`` can be a file path (for example, ``'/tmp/my_dds_config.xml'``) or a string containing the full XML document with the following format ``'str://"<dds>...</dds>"'``)
 
 	"""
 
-	def __init__(self, configName, url):
+	def __init__(self, config_name, url):
 		# enable data event (default), 0-based seq indexing
 		options = _ConnectorOptions(
 			enable_on_data_event = 1,
 			one_based_sequence_indexing = 0)
 		self.native = connector_binding.new(
-			tocstring(configName),
+			tocstring(config_name),
 			tocstring(url),
 			ctypes.byref(options))
 		_check_entity_creation(self.native, "Connector")
@@ -1260,7 +1260,7 @@ class Connector:
 		_check_retcode(retcode)
 
 @contextmanager
-def open_connector(configName, url):
+def open_connector(config_name, url):
 	"""A resource manager that creates and deletes a Connector
 
 	It takes the sames arguments as the :class:`Connector` class::
@@ -1271,7 +1271,7 @@ def open_connector(configName, url):
 		# connector closed after with block exits
 	"""
 
-	connector = Connector(configName, url)
+	connector = Connector(config_name, url)
 	try:
 		yield connector
 	finally:
