@@ -136,7 +136,7 @@ The method :meth:`Input.wait_for_publications()` can be used to detect when a co
 DDS publication is matched or stops matching. It returns the change in the number of
 matched publications since the last time it was called::
 
-   change_in_matches = Input.wait_for_publications()
+   change_in_matches = input.wait_for_publications()
 
 For example, if a new compatible publication is discovered within the specified
 ``timeout``, the function returns 1.

@@ -7,30 +7,39 @@ Getting Started
 Installing RTI Connector for Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Make sure you have Python installed. Then use *pip* to install *RTI Connector*
-as follows:
+There are two ways to obtain *RTI Connector* for Python. You can install it with
+*pip*:
 
 .. code:: bash
 
    $ pip install rticonnextdds_connector
 
-You can also clone the repository:
+And then run your *RTI Connector* applications:
+
+.. code:: bash
+
+    $ python my_connector_app.py
+
+You can also clone the repository and run the examples directly without installing
+*RTI Connector*:
 
 .. code:: bash
 
    $ git clone --recursive https://github.com/rticommunity/rticonnextdds-connector-py.git
 
+In order to gain access to the examples, clone the github repository.
+
 Running the examples
 ~~~~~~~~~~~~~~~~~~~~
 
-To run the examples, first clone the repository as indicated in the previous section,
-then run any of the python scripts in the ``examples/python`` directory:
+The examples are located in  the ``examples/python`` directory. To run the simple
+example:
 
 .. code:: bash
 
     python examples/python/simple/reader.py
 
-On another shell:
+In another shell:
 
 .. code:: bash
 
@@ -55,12 +64,15 @@ Supported Platforms
 
 *RTI Connector* has been tested with Python 2.7.14 and 3.6.3.
 
-*RTI Connector* uses a native C library. It has been tested on the following
-platforms:
+*RTI Connector* uses a native C library that works on most Windows, Linux and
+MacOS platforms. It has been tested on the following systems:
 
-- Windows (64-bit Windows 10 with VS 2015 and 32-bit Windows 7 with VS 2017)
-- Linux (64-bit CentOS 6.5 with gcc 4.8.2, 32-bit Ubuntu 16.04 gcc 5.4.0, and
-- MacOS (Darwin 18 clang 10)
+(TODO: clarify PAM)
+
+- Windows: 64-bit Windows 10 with VS 2015 and 32-bit Windows 7 with VS 2017
+- Linux: 64-bit CentOS 6.5 with gcc 4.8.2, 32-bit Ubuntu 16.04 gcc 5.4.0, and
+ARM Yocto Linux 2.0.3 with gcc 5.2.0
+- MacOS: Darwin 18 with clang 10
 
 (TODO: link to main Connector landing page)
 
