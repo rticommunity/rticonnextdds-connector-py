@@ -6,7 +6,7 @@ Reading data (Input)
 .. testsetup:: *
 
    import rticonnextdds_connector as rti
-   connector = rti.Connector("MyParticipantLibrary::MyParticipant", "ShapeExample.xml");
+   connector = rti.Connector("MyParticipantLibrary::MyParticipant", "ShapeExample.xml")
 
 
 Getting the input
@@ -16,7 +16,7 @@ To read/take samples, first get a reference to the :class:`Input`:
 
 .. testcode::
 
-   input = connector.get_input("MySubscriber::MySquareReader");
+   input = connector.get_input("MySubscriber::MySquareReader")
 
 :meth:`Connector.get_input()` returns a :class:`Input` object. This example,
 obtains the input defined by the *data_reader* named *MySquareReader* within
@@ -28,38 +28,6 @@ the *subscriber* named *MySubscriber*::
 
 This *subscriber* is defined inside the *domain_participant* selected to create
 this ``connector`` (see :ref:`Create a new *Connector*`).
-
-Matching with a Publication
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The method :meth:`Input.wait_for_publications()` can be used to detect when a compatible
-DDS publication is matched or unmatched. It returns the change in the number of
-matched publications since the last time it was called::
-
-   change_in_matches = Input.wait_for_publications()
-
-For example, if a new :class:`Output` was matched within the
-specified ``timeout``, the function would return 1. If, at a later point, this :class:`Output`
-left the network, a subsequent call to :meth:`Input.wait_for_publications()` would return
--1.
-The optional ``timeout`` argument can be used to specify the maximum amount of time in
-milliseconds to wait for a new match. If no match is found within the ``timeout``, :class:`TimeoutError`
-is raised. By default the timeout is infinite.
-
-
-In order to ascertain whether or not an :class:`Input` is matched with a specific :class:`Output`, you
-should use the :meth:`Input.get_matched_publications()` method. This method returns a list
-of the *Publication Names* of all of the matched :class:`Output`.
-
-.. testcode::
-
-   matched_outputs = input.get_matched_publications()
-
-.. note::
-    The list returned will contain the name of each matched publication.
-    If one of them didn't specify a name, the list will contain a None element
-    instead. In any case, the size of the list reflects the current number of
-    matched publication.
 
 Reading or taking the data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -160,6 +128,27 @@ You can access a field of the sample meta-data, the *SampleInfo*, as follows:
 
 
 See :meth:`SampleIterator.info` for the list of meta-data fields available
+
+Matching with a Publication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The method :meth:`Input.wait_for_publications()` can be used to detect when a compatible
+DDS publication is matched or stops matching. It returns the change in the number of
+matched publications since the last time it was called::
+
+   change_in_matches = input.wait_for_publications()
+
+For example, if a new compatible publication is discovered within the specified
+``timeout``, the function returns 1.
+
+You can obtain information about the existing matched publications with
+:attr:`Input.matched_publication`:
+
+.. testcode::
+
+   matched_pubs = input.matched_publications
+   for pub_info in matched_pubs:
+      pub_name = pub_info['name']
 
 Class reference: Input, SampleIterator, ValidSampleIterator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

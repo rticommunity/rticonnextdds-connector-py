@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('../rticonnextdds_connector'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'rticonnextdds-connector-py'
+project = 'RTI Connector for Python'
 copyright = '2019, RTI'
 author = 'RTI'
 

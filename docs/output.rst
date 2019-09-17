@@ -7,12 +7,12 @@ Writing data (Output)
 .. testsetup:: *
 
    import rticonnextdds_connector as rti
-   connector = rti.Connector("MyParticipantLibrary::MyParticipant", "ShapeExample.xml");
+   connector = rti.Connector("MyParticipantLibrary::MyParticipant", "ShapeExample.xml")
 
 Getting the Output
 ~~~~~~~~~~~~~~~~~~
 
-To write a data sample, first get a reference to the output port:
+To write a data sample, first look up an output:
 
 .. testcode::
 
@@ -59,38 +59,6 @@ For example::
 
 See :class:`Instance` and :ref:`Accessing the data` for more information.
 
-Matching with a Subscription
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The method :meth:`Output.wait_for_subscriptions()` can be used to detect when a compatible
-DDS subscription is matched or unmatched. It returns the change in the number of
-matched subscriptions since the last time it was called::
-
-   change_in_matches = Output.wait_for_subscriptions()
-
-For example, if a new :class:`Input` was matched within the
-specified ``timeout``, the function would return 1. If, at a later point, this :class:`Input`
-left the network, a subsequent call to :meth:`Output.wait_for_subscriptions()` would return
--1.
-The optional ``timeout`` argument can be used to specify the maximum amount of time in
-milliseconds to wait for a new match. If no match is found within the ``timeout``, :class:`TimeoutError`
-is raised. By default the timeout is infinite.
-
-
-In order to ascertain whether or not an :class:`Output` is matched with a specific :class:`Input`, you
-should use the :meth:`Output.get_matched_subscriptions()` method. This method returns a list
-of the *Subscription Names* of all of the matched :class:`Input`.
-
-.. testcode::
-
-   matched_inputs = output.get_matched_subscriptions()
-
-.. note::
-    The list returned will contain the name of each matched subscription.
-    If one of them didn't specify a name, the list will contain a None element
-    instead. In any case, the size of the list reflects the current number of
-    matched subscriptions.
-
 Writing the data sample
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -110,6 +78,27 @@ write with a specific timestamp:
 .. testcode::
 
   output.write(source_timestamp=100000)
+
+Matching with a Subscription
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before writing, the method :meth:`Output.wait_for_subscriptions()` can be used to
+detect when a compatible DDS subscription is matched or stops matching. It returns
+the change in the number of matched subscriptions since the last time it was called::
+
+   change_in_matches = output.wait_for_subscriptions()
+
+For example, if a new compatible subscription is discovered within the specified
+``timeout``, the function returns 1.
+
+You can obtain information about the existing matched subscriptions with
+:attr:`Output.matched_subscriptions`:
+
+.. testcode::
+
+   matched_subs = output.matched_subscriptions
+   for sub_info in matched_subs:
+    sub_name = sub_info['name']
 
 Class reference: Output, Instance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
