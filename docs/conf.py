@@ -18,10 +18,11 @@ sys.path.insert(0, os.path.abspath('../rticonnextdds_connector'))
 # -- Project information -----------------------------------------------------
 
 project = 'RTI Connector for Python'
-copyright = '2019, RTI'
-author = 'RTI'
+copyright = '2019, Real-Time Innovations, Inc'
+author = 'Real-Time Innovations, Inc.'
 
 # The full version, including alpha/beta/rc tags
+version = '1.0.0'
 release = '1.0.0'
 
 master_doc = 'index'
@@ -57,3 +58,23 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# Theme options are theme-specific and customize the look and feel of a theme
+# further.  For a list of options available for each theme, see the
+# documentation.
+#
+html_theme_options = {
+    "collapse_navigation" : False
+}
+
+# The name of an image file (relative to this directory) to place at the top
+# of the sidebar.
+#
+html_logo = "static/rti-logo-FINALv2-White-OrangeDot.png"
+
+# The name of an image file (relative to this directory) to use as a favicon of
+# the docs.  This file should be a Windows icon file (.ico) being 16x16 or
+# 32x32 pixels large.
+#
+html_favicon = "static/favicon.ico"
+
