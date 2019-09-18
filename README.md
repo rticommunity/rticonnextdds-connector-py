@@ -10,9 +10,18 @@ distributed networking databus.
 publish and subscribe to the *RTI Connext DDS databus* in Python and other
 languages.
 
+## Documentation
+
 To get started and learn more about *RTI Connector for Python* see the
 [documentation here](https://github.com/rticommunity/rticonnextdds-connector-py)
 **TODO: add correct link to documentation**
+
+## Examples
+
+The `examples/python` directory provides several examples:
+* `simple` shows how to create basic publisher and subscriber applications
+* In `transformation`, an application reads, transforms and publishes back the data
+* `images` shows how to manipulate more complex data types
 
 ## License
 With the sole exception of the contents of the "examples" subdirectory, all use of this product is subject to the RTI Software License Agreement included at the top level of this repository. Files within the "examples" subdirectory are licensed as marked within the file.

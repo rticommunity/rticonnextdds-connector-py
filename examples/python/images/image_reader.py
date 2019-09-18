@@ -1,0 +1,66 @@
+###############################################################################
+# (c) 2005-2015 Copyright, Real-Time Innovations.  All rights reserved.       #
+# No duplications, whole or partial, manual or electronic, may be made        #
+# without express written permission.  Any such copies, or revisions thereof, #
+# must display this notice unaltered.                                         #
+# This code contains trade secrets of Real-Time Innovations, Inc.             #
+###############################################################################
+
+"""Reader without using the wait call."""
+
+from __future__ import print_function
+from sys import path as sys_path
+from os import path as os_path
+import matplotlib.pyplot as plot
+import matplotlib.animation as animation
+import numpy
+
+file_path = os_path.dirname(os_path.realpath(__file__))
+sys_path.append(file_path + "/../../../")
+import rticonnextdds_connector as rti
+
+
+with rti.open_connector(
+    config_name = "MyParticipantLibrary::ImageSubParticipant",
+    url = file_path + "/ImagesExample.xml") as connector:
+
+    # Create a blank image
+    fig = plot.figure()
+    fig.canvas.set_window_title("No image received")
+    blank_image = plot.imshow(numpy.zeros((40, 60, 3)), animated=True)
+
+    input = connector.get_input("MySubscriber::ImageReader")
+
+    # The animation function, called periodically in a set interval, reads the
+    # last image received and draws it
+    def read_and_draw(frame):
+        # The Qos configuration guarantees we will only have the last sample;
+        # we read (not take) so we can access it again in the next interval if
+        # we don't receive a new one
+        input.read()
+        for sample in input.valid_data_iterator:
+            # Get the received pixels (a linear sequence)
+            raw_pixels = numpy.array(sample["pixels"])
+
+            # Convert the linear sequence of pixels into an Height x Width x 3
+            # matrix of RGB pixels that we can draw with imgshow
+            image_dim = (
+                int(sample["resolution.height"]),
+                int(sample["resolution.width"]),
+                3)
+            structured_pixels = raw_pixels.reshape(image_dim)
+
+            # Draw the image
+            image = plot.imshow(structured_pixels)
+
+            # Set the title of the image
+            fig.canvas.set_window_title("Image received from " + sample["source"])
+            return image,
+        return blank_image, # when we haven't received any image
+
+    # Create the animation and show
+    ani = animation.FuncAnimation(fig, read_and_draw, interval=500, blit=True)
+
+    # Show the image and block until the window is closed
+    plot.show()
+    print("Exiting...")
