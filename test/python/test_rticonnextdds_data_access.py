@@ -695,3 +695,8 @@ class TestDataAccess:
         with pytest.raises(rti.Error, match=r".*cannot convert field to string.*") as excinfo:
           test_output.instance.set_dictionary({name:"not a number"})
           print("Field " + name + " did not raise an exception")
+
+  def test_error_in_dictionary(self, test_output):
+    with pytest.raises(rti.Error) as excinfo:
+      # sequence max length is 10
+      test_output.instance.set_dictionary({"my_int_sequence":[10] * 11})
