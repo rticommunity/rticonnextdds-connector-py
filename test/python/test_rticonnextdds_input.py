@@ -51,6 +51,7 @@ class TestInput:
       and isinstance(rtiInputFixture.samples,rti.Samples) \
       and isinstance(rtiInputFixture.infos,rti.Infos)
 
+  @pytest.mark.xfail(sys.platform.startswith("win"), reason="symbols not exported")
   def test_reader_native_call(self, rtiInputFixture):
     get_topic = rti.connector_binding.library.DDS_DataReader_get_topicdescription
     get_topic.restype = ctypes.c_void_p
