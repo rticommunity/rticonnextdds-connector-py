@@ -15,6 +15,8 @@ import matplotlib.pyplot as plot
 import matplotlib.animation as animation
 import numpy
 
+# Updating the system path is not required if you have pip-installed
+# rticonnextdds-connector
 file_path = os_path.dirname(os_path.realpath(__file__))
 sys_path.append(file_path + "/../../../")
 import rticonnextdds_connector as rti

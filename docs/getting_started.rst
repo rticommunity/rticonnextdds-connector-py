@@ -32,8 +32,10 @@ In order to gain access to the examples, clone the github repository.
 Running the examples
 ~~~~~~~~~~~~~~~~~~~~
 
-The examples are located in  the ``examples/python`` directory. To run the simple
-example:
+The examples are located in the `examples/python <https://github.com/rticommunity/rticonnextdds-connector-py/tree/master/examples/python>`__
+directory.
+
+To run the ``simple`` example, run the reader in one shell:
 
 .. code:: bash
 
@@ -48,13 +50,13 @@ In another shell:
 This is how ``reader.py`` looks like:
 
 .. literalinclude:: ../examples/python/simple/reader.py
-    :lines: 19-
+    :lines: 18-
 
 
 And this is ``writer.py``:
 
 .. literalinclude:: ../examples/python/simple/writer.py
-    :lines: 17-
+    :lines: 18-
 
 To learn more about *RTI Connector* continue to the next section,
 :ref:`Using a Connector`.
@@ -70,8 +72,7 @@ MacOS platforms. It has been tested on the following systems:
 (TODO: clarify PAM)
 
 - Windows: 64-bit Windows 10 with VS 2015 and 32-bit Windows 7 with VS 2017
-- Linux: 64-bit CentOS 6.5 with gcc 4.8.2, 32-bit Ubuntu 16.04 gcc 5.4.0, and
-ARM Yocto Linux 2.0.3 with gcc 5.2.0
+- Linux: 64-bit CentOS 6.5 with gcc 4.8.2, 32-bit Ubuntu 16.04 gcc 5.4.0, and ARM Yocto Linux 2.0.3 with gcc 5.2.0
 - MacOS: Darwin 18 with clang 10
 
 (TODO: link to main Connector landing page)

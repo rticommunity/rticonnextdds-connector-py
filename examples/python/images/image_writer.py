@@ -12,16 +12,27 @@ from sys import path as sys_path
 from os import path as os_path
 from os import getpid
 from time import sleep
-import numpy as np
+import numpy as np, random
 
+# Updating the system path is not required if you have pip-installed
+# rticonnextdds-connector
 file_path = os_path.dirname(os_path.realpath(__file__))
 sys_path.append(file_path + "/../../../")
-
 import rticonnextdds_connector as rti
 
+def random_rgb():
+    # Generate a random RGB pixel
+    return [int(255*random.random()), int(255*random.random()), int(255*random.random())]
+
+def generate_random_image(size):
+    # Generate a random flat list of pixels of 3 different colors
+    random_colors = [random_rgb() for i in range(3)]
+    pixels = np.array([random.choice(random_colors) for i in range(size)])
+    return pixels.reshape(-1).tolist() # Flatten out and convert to list
+
 def update_image(pixels, iteration):
-    pixels.insert(0, pixels.pop())
-    return pixels
+    # Shift 3 elements (one pixel)
+    return pixels[3:] + pixels[:3]
 
 with rti.open_connector(
     config_name = "MyParticipantLibrary::ImagePubParticipant",
@@ -29,14 +40,11 @@ with rti.open_connector(
 
     output = connector.get_output("MyPublisher::ImageWriter")
 
-    print("Waiting for subscriptions...")
-    output.wait_for_subscriptions()
-
-    print("Writing...")
-
     # Identify the source of the image with the process id
     output.instance["source"] = "ImageWriter " + str(getpid())
-    current_pixels = [int(x * 255) for x in np.sin(np.random.random(40 * 60 * 3))]
+    current_pixels = generate_random_image(40 * 60)
+
+    print("Writing...")
     for i in range(1, 100):
         # Write images with different orientations
         if i % 10 != 0:
@@ -51,5 +59,6 @@ with rti.open_connector(
         output.write()
         sleep(.5) # Write at a rate of one sample every 1 seconds, for ex.
 
+    # Note: we don't call output.wait() because this output is configured
+    # with best-effort reliability, and therefore it won't wait for acknowledgments
     print("Exiting...")
-    output.wait() # Wait for all subscriptions to receive the data before exiting

@@ -6,11 +6,12 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-"""Simple Square writer"""
+from time import sleep
 
+# Updating the system path is not required if you have pip-installed
+# rticonnextdds-connector
 from sys import path as sys_path
 from os import path as os_path
-from time import sleep
 file_path = os_path.dirname(os_path.realpath(__file__))
 sys_path.append(file_path + "/../../../")
 
