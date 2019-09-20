@@ -236,13 +236,10 @@ class TestDataAccess:
     sample = populated_input[0]
     assert sample.get_number("my_optional_point.x") is None
 
-  @pytest.mark.xfail
   def test_unset_complex_optional_dict2(self, populated_input):
     sample = populated_input[0]
     assert sample.get_number("my_optional_point.x") is None
     dictionary = sample.get_dictionary()
-    # Due to CORE-9685 the previous call to get_number "initializes"
-    # my_optional_point, so get_dictionary now incorrectly returns it
     assert not "my_optional_point" in dictionary
 
   def test_reset_optional_number(self, test_output, test_input):
@@ -484,6 +481,7 @@ class TestDataAccess:
     # largest long long
     self.verify_large_integer(test_output, test_input, 2**63 - 1)
 
+  @pytest.mark.xfail(sys.platform.startswith("win"), reason="symbols not exported")
   def test_access_input_native_dynamic_data(self, populated_input):
     get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
     get_member_count.restype = ctypes.c_uint
@@ -491,6 +489,7 @@ class TestDataAccess:
     count = get_member_count(populated_input[0].native)
     assert count > 0
 
+  @pytest.mark.xfail(sys.platform.startswith("win"), reason="symbols not exported")
   def test_access_output_native_dynamic_data(self, test_output, test_dictionary):
     test_output.instance.set_dictionary(test_dictionary)
     get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count
@@ -695,3 +694,8 @@ class TestDataAccess:
         with pytest.raises(rti.Error, match=r".*cannot convert field to string.*") as excinfo:
           test_output.instance.set_dictionary({name:"not a number"})
           print("Field " + name + " did not raise an exception")
+
+  def test_error_in_dictionary(self, test_output):
+    with pytest.raises(rti.Error) as excinfo:
+      # sequence max length is 10
+      test_output.instance.set_dictionary({"my_int_sequence":[10] * 11})
