@@ -39,5 +39,5 @@ with rti.open_connector(
             # Or you can access the field individually
             size = sample.get_number("shapesize")
             color = sample.get_string("color")
-            print("Received x: " + repr(x) + " y: " + repr(y) + \
+            print("Received x: " + repr(x) + " y: " + repr(y) +
                     " size: " + repr(size) + " color: " + repr(color))

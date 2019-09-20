@@ -18,23 +18,8 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                      is_default_qos="true">
             <participant_qos>
                 <participant_name>
-                    <name>Connector ShapeExample</name>
+                    <name>Connector Shape Example</name>
                 </participant_name>
-
-                <!-- Turn on monitoring -->
-                <!--
-                <property>
-                    <value>
-                        <element>
-                            <name>rti.monitor.library</name>
-                            <value>rtimonitoring</value>
-                        </element>
-                        <element>
-                            <name>rti.monitor.create_function_ptr</name>
-                            <value>$(NDDS_MONITOR)</value>
-                        </element>
-                    </value>
-                </property> -->
             </participant_qos>
         </qos_profile>
     </qos_library>

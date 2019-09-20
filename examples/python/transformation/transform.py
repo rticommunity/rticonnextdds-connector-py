@@ -6,7 +6,7 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-"""Read a sample and write a new one."""
+"""Reads Squares, transforms them and writes them as Circles."""
 
 from sys import path as sys_path
 from os import path as os_path
@@ -23,6 +23,7 @@ with rti.open_connector(
     output = connector.get_output("MyPublisher::MyCircleWriter")
 
     # Read data from the input, transform it and write it into the output
+    print("Waiting for data...")
     while True:
         input.wait() # Wait for data in the input
         input.take()
