@@ -6,7 +6,7 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-"""Simple Square writer"""
+"""Publishes random images"""
 
 from sys import path as sys_path
 from os import path as os_path

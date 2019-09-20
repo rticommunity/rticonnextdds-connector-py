@@ -12,9 +12,12 @@ This examples requires the Python packages **matplotlib** and **numpy**:
 
     $ pip install matplotlib numpy
 
-
 To run the example, in different shells, run any number of instances of the writer and the reader in any order:
 
     $ python image_writer.py
     $ python image_reader.py
+
+`image_reader.py` requires a graphical backend for *matplotlib*. If your python
+installation doesn't ahve one, you can run `image_reader_file.py` instead, which
+will save the last image into a file called *image.png*.
 

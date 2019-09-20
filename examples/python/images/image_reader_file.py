@@ -6,14 +6,15 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-"""Reads images and displays them"""
+"""Reads images and saves them into a file"""
 
 from __future__ import print_function
-from sys import path as sys_path
+from sys import path as sys_path, stdout
 from os import path as os_path
 import matplotlib.pyplot as plot
-import matplotlib.animation as animation
+import matplotlib
 import numpy
+from time import sleep
 
 # Updating the system path is not required if you have pip-installed
 # rticonnextdds-connector
@@ -21,6 +22,7 @@ file_path = os_path.dirname(os_path.realpath(__file__))
 sys_path.append(file_path + "/../../../")
 import rticonnextdds_connector as rti
 
+matplotlib.use('Agg') # Non-GUI backend
 
 with rti.open_connector(
     config_name = "MyParticipantLibrary::ImageSubParticipant",
@@ -28,17 +30,11 @@ with rti.open_connector(
 
     # Create a blank image
     fig = plot.figure()
-    fig.canvas.set_window_title("No image received")
-    blank_image = plot.imshow(numpy.zeros((40, 60, 3)), animated=True)
+    blank_image = plot.imshow(numpy.zeros((40, 60, 3)))
 
     input = connector.get_input("MySubscriber::ImageReader")
 
-    # The animation function, called periodically in a set interval, reads the
-    # last image received and draws it
-    def read_and_draw(frame):
-        # The Qos configuration guarantees we will only have the last sample;
-        # we read (not take) so we can access it again in the next interval if
-        # we don't receive a new one
+    while True:
         input.read()
         for sample in input.valid_data_iterator:
             # Get the received pixels (a linear sequence)
@@ -52,17 +48,8 @@ with rti.open_connector(
                 3)
             structured_pixels = raw_pixels.reshape(image_dim)
 
-            # Draw the image
+            # Draw and save the image
             image = plot.imshow(structured_pixels)
+            plot.savefig('image.png')
 
-            # Set the title of the image
-            fig.canvas.set_window_title("Image received from " + sample["source"])
-            return image,
-        return blank_image, # when we haven't received any image
-
-    # Create the animation and show
-    ani = animation.FuncAnimation(fig, read_and_draw, interval=500, blit=True)
-
-    # Show the image and block until the window is closed
-    plot.show()
-    print("Exiting...")
+            sleep(.5) # Poll every half second
