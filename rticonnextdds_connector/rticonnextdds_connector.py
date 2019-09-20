@@ -266,6 +266,10 @@ class _ConnectorBinding:
 		self.setJSONInstance.restype = ctypes.c_int
 		self.setJSONInstance.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_char_p]
 
+		self.set_max_objects_per_thread = self.library.RTI_Connector_set_max_objects_per_thread
+		self.set_max_objects_per_thread.restype = ctypes.c_int
+		self.setJSONInstance.argtypes = [ctypes.c_int]
+
 		self.getLastErrorMessage = self.library.RTI_Connector_get_last_error_message
 		self.getLastErrorMessage.restype = POINTER(c_char)
 		self.getLastErrorMessage.argtypes = []
@@ -1258,6 +1262,24 @@ class Connector:
 			timeout = -1
 		retcode = connector_binding.wait(self.native,timeout)
 		_check_retcode(retcode)
+
+	@staticmethod
+	def set_max_objects_per_thread(value):
+		"""Allows increasing the number of Connector instances that can be created
+
+		The default value is 1024. If your application creates more than eight
+		``Connector`` instances approximately, you may have to increase this
+		value.
+
+		This operation can only be called before creating any ``Connector``
+		instance.
+
+		See `SYSTEM_RESOURCE_LIMITS QoS Policy <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/SYSTEM_RESOURCE_LIMITS_QoS.htm>`__
+		in the *RTI Connext DDS* User's Manual.
+
+		:param number value: The value for *max_objects_per_thread*
+		"""
+		_check_retcode(connector_binding.set_max_objects_per_thread(value))
 
 @contextmanager
 def open_connector(config_name, url):
