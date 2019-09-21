@@ -268,7 +268,7 @@ class _ConnectorBinding:
 
 		self.set_max_objects_per_thread = self.library.RTI_Connector_set_max_objects_per_thread
 		self.set_max_objects_per_thread.restype = ctypes.c_int
-		self.setJSONInstance.argtypes = [ctypes.c_int]
+		self.set_max_objects_per_thread.argtypes = [ctypes.c_int]
 
 		self.getLastErrorMessage = self.library.RTI_Connector_get_last_error_message
 		self.getLastErrorMessage.restype = POINTER(c_char)
