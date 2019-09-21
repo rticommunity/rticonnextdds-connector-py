@@ -146,25 +146,6 @@ class TestInstance:
     with pytest.raises(rti.Error, match=r".*non_existent_field*") as execinfo:
       rtiOutputFixture.instance.set_dictionary(invalid_dictionary)
 
-  @pytest.mark.xfail
-  # Implicit type conversion from Boolean to number
-  def test_setNumber_with_Boolean(self,rtiOutputFixture):
-    """
-    This function tests that a ``TypeError`` is raised when
-    :func:`rticonnextdds_connector.Instance.setNumber` is called
-    with a Boolean value
-
-    :param rtiOutputFixture: :func:`conftest.rtiOutputFixture`
-    :type rtiOutputFixture: `pytest.fixture <https://pytest.org/latest/builtin.html#_pytest.python.fixture>`_
-
-    .. note:: This test is marked to fail as a Boolean value is
-       implicitly type converted to a Number.
-
-    """
-
-    with pytest.raises(rti.Error) as execinfo:
-      rtiOutputFixture.instance.set_number("x", True)
-
   def test_setNumber_with_String(self,rtiOutputFixture):
     """
     This function tests that a ``TypeError`` is raised when
@@ -178,8 +159,6 @@ class TestInstance:
     number_field="x"
     with pytest.raises(TypeError) as execinfo:
       rtiOutputFixture.instance.set_number(number_field,"str")
-    print("\nException of type:"+str(execinfo.type)+ \
-      "\nvalue:"+str(execinfo.value))
 
   def test_setNumber_with_Dictionary(self,rtiOutputFixture):
     """
@@ -194,8 +173,6 @@ class TestInstance:
     number_field="x"
     with pytest.raises(TypeError) as execinfo:
       rtiOutputFixture.instance.set_number(number_field,{"x":1})
-    print("\nException of type:"+str(execinfo.type)+ \
-      "\nvalue:"+str(execinfo.value))
 
   def test_setString_with_Boolean(self,rtiOutputFixture):
     """
@@ -210,8 +187,6 @@ class TestInstance:
     string_field="color"
     with pytest.raises(TypeError) as execinfo:
       rtiOutputFixture.instance.set_string(string_field,True)
-    print("\nException of type:"+str(execinfo.type)+ \
-      "\nvalue:"+str(execinfo.value))
 
   def test_setString_with_Number(self,rtiOutputFixture):
     """
@@ -226,8 +201,6 @@ class TestInstance:
     string_field="color"
     with pytest.raises(TypeError) as execinfo:
       rtiOutputFixture.instance.setString(string_field,55.55)
-    print("\nException of type:"+str(execinfo.type)+ \
-      "\nvalue:"+str(execinfo.value))
 
   def test_setString_with_Dictionary(self,rtiOutputFixture):
     """
@@ -242,9 +215,6 @@ class TestInstance:
     string_field="color"
     with pytest.raises(TypeError) as execinfo:
       rtiOutputFixture.instance.set_string(string_field,{"color":1})
-    print("\nException of type:"+str(execinfo.type)+ \
-      "\nvalue:"+str(execinfo.value))
-
 
   def test_setBoolean_with_String(self,rtiOutputFixture):
     """
@@ -259,8 +229,6 @@ class TestInstance:
     boolean_field="z"
     with pytest.raises(TypeError) as execinfo:
       rtiOutputFixture.instance.set_boolean(boolean_field,"str")
-    print("\nException of type:"+str(execinfo.type)+ \
-      "\nvalue:"+str(execinfo.value))
 
   # Implicit type conversion from number to Boolean
   def test_setBoolean_with_Number(self,rtiOutputFixture):
@@ -279,8 +247,6 @@ class TestInstance:
     boolean_field="z"
     with pytest.raises(TypeError) as execinfo:
       rtiOutputFixture.instance.setBoolean(boolean_field,55.55)
-    print("\nException of type:"+str(execinfo.type)+ \
-      "\nvalue:"+str(execinfo.value))
 
   def test_setBoolean_with_Dictionary(self,rtiOutputFixture):
     """

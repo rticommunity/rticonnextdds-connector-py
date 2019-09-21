@@ -179,12 +179,6 @@ class TestDataAccess:
     assert sample.get_number("my_union.my_int_sequence[1]") == 20
     assert sample.get_number("my_int_union.my_long") == 222
 
-  @pytest.mark.xfail
-  def test_union_discriminator_value(self, populated_input):
-    sample = populated_input[0]
-    assert sample.get_number("my_int_union#") == 200
-    assert sample.get_number("my_union#") == 2
-
   def test_union_selected_member(self, populated_input):
     sample = populated_input[0]
     assert sample.get_string("my_int_union#") == "my_long"
@@ -337,23 +331,20 @@ class TestDataAccess:
     with pytest.raises(rti.Error) as excinfo:
       test_output.instance.clear_member("my_nonexistent_member")
 
-  @pytest.mark.xfail
   def test_reset_sequence(self, test_output, test_input):
     test_output.instance.set_number("my_union.my_int_sequence[2]", 10)
     test_output.instance.set_number("my_point.x", 3)
-    test_output.write()
-    wait_for_data(test_input)
+    test_output.instance["my_point_sequence[1].x"] = 44
 
-    assert test_input[0].get_number("my_point.x") == 3
-    assert test_input[0].get_number("my_union.my_int_sequence#") == 3
+    sample = send_data(test_output, test_input)
+    assert sample.get_number("my_point.x") == 3
+    assert sample.get_number("my_union.my_int_sequence#") == 3
+    assert sample.get_number("my_point_sequence#") == 2
 
     test_output.instance.set_dictionary({'my_int_sequence':[]})
-    test_output.write()
-    wait_for_data(test_input)
 
-    sample = test_input[0]
+    sample = send_data(test_output, test_input)
     assert sample.get_number("my_int_sequence#") == 0
-
     # The other fields are unchanged:
     assert sample.get_number("my_point.x") == 3
     assert sample.get_number("my_point_sequence#") == 2
