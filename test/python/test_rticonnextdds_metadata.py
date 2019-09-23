@@ -10,8 +10,6 @@ import pytest,time,sys,os,ctypes
 from collections import namedtuple
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
-# import concurrent.futures
-from time import sleep
 from test_utils import *
 
 Requester = namedtuple('Requester', 'writer reader')
