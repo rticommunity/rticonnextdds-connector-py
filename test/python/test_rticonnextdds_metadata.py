@@ -10,6 +10,8 @@ import pytest,time,sys,os,ctypes
 from collections import namedtuple
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
+# import concurrent.futures
+from time import sleep
 from test_utils import *
 
 Requester = namedtuple('Requester', 'writer reader')
@@ -107,6 +109,24 @@ class TestMetadata:
     bad_octet_type = {"writer_guid": [1] * 15 + ["Hi"], "sequence_number": 10}
     with pytest.raises(rti.Error, match=r".*invalid type in octet array, index: 15.*") as excinfo:
       one_use_output.write(identity=bad_octet_type)
+
+  def test_dispose(self, one_use_output, one_use_input):
+    one_use_output.instance["color"] = "RED"
+    sample = send_data(one_use_output, one_use_input, action="write")
+    assert sample.info["valid_data"] == True
+    sample = send_data(one_use_output, one_use_input, action="dispose")
+    assert sample.info["valid_data"] == False
+
+  def test_unregister(self, one_use_output, one_use_input):
+    one_use_output.instance["color"] = "RED"
+    sample = send_data(one_use_output, one_use_input)
+    assert sample.info["valid_data"] == True
+    sample = send_data(one_use_output, one_use_input, action="unregister")
+    assert sample.info["valid_data"] == False
+
+  def test_bad_write_action(self, one_use_output):
+    with pytest.raises(rti.Error, match=r".*error parsing action field.*") as excinfo:
+      one_use_output.write(action="bad")
 
   def test_request_reply(self, requester, replier):
 

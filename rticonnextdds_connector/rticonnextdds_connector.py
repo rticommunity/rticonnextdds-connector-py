@@ -1038,12 +1038,17 @@ class Output:
 		unchanged. If for the next write you need to start from scratch, use
 		:meth:`clear_members()`
 
+		This method can also *dispose* or *unregister* an instance by passing
+		the argument ``action="dispose"`` or ``action="unregister"``. In these
+		two cases, only the ``instance`` *key* members are required.
+
 		This method receives a number of optional parameters, a subset of those
 		documented in the `Writing Data section <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Writing_Data.htm?Highlight=DDS_WriteParams_t>`__.
 		of the *Connext DDS Core Libraries* User's Manual.
 
 		The supported parameters are:
 
+		:param action str: One of ``"write"`` (default), ``"dispose"`` or ``"unregister"``
 		:param integer source_timestamp: The source timestamp, an integer representing the total number of nanoseconds
 		:param dict identity: A dictionary containing the keys ``"writer_guid"`` (a list of 16 bytes) and ``"sequence_number"`` (an integer) that uniquely identifies this sample.
 		:param dict related_sample_identity: Used for request-reply communications. It has the same format as ``identity``
