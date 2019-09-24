@@ -7,4 +7,5 @@ Advanced topics
    data
    threading
    errors
+   features
 
