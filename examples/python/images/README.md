@@ -18,6 +18,6 @@ To run the example, in different shells, run any number of instances of the writ
     $ python image_reader.py
 
 `image_reader.py` requires a graphical backend for *matplotlib*. If your python
-installation doesn't ahve one, you can run `image_reader_file.py` instead, which
+installation doesn't have one, you can run `image_reader_file.py` instead, which
 will save the last image into a file called *image.png*.
 
