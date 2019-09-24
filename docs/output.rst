@@ -79,6 +79,15 @@ write with a specific timestamp:
 
   output.write(source_timestamp=100000)
 
+It is also possible to dispose or unregister an instance:
+
+.. testcode::
+
+  output.write(action="dispose")
+  output.write(action="unregister")
+
+In these two cases, only the *key* fields in the ``Output.instance`` are relevant.
+
 Matching with a Subscription
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
