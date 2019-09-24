@@ -43,7 +43,6 @@ This code contains trade secrets of Real-Time Innovations, Inc.
 			<member name="source" stringMaxLength="128" type="string"/>
 			<member name="resolution" type="nonBasic" nonBasicTypeName= "Resolution"/>
 			<member name="pixels" sequenceMaxLength="MAX_IMAGE_SIZE" type="byte"/>
-			<member name="matrix" type="byte" arrayDimensions="100,100"/>
 		</struct>
 	</types>
 
