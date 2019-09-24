@@ -3,8 +3,8 @@ Using a Connector
 
 .. py:currentmodule:: rticonnextdds_connector
 
-Import the *Connector* package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Import the Connector package
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To use the ``rticonnextdds_connector`` package, import it. For example:
 
@@ -12,7 +12,7 @@ To use the ``rticonnextdds_connector`` package, import it. For example:
 
    import rticonnextdds_connector as rti
 
-Create a new *Connector*
+Creating a new Connector
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 To create a new :class:`Connector`, pass an XML file and a configuration name:
@@ -49,8 +49,8 @@ from the *RTI Connext DDS Core Libraries User's Manual*.
   not protected for multi-threaded access. See :ref:`Threading model` for more
   information.
 
-Closing a *Connector*
-~~~~~~~~~~~~~~~~~~~~~
+Closing a Connector
+~~~~~~~~~~~~~~~~~~~
 
 To destroy all the DDS entities that belong to a *Connector* previously
 created, call :meth:`Connector.close()`:
@@ -72,8 +72,8 @@ and automatically close the connector:
       # ...
 
 
-Reading and Writing Data
-~~~~~~~~~~~~~~~~~~~~~~~~
+Getting the Inputs and Outputs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once you have created a ``Connector`` instance, :meth:`Connector.get_output()`
 returns the :class:`Output` that allows writing data, and :meth:`Connector.get_input()`

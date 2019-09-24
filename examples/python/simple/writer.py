@@ -6,23 +6,35 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
-"""Samples's writer."""
-
-from sys import path as sysPath
-from os import path as osPath
 from time import sleep
-filepath = osPath.dirname(osPath.realpath(__file__))
-sysPath.append(filepath + "/../../../")
+
+# Updating the system path is not required if you have pip-installed
+# rticonnextdds-connector
+from sys import path as sys_path
+from os import path as os_path
+file_path = os_path.dirname(os_path.realpath(__file__))
+sys_path.append(file_path + "/../../../")
+
 import rticonnextdds_connector as rti
 
-connector = rti.Connector("MyParticipantLibrary::MyParticipant",
-                          filepath + "/../ShapeExample.xml")
-outputDDS = connector.get_output("MyPublisher::MySquareWriter")
+with rti.open_connector(
+    config_name = "MyParticipantLibrary::MyPubParticipant",
+    url = file_path + "/../ShapeExample.xml") as connector:
 
-for i in range(1, 500):
-    outputDDS.instance.set_number("x", i)
-    outputDDS.instance.set_number("y", i*2)
-    outputDDS.instance.set_number("shapesize", 30)
-    outputDDS.instance.set_string("color", "BLUE")
-    outputDDS.write()
-    sleep(0.5)
+    output = connector.get_output("MyPublisher::MySquareWriter")
+
+    print("Waiting for subscriptions...")
+    output.wait_for_subscriptions()
+
+    print("Writing...")
+    for i in range(1, 100):
+        output.instance.set_number("x", i)
+        output.instance.set_number("y", i*2)
+        output.instance.set_number("shapesize", 30)
+        output.instance.set_string("color", "BLUE")
+        output.write()
+
+        sleep(0.5) # Write at a rate of one sample every 0.5 seconds, for ex.
+
+    print("Exiting...")
+    output.wait() # Wait for all subscriptions to receive the data before exiting

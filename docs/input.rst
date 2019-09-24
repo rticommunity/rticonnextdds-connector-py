@@ -27,7 +27,7 @@ the *subscriber* named *MySubscriber*::
    </subscriber>
 
 This *subscriber* is defined inside the *domain_participant* selected to create
-this ``connector`` (see :ref:`Create a new *Connector*`).
+this ``connector`` (see :ref:`Creating a new Connector`).
 
 Reading or taking the data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -27,7 +27,7 @@ the *publisher* named *MyPublisher*::
    </publisher>
 
 This *publisher* is defined inside the *domain_participant* selected to create
-this ``connector`` (see :ref:`Create a new *Connector*`).
+this ``connector`` (see :ref:`Creating a new Connector`).
 
 Populating the data sample
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
