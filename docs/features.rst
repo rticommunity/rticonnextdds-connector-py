@@ -77,8 +77,11 @@ General features
      - Not supported
      - API not available
    * - `Transport Plugins <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/transports.htm>`__
-     - Supported
-     - Configurable in XML
+     - Partial
+     - The built-in transports can be configured in XML, but add-ons cannot be loaded (see next)
+   * - Add-on Libraries (`Monitoring <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/PartMonitoringLib.htm>`__, `Security Plugins <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/dds_security/html_files/RTI_SecurityPlugins_GettingStarted/index.htm>`__ ...)
+     - Not supported
+     - Connector can't currently load dynamically-linked add-on libraries.
 
 Features related to sending data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

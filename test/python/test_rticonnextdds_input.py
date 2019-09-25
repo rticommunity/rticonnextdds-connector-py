@@ -9,7 +9,7 @@
 import pytest,sys,os,ctypes
 sys.path.append(os.path.dirname(os.path.realpath(__file__))+ "/../../")
 import rticonnextdds_connector as rti
-from test_utils import open_test_connector, wait_for_data
+from test_utils import open_test_connector, wait_for_data, send_data
 
 class TestInput:
   """
@@ -76,3 +76,17 @@ class TestInput:
       output.wait_for_subscriptions(5000)
       matched_subs = output.matched_subscriptions
       assert {"name":"TestReader"} in matched_subs
+
+  def test_unbounded(self):
+    with open_test_connector("MyParticipantLibrary::TestUnbounded") as connector:
+      output = connector.get_output("TestPublisher::TestWriter")
+      input = connector.get_input("TestSubscriber::TestReader")
+      output.instance.set_dictionary({
+        "my_sequence": [44] * 200,
+        "my_string": "A" * 200
+      })
+
+      sample = send_data(output, input)
+
+      assert sample["my_sequence"] == [44] * 200
+      assert sample["my_string"] == "A" * 200

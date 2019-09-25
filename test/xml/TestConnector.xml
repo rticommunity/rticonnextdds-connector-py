@@ -24,6 +24,16 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                         <nanosec>100000000</nanosec>
                     </shutdown_cleanup_period>
                 </database>
+                <property>
+                    <value><element>
+                            <name>rti.monitor.library</name>
+                            <value>rtimonitoring</value>
+                           </element>
+                           <element>
+                             <name>rti.monitor.create_function</name>
+                             <value>RTIDefaultMonitor_create</value>
+                           </element></value>
+                </property>
             </participant_qos>
             <datawriter_qos>
                 <reliability>
@@ -129,15 +139,21 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <member name="my_int64" type="int64"/>
             <member name="my_uint64" type="uint64"/>
         </struct>
+        <struct name= "UnboundedType">
+            <member name="my_string" stringMaxLength="-1" type="string"/>
+            <member name="my_sequence" sequenceMaxLength="-1" type="int32"/>
+        </struct>
     </types>
 
     <!-- Domain Library -->
     <domain_library name="MyDomainLibrary">
         <domain name="MyDomain" domain_id="0">
             <register_type name="ShapeType" type_ref="ShapeType" />
+            <register_type name="UnboundedType" type_ref="UnboundedType" />
             <topic name="Square" register_type_ref="ShapeType"/>
             <topic name="Circle" register_type_ref="ShapeType"/>
             <topic name="SingleUseShape" register_type_ref="ShapeType"/>
+            <topic name="UnboundedTopic" register_type_ref="UnboundedType"/>
         </domain>
         <domain name="DataAccessDomain" domain_id="0">
             <register_type name="MyType" type_ref="MyType" />
@@ -253,6 +269,68 @@ This code contains trade secrets of Real-Time Innovations, Inc.
 
             <publisher name="TestPublisher">
                 <data_writer name="TestWriter" topic_ref="SingleUseShape" />
+            </publisher>
+        </domain_participant>
+
+        <domain_participant name="TestAppAckParticipant"
+                            domain_ref="MyDomainLibrary::MyDomain">
+            <subscriber name="TestSubscriber">
+                <data_reader name="TestReader" topic_ref="SingleUseShape">
+                    <datareader_qos>
+                        <reliability>
+                            <kind>RELIABLE_RELIABILITY_QOS</kind>
+                            <acknowledgment_kind>APPLICATION_AUTO_ACKNOWLEDGMENT_MODE</acknowledgment_kind>
+                        </reliability>
+                    </datareader_qos>
+                </data_reader>
+            </subscriber>
+
+            <publisher name="TestPublisher">
+                <data_writer name="TestWriter" topic_ref="SingleUseShape">
+                    <datawriter_qos>
+                        <reliability>
+                            <kind>RELIABLE_RELIABILITY_QOS</kind>
+                            <acknowledgment_kind>APPLICATION_AUTO_ACKNOWLEDGMENT_MODE</acknowledgment_kind>
+                        </reliability>
+                    </datawriter_qos>
+                </data_writer>
+            </publisher>
+        </domain_participant>
+
+        <domain_participant name="TestUnbounded"
+                            domain_ref="MyDomainLibrary::MyDomain">
+            <subscriber name="TestSubscriber">
+                <data_reader name="TestReader" topic_ref="UnboundedTopic">
+                    <datareader_qos>
+                        <property>
+                            <value>
+                                <element>
+                                    <name>
+                                        dds.data_reader.history.memory_manager.fast_pool.pool_buffer_max_size
+                                    </name>
+                                    <value>4096</value>
+                                </element>
+                            </value>
+                        </property>
+                    </datareader_qos>
+                </data_reader>
+            </subscriber>
+
+            <publisher name="TestPublisher">
+                <data_writer name="TestWriter" topic_ref="UnboundedTopic">
+                    <datawriter_qos>
+                        <property>
+                            <value>
+                                <element>
+                                    <name>
+                                        dds.data_writer.history.memory_manager.fast_pool.pool_buffer_max_size
+                                    </name>
+                                    <value>4096</value>
+                                </element>
+                            </value>
+                        </property>
+                    </datawriter_qos>
+                </data_writer>
             </publisher>
         </domain_participant>
     </domain_participant_library>
