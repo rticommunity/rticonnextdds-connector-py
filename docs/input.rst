@@ -39,7 +39,7 @@ data is available::
 
   input.wait()
 
-The method :meth:`Connector.wait()` has the same behaviour as :meth:`Input.wait()`,
+The method :meth:`Connector.wait()` has the same behavior as :meth:`Input.wait()`,
 but will block until data is available on any of the :class:`Input` objects within
 the :class:`Connector`::
 
@@ -57,39 +57,33 @@ a future ``read()`` or ``take()``::
 Accessing the data samples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After calling the read/take operations there are several ways to access the
-data samples. The simplest uses :meth:`Input.valid_data_iterator` to iterate
-through all the samples with valid data and calls :meth:`SampleIterator.get_dictionary()`
-to retrieve all the fields in the sample:
+After calling the read/take operations, :attr:`Input.samples` contains the data
+samples:
 
 .. testcode::
 
-   for sample in input.valid_data_iterator:
-      print(sample.get_dictionary())
-
-Use :meth:`Input.data_iterator` to also access samples that contain
-meta-data only (see next section, :ref:`Accessing the SampleInfo`):
-
-.. testcode::
-
-   for sample in input.data_iterator:
-      # Access sample.info
+   for sample in input.samples:
       if sample.valid_data:
          print(sample.get_dictionary())
 
-The class ``Input`` itself is iterable, so it is also possible to write
-``for sample in input``, which is equivalent to ``for sample in input.data_iterator``.
+:meth:`SampleIterator.get_dictionary()` retrieves all the fields of a sample.
+
+If you don't need to access the meta-data (see :ref:`Accessing the SampleInfo`),
+the simplest way to access the data uses :attr:`Samples.valid_data_iter` to skip
+samples with invalid data:
+
+.. testcode::
+
+   for sample in input.samples.valid_data_iter:
+      print(sample.get_dictionary())
 
 It is possible to access an individual sample too:
 
 .. testcode::
 
-   if input.sample_count > 0:
-      if input[0].valid_data:
-         print(input[0].get_dictionary())
-
-The method :meth:`Input.get_sample()` is also available; ``input[i]`` is equivalent
-to ``input.get_sample(i)``.
+   if input.samples.count > 0:
+      if input.samples[0].valid_data:
+         print(input.samples[0].get_dictionary())
 
 .. warning::
    All the methods described in this section return iterators to samples.
@@ -104,7 +98,7 @@ for example:
 
 .. testcode::
 
-   for sample in input.valid_data_iterator:
+   for sample in input.samples.valid_data_iter:
       x = sample.get_number("x") # or just sample["x"]
       y = sample.get_number("y")
       size = sample.get_number("shapesize")
@@ -123,7 +117,7 @@ You can access a field of the sample meta-data, the *SampleInfo*, as follows:
 
 .. testcode::
 
-   for sample in input.data_iterator:
+   for sample in input.samples:
       source_timestamp = sample.info["source_timestamp"]
 
 
@@ -150,8 +144,8 @@ You can obtain information about the existing matched publications with
    for pub_info in matched_pubs:
       pub_name = pub_info['name']
 
-Class reference: Input, SampleIterator, ValidSampleIterator
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Class reference: Input, Samples, SampleIterator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Input class
 ^^^^^^^^^^^
@@ -159,6 +153,11 @@ Input class
 .. autoclass:: rticonnextdds_connector.Input
    :members:
 
+Samples class
+^^^^^^^^^^^^^
+
+.. autoclass:: rticonnextdds_connector.Samples
+   :members:
 
 SampleIterator class
 ^^^^^^^^^^^^^^^^^^^^

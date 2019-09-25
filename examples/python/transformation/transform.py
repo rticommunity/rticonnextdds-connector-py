@@ -27,7 +27,7 @@ with rti.open_connector(
     while True:
         input.wait() # Wait for data in the input
         input.take()
-        for sample in input.valid_data_iterator:
+        for sample in input.samples.valid_data_iter:
             data = sample.get_dictionary()
 
             data["x"], data["y"] = data["y"], data["x"]

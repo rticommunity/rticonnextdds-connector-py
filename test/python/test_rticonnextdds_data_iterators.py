@@ -13,19 +13,15 @@ import rticonnextdds_connector as rti
 class TestDataIterators:
 
   """
-  This class tests the iteration of Input samples with data_iterator and
-  valid_data_iterator
+  This class tests the iteration of Input Samples
   """
   @pytest.fixture(scope="class")
   def populatedInput(self, rtiOutputFixture, rtiInputFixture):
     """Class fixture that writes the test messages do they're available in the input
 
-    TODO: add an invalid-data sample (we may need to implement dispose() for
-    that)
-
     """
 
-    rtiInputFixture.expected_count = 3
+    rtiInputFixture.expected_count = 4
 
     # Add extra element so that if the iterators fail and advance one element
     # too many, we can detect it in the zip's below
@@ -43,47 +39,44 @@ class TestDataIterators:
       {"x":3, "y":3, "z":True, "color":"YELLOW", "shapesize":15})
     rtiOutputFixture.write()
 
+    rtiOutputFixture.write(action="dispose")
+
     for i in range(1, 20):
       rtiInputFixture.read()
-      if rtiInputFixture.sample_count == 3:
+      if rtiInputFixture.samples.count == rtiInputFixture.expected_count:
         break
       time.sleep(.5)
 
     return rtiInputFixture
 
   def test_data_iterator(self, populatedInput):
-    """Tests Input.data_iterator"""
+    """Tests SampleIterator, Samples"""
 
-    assert populatedInput.sample_count == populatedInput.expected_count
+    assert populatedInput.samples.count == populatedInput.expected_count
     count = 0
 
-    for sample in populatedInput.data_iterator:
-      assert sample.valid_data
-      assert sample.get_number("x") == populatedInput.expected_values[count]
-      assert sample.get_dictionary()["y"] == populatedInput.expected_values[count]
+    for sample in populatedInput.samples:
+      if count < 3:
+        assert sample.valid_data
+        assert sample.get_number("x") == populatedInput.expected_values[count]
+        assert sample.get_dictionary()["y"] == populatedInput.expected_values[count]
+      else:
+        assert not sample.valid_data
       count = count + 1
-
     assert count == populatedInput.expected_count
 
-    count = 0
-    for sample in populatedInput:
-      assert sample.valid_data
-      assert sample.get_number("x") == populatedInput.expected_values[count]
-      assert sample.get_dictionary()["y"] == populatedInput.expected_values[count]
-      count = count + 1
-
-    assert count == populatedInput.expected_count
+    assert populatedInput.samples[0].get_number("x") == populatedInput.expected_values[0]
 
   def test_valid_data_iterator(self, populatedInput):
-    """Tests Input.valid_data_iterator"""
+    """Tests Samples.valid_data_iterator"""
 
-    assert populatedInput.sample_count == populatedInput.expected_count
+    assert populatedInput.samples.count == populatedInput.expected_count
 
     count = 0
-    for sample in populatedInput.valid_data_iterator:
+    for sample in populatedInput.samples.valid_data_iter:
       assert sample.valid_data
       assert sample.get_number("x") == populatedInput.expected_values[count]
       assert sample.get_dictionary()["y"] == populatedInput.expected_values[count]
       count = count + 1
 
-    assert count == populatedInput.expected_count
+    assert count == populatedInput.expected_count - 1

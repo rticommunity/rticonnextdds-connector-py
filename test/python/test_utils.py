@@ -23,12 +23,12 @@ def wait_for_data(input, count = 1, do_take = True):
 
   for i in range(1, 5):
     input.read()
-    assert input.sample_count <= count
-    if input.sample_count == count:
+    assert input.samples.count <= count
+    if input.samples.count == count:
       break
-    input.wait(1000)
+    input.wait(5000)
 
-  assert input.sample_count == count
+  assert input.samples.count == count
   if do_take:
     input.take()
 
@@ -38,4 +38,4 @@ def send_data(output, input, **kwargs):
 
   output.write(**kwargs)
   wait_for_data(input)
-  return input[0]
+  return input.samples[0]

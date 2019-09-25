@@ -102,7 +102,7 @@ Which corresponds to the following IDL definition::
     You can get the XML definition of an IDL file with *rtiddsgen -convertToXml MyType.idl*.
 
 We will refer to an ``Output`` named ``output`` and
-``Input`` named ``input`` such that ``input.sample_count > 0``.
+``Input`` named ``input`` such that ``input.samples.count > 0``.
 
 Using dictionaries vs accessing individual members
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -177,7 +177,7 @@ with numeric fields, returning the number as a string. For example:
 
 .. testcode::
 
-    for sample in input.valid_data_iterator:
+    for sample in input.samples.valid_data_iter:
         value = sample.get_number("my_double")
         value = sample.get_boolean("my_boolean")
         value = sample.get_string("my_string")
@@ -244,7 +244,7 @@ It is possible to obtain the dictionary of a nested struct using
 
 .. testcode::
 
-   for sample in input.valid_data_iterator:
+   for sample in input.samples.valid_data_iter:
       point = sample.get_dictionary("my_point")
 
 ``member_name`` must be one of the following types: array, sequence,
@@ -252,7 +252,7 @@ struct, value or union. If not, the call to get_dictionary will fail:
 
 .. testcode::
 
-   # for sample in input.valid_data_iterator:
+   # for sample in input.samples.valid_data_iter:
       # long = sample.get_dictionary("my_long") # ERROR, the_long is a basic type
 
 It is also possible to obtain the dictionary of a struct using the ``__getitem__``
@@ -260,7 +260,7 @@ operator:
 
 .. testcode::
 
-    for sample in input.valid_data_iterator:
+    for sample in input.samples.valid_data_iter:
         point = sample["my_point"]
         # point is a dict
 
@@ -275,15 +275,15 @@ where ``0 <= index < length``:
 
 .. testcode::
 
-    value = input[0].get_number("my_int_sequence[1]")
-    value = input[0].get_number("my_point_sequence[2].y")
+    value = input.samples[0].get_number("my_int_sequence[1]")
+    value = input.samples[0].get_number("my_point_sequence[2].y")
 
 Another option is to use ``SampleIterator.get_dictionary("field_name")`` to obtain
 a dictionary containing all of the elements of the array or sequence with name ``field_name``:
 
 .. testcode::
 
-    for sample in input.valid_data_iterator:
+    for sample in input.samples.valid_data_iter:
         the_point_sequence = sample.get_dictionary("my_point_sequence")
 
 It is also possible to supply ``member_name`` as an element of an array (if the
@@ -291,14 +291,14 @@ type of the array is complex):
 
 .. testcode::
 
-   for sample in input.valid_data_iterator:
+   for sample in input.samples.valid_data_iter:
       point_element = sample.get_dictionary("my_point_sequence[1]")
 
 The ``__getitem__`` operator can be used to obtain arrays and sequences:
 
 .. testcode::
 
-    for sample in input.valid_data_iterator:
+    for sample in input.samples.valid_data_iter:
         point_sequence = sample["my_point_sequence"]
         # point is a list
 
@@ -324,7 +324,7 @@ To get the length of a sequence in an Input sample:
 
 .. testcode::
 
-    length = input[0].get_number("my_int_sequence#")
+    length = input.samples[0].get_number("my_int_sequence#")
 
 
 In dictionaries, sequences and arrays are represented as lists. For example:
@@ -365,10 +365,10 @@ On an Input, any of the getters may return ``None`` if the field is optional:
 
 .. testcode::
 
-    if input[0].get_number("my_optional_long") is None:
+    if input.samples[0].get_number("my_optional_long") is None:
         print("my_optional_long not set")
 
-    if input[0].get_number("my_optional_point.x") is None:
+    if input.samples[0].get_number("my_optional_point.x") is None:
         print("my_optional_point not set")
 
 :meth:`SampleIterator.get_dictionary()` returns a dictionary that doesn't include unset
@@ -437,14 +437,14 @@ You can change it later:
 
 In an Input, you can obtain the selected member as a string::
 
-    if input[0].get_string("my_union#") == "point":
-        value = input[0].get_number("my_union.point")
+    if input.samples[0].get_string("my_union#") == "point":
+        value = input.samples[0].get_number("my_union.point")
 
 The ``__getitem__`` operator can be used to obtain unions:
 
 .. testcode::
 
-    for sample in input.valid_data_iterator:
+    for sample in input.samples.valid_data_iter:
         union = sample["my_union"]
         # union is a dict
 

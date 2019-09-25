@@ -96,7 +96,7 @@ class TestDataflow:
           time.sleep(.5)
           retrieve_func= getattr(rtiInputFixture,method)
           retrieve_func()
-          if rtiInputFixture.sample_count > 0:
+          if rtiInputFixture.samples.count > 0:
             break
 
   def test_samples_getLength(self,rtiInputFixture):
@@ -165,11 +165,11 @@ class TestDataflow:
       and z == testMsg['z'] and color == testMsg['color'] \
       and shapesize == testMsg['shapesize']
 
-    x = rtiInputFixture[0].get_number("x")
-    y = rtiInputFixture.get_sample(0).get_number("y")
-    z = rtiInputFixture.get_sample(0).get_boolean("z")
-    color  = rtiInputFixture[0].get_string("color")
-    shapesize = rtiInputFixture[0].get_number("shapesize")
+    x = rtiInputFixture.samples[0].get_number("x")
+    y = rtiInputFixture.samples[0].get_number("y")
+    z = rtiInputFixture.samples[0].get_boolean("z")
+    color  = rtiInputFixture.samples[0].get_string("color")
+    shapesize = rtiInputFixture.samples[0].get_number("shapesize")
     assert x == testMsg['x'] and y == testMsg['y'] \
       and z == testMsg['z'] and color == testMsg['color'] \
       and shapesize == testMsg['shapesize']

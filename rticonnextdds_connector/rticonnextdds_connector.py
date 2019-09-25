@@ -342,8 +342,61 @@ class _ConnectorOptions(ctypes.Structure):
 #
 
 class Samples:
+	"""Provides access to the data samples read by an Input
+
+	This class provides the special method ``__iter__`` to iterate over the data
+	samples and ``__getitem__`` to access a specific sample by index. Both return
+	the type :class:`SampleIterator`.
+
+	The default iterator provides access to all the data samples retrieved by the
+	most-recent call to :meth:`read()` or :meth:`take()`. Use :meth:`valid_data_iter`
+	to access only samples with valid data.
+
+	``Samples`` is the type of the property :attr:`Input.samples`.
+
+	For more information and examples see :ref:`Accessing the data samples`.
+	"""
+
 	def __init__(self,input):
 		self.input = input
+
+	def __getitem__(self, index):
+		"""Gets an iterator to a sample in a specific index"""
+
+		return SampleIterator(self.input, index)
+
+	def __iter__(self):
+		"""Iterates over the data samples"""
+
+		return SampleIterator(self.input)
+
+	@property
+	def count(self):
+		"""Returns the number of samples available
+
+		:return: The number of samples available since the last time read/take was called
+		"""
+
+		return self.input.samples.getLength()
+
+	@property
+	def valid_data_iter(self):
+		"""Returns an iterator to the data samples with valid data
+
+		The iterator provides access to the data samples retrieved by the
+		most-recent call to :meth:`Input.read()` or :meth:`Input.take()`, and
+		skips samples with invalid data (meta-data only).
+
+		To access all samples, including those with meta-data only,
+		iterate over :attr:`Input.samples` directly.
+
+		By using this iterator, it is not necessary to check if each sample
+		contains valid data.
+
+		:return: An iterator to the data samples with valid
+		:rtype: :class:`ValidSampleIterator`
+		"""
+		return ValidSampleIterator(self.input)
 
 	def getLength(self):
 		c_value = ctypes.c_double()
@@ -528,9 +581,7 @@ class SampleIterator:
 	"""Iterates and provides access to a data sample
 
 	A SampleIterator provides access to the data received by an input.
-	SampleIterators are returned by :meth:`Input.data_iterator()`,
-	and :meth:`Input.get_sample()`; :meth:`Input.valid_data_iterator()` returns
-	a subclass, :class:`ValidSampleIterator`.
+	SampleIterator is the iterator type of :attr:`Input.samples`.
 
 	See :ref:`Reading data (Input)`.
 
@@ -651,7 +702,7 @@ class ValidSampleIterator(SampleIterator):
 
 	This iterator provides the same methods as :class:`SampleIterator`.
 
-	See :meth:`Input.valid_data_iterator`.
+	See :meth:`Samples.valid_data_iter`.
 	"""
 
 	def __next__(self):
@@ -679,7 +730,7 @@ class Input:
 		self.name = name
 		self.native = connector_binding.getReader(self.connector.native,tocstring(self.name))
 		_check_entity_creation(self.native, "Input")
-		self.samples = Samples(self)
+		self._samples = Samples(self)
 		self.infos = Infos(self)
 
 	def read(self):
@@ -694,13 +745,23 @@ class Input:
 	def take(self):
 		"""Accesses the sample received by this Input
 
-		After calling this method, the samples are accessible with
-		:attr:`data_iterator`, :attr:`valid_data_iterator`,
-		or :meth:`get_sample()`.
+		After calling this method, the samples are accessible from :attr:`samples`
 
 		"""
 
 		_check_retcode(connector_binding.take(self.connector.native,tocstring(self.name)))
+
+	@property
+	def samples(self):
+		"""Allows iterating over the samples read by this input
+
+		This container provides iterators to access the data samples retrieved
+		by the most-recent call to :meth:`read()` or :meth:`take()`.
+
+		:rtype: :class:`Samples`
+		"""
+
+		return self._samples
 
 	def wait(self, timeout = None):
 		"""Wait for this input to receive data.
@@ -751,79 +812,6 @@ class Input:
 		retcode = connector_binding.get_matched_publications(self.native, byref(native_json_str))
 		_check_retcode(retcode)
 		return json.loads(_move_native_string(native_json_str))
-
-	def __getitem__(self, index):
-		"""Equivalent to :meth:`get_sample()`"""
-
-		return SampleIterator(self, index)
-
-	@property
-	def sample_count(self):
-		"""Returns the number of samples available
-
-		:return: The number of samples available since the last time read/take was called
-		"""
-
-		return self.samples.getLength()
-
-	def get_sample(self, index):
-		"""Returns an iterator to the sample in a given index
-
-		Important: Calling :meth:`read()` or :meth:`take()` invalidates
-		all iterators previously returned.
-
-		The `Input` class also provides ``__getitem__``, making it possible to
-		interchangeably write ``input[i]`` or ``input.get_sample(i)``
-
-		:param number index: A zero-based index, less than :attr:`sample_count`.
-
-		:return: An iterator that accesses the sample in the position indicated by ``index``.
-		:rtype: :class:`SampleIterator`
-		"""
-		return SampleIterator(self, index)
-
-	def __iter__(self):
-		"""Equivalent to :attr:`data_iterator` """
-
-		return SampleIterator(self)
-
-	@property
-	def data_iterator(self):
-		"""Returns an iterator to the data samples
-
-		The iterator provides access to all the data samples retrieved by the
-		most-recent call to :meth:`read()` or :meth:`take()`.
-
-		This iterator may return samples with invalid data. Use :attr:`valid_data_iterator`
-		to access only samples with valid data.
-
-		The `Input` class also provides ``__iter__``, making it possible to
-		interchangeably write ``for sample in input`` or
-		``for sample in input.data_iterator``.
-
-		:return: An iterator to the samples
-		:rtype: :class:`SampleIterator`
-		"""
-		return SampleIterator(self)
-
-	@property
-	def valid_data_iterator(self):
-		"""Returns an iterator to the data samples with valid data
-
-		The iterator provides access to the data samples retrieved by the
-		most-recent call to :meth:`read()` or :meth:`take()`, and skips samples
-		with invalid data (meta-data only).
-
-		To access all samples, including those with meta-data only,
-		use :attr:`data_iterator`
-
-		By using this iterator, it is not necessary to check if each sample
-		contains valid data.
-
-		:return: An iterator to the data samples with valid
-		:rtype: :class:`ValidSampleIterator`
-		"""
-		return ValidSampleIterator(self)
 
 class Instance:
 	"""A data sample
