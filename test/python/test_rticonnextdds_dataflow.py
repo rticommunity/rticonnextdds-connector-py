@@ -96,7 +96,7 @@ class TestDataflow:
           time.sleep(.5)
           retrieve_func= getattr(rtiInputFixture,method)
           retrieve_func()
-          if rtiInputFixture.samples.count > 0:
+          if rtiInputFixture.samples.length > 0:
             break
 
   def test_samples_getLength(self,rtiInputFixture):

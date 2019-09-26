@@ -375,7 +375,7 @@ class Samples:
 		return SampleIterator(self.input)
 
 	@property
-	def count(self):
+	def length(self):
 		"""Returns the number of samples available
 
 		:return: The number of samples available since the last time read/take was called
@@ -409,7 +409,7 @@ class Samples:
 				tocstring(self.input.name),
 				ctypes.byref(c_value))
 		_check_retcode(retcode)
-		return c_value.value
+		return int(c_value.value)
 
 	def getNumber(self, index, field_name):
 		if type(index) is not int:

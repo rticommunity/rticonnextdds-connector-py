@@ -102,7 +102,7 @@ Which corresponds to the following IDL definition::
     You can get the XML definition of an IDL file with *rtiddsgen -convertToXml MyType.idl*.
 
 We will refer to an ``Output`` named ``output`` and
-``Input`` named ``input`` such that ``input.samples.count > 0``.
+``Input`` named ``input`` such that ``input.samples.length > 0``.
 
 Using dictionaries vs accessing individual members
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

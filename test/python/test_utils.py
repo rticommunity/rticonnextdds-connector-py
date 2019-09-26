@@ -23,12 +23,12 @@ def wait_for_data(input, count = 1, do_take = True):
 
   for i in range(1, 5):
     input.read()
-    assert input.samples.count <= count
-    if input.samples.count == count:
+    assert input.samples.length <= count
+    if input.samples.length == count:
       break
     input.wait(5000)
 
-  assert input.samples.count == count
+  assert input.samples.length == count
   if do_take:
     input.take()
 

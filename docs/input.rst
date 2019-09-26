@@ -81,7 +81,7 @@ It is possible to access an individual sample too:
 
 .. testcode::
 
-   if input.samples.count > 0:
+   if input.samples.length > 0:
       if input.samples[0].valid_data:
          print(input.samples[0].get_dictionary())
 

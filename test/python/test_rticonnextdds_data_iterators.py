@@ -43,7 +43,7 @@ class TestDataIterators:
 
     for i in range(1, 20):
       rtiInputFixture.read()
-      if rtiInputFixture.samples.count == rtiInputFixture.expected_count:
+      if rtiInputFixture.samples.length == rtiInputFixture.expected_count:
         break
       time.sleep(.5)
 
@@ -52,11 +52,11 @@ class TestDataIterators:
   def test_data_iterator(self, populatedInput):
     """Tests SampleIterator, Samples"""
 
-    assert populatedInput.samples.count == populatedInput.expected_count
-    count = 0
+    assert populatedInput.samples.length == populatedInput.expected_count
 
+    count = 0
     for sample in populatedInput.samples:
-      if count < 3:
+      if count <= 2:
         assert sample.valid_data
         assert sample.get_number("x") == populatedInput.expected_values[count]
         assert sample.get_dictionary()["y"] == populatedInput.expected_values[count]
@@ -67,10 +67,22 @@ class TestDataIterators:
 
     assert populatedInput.samples[0].get_number("x") == populatedInput.expected_values[0]
 
+    count = 0
+    for i in range(populatedInput.samples.length):
+      sample = populatedInput.samples[i]
+      if count <= 2:
+        assert sample.valid_data
+        assert sample.get_number("x") == populatedInput.expected_values[i]
+        assert sample.get_dictionary()["y"] == populatedInput.expected_values[i]
+      else:
+        assert not sample.valid_data
+      count = count + 1
+    assert count == populatedInput.expected_count
+
   def test_valid_data_iterator(self, populatedInput):
     """Tests Samples.valid_data_iterator"""
 
-    assert populatedInput.samples.count == populatedInput.expected_count
+    assert populatedInput.samples.length == populatedInput.expected_count
 
     count = 0
     for sample in populatedInput.samples.valid_data_iter:

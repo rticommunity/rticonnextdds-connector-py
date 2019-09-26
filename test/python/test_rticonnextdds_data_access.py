@@ -80,7 +80,7 @@ class TestDataAccess:
     test_input = test_connector.get_input("TestSubscriber::TestReader")
     wait_for_data(input = test_input, count = 1, do_take = True)
 
-    assert test_input.samples.count == 1
+    assert test_input.samples.length == 1
     assert test_input.samples[0].valid_data
 
     return test_input
