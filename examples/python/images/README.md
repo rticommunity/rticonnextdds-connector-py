@@ -2,8 +2,8 @@
 
 ## Example description
 In this example `image_writer.py` publishes images at a set rate.
-`image_reader.py` polls every certain amount of time to retrieve the last
-received image and display it.
+`image_reader.py` image_reader.py polls at the configured interval to retrieve
+the most recently received image and display it.
 
 This example shows how to manipulate a more complex type.
 
