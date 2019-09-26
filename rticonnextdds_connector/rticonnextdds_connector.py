@@ -342,7 +342,7 @@ class _ConnectorOptions(ctypes.Structure):
 #
 
 class Samples:
-	"""Provides access to the data samples read by an Input
+	"""Provides access to the data samples read by an Input (:attr:`Input.samples`)
 
 	This class provides the special method ``__iter__`` to iterate over the data
 	samples and ``__getitem__`` to access a specific sample by index. Both return
@@ -355,6 +355,10 @@ class Samples:
 	``Samples`` is the type of the property :attr:`Input.samples`.
 
 	For more information and examples see :ref:`Accessing the data samples`.
+
+	Special methods:
+		* ``__getitem__`` gets a sample by index: ``input.samples[i]``
+		* ``__iter__`` enables iteration: ``for s in input.samples: ...``
 	"""
 
 	def __init__(self,input):
