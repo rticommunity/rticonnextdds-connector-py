@@ -24,16 +24,6 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                         <nanosec>100000000</nanosec>
                     </shutdown_cleanup_period>
                 </database>
-                <property>
-                    <value><element>
-                            <name>rti.monitor.library</name>
-                            <value>rtimonitoring</value>
-                           </element>
-                           <element>
-                             <name>rti.monitor.create_function</name>
-                             <value>RTIDefaultMonitor_create</value>
-                           </element></value>
-                </property>
             </participant_qos>
             <datawriter_qos>
                 <reliability>
