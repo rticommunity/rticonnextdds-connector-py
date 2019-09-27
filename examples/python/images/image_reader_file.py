@@ -36,7 +36,7 @@ with rti.open_connector(
 
     while True:
         input.read()
-        for sample in input.valid_data_iterator:
+        for sample in input.samples.valid_data_iter:
             # Get the received pixels (a linear sequence)
             raw_pixels = numpy.array(sample["pixels"])
 

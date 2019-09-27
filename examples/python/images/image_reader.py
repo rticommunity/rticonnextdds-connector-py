@@ -40,7 +40,7 @@ with rti.open_connector(
         # we read (not take) so we can access it again in the next interval if
         # we don't receive a new one
         input.read()
-        for sample in input.valid_data_iterator:
+        for sample in input.samples.valid_data_iter:
             # Get the received pixels (a linear sequence)
             raw_pixels = numpy.array(sample["pixels"])
 

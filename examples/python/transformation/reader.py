@@ -26,5 +26,5 @@ with rti.open_connector(
     for i in range(1, 500):
         input.wait() # wait for data on this input
         input.take()
-        for sample in input.valid_data_iterator:
+        for sample in input.samples.valid_data_iter:
             print("Received circle: " + str(sample.get_dictionary()))

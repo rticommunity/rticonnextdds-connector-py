@@ -57,7 +57,7 @@ protect calls to the same :class:`Connector`:
 
       with lock: # Take the lock again
          input.take();
-         for sample in input.valid_data_iterator:
+         for sample in input.samples.valid_data_iter:
             print(sample.get_dictionary())
 
    def write_thread():
