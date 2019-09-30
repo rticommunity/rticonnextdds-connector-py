@@ -15,9 +15,12 @@ This code contains trade secrets of Real-Time Innovations, Inc.
     <qos_library name="QosLibrary">
         <qos_profile name="DefaultProfile" is_default_qos="true">
         	<participant_qos>
-                <transport_builtin>
-                    <mask>UDPV4 | SHMEM</mask>
-                </transport_builtin>
+                <discovery>
+                    <initial_peers>
+                        <element>shmem://</element>
+                    </initial_peers>
+                    <multicast_receive_addresses/>
+                </discovery>
                 <database>
                     <shutdown_cleanup_period>
                         <sec>0</sec>
