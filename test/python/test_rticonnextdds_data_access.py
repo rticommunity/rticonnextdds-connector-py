@@ -504,8 +504,9 @@ class TestDataAccess:
     end = time.time()
     get_item_duration = end - start
 
-    print("__getitem__ is {:2.2%} slower than get_number".format(
-      (get_item_duration - get_number_duration) / get_number_duration))
+    if get_number_duration:
+      print("__getitem__ is {:2.2%} slower than get_number".format(
+        (get_item_duration - get_number_duration) / get_number_duration))
 
   def test_output_performance(self, test_output):
     num_iter = 1000
@@ -523,8 +524,9 @@ class TestDataAccess:
     end = time.time()
     get_item_duration = end - start
 
-    print("__setitem__ is {:2.2%} slower than set_number".format(
-      (get_item_duration - get_number_duration) / get_number_duration))
+    if get_number_duration > 0:
+      print("__setitem__ is {:2.2%} slower than set_number".format(
+        (get_item_duration - get_number_duration) / get_number_duration))
 
   def test_set_into_samples(self, test_output):
     """
