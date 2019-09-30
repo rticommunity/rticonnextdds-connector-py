@@ -294,7 +294,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                             domain_ref="MyDomainLibrary::MyDomain">
             <subscriber name="TestSubscriber">
                 <data_reader name="TestReader" topic_ref="UnboundedTopic">
-                    <datareader_qos>
+                    <datareader_qos base_name="QosLibrary::DefaultProfile">
                         <property>
                             <value>
                                 <element>
@@ -311,7 +311,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
 
             <publisher name="TestPublisher">
                 <data_writer name="TestWriter" topic_ref="UnboundedTopic">
-                    <datawriter_qos>
+                    <datawriter_qos base_name="QosLibrary::DefaultProfile">
                         <property>
                             <value>
                                 <element>
