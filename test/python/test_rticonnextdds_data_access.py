@@ -691,3 +691,8 @@ class TestDataAccess:
     with pytest.raises(rti.Error) as excinfo:
       # sequence max length is 10
       test_output.instance.set_dictionary({"my_int_sequence":[10] * 11})
+
+  def test_clear_member_with_setitem(self, test_output, test_input):
+    test_output.instance['my_optional_bool'] = None
+    sample = send_data(test_output, test_input)
+    assert sample['my_optional_bool'] is None
