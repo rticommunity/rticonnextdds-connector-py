@@ -711,3 +711,11 @@ class TestDataAccess:
     test_output.instance['my_optional_bool'] = None
     sample = send_data(test_output, test_input)
     assert sample['my_optional_bool'] is None
+
+  def test_nested_syntax_in_dictionary(self, test_output, test_input):
+    test_output.instance.set_dictionary({"my_point_sequence[2].y": 153})
+    test_output.instance.set_dictionary({"my_point_sequence[2].x": 111})
+    test_output.instance["my_point_sequence[3]"] = {"x":444, "y":555}
+    sample = send_data(test_output, test_input)
+    assert sample["my_point_sequence[2]"] == {"x":111, "y":153}
+    assert sample["my_point_sequence[3]"] == {"x":444, "y":555}
