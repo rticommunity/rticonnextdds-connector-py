@@ -696,6 +696,17 @@ class TestDataAccess:
     sample = send_data(test_output, test_input)
     assert sample["my_int_sequence"] == [10] * 10
 
+  def test_error_in_dictionary2(self, test_output, test_input):
+    with pytest.raises(rti.Error) as excinfo:
+      # error parsing an element is different from error parsing sequence itself
+      test_output.instance.set_dictionary({"my_point_sequence":[
+        {"x": 1, "y":2}, {"x": 34, "bad":40}]})
+    # Make sure the previous error didn't corrupt the instance
+    test_output.instance.set_dictionary({"my_point_sequence":[
+        {"x": 1, "y":2}, {"x": 34, "y":40}]})
+    sample = send_data(test_output, test_input)
+    assert sample["my_point_sequence[1].y"] == 40
+
   def test_clear_member_with_setitem(self, test_output, test_input):
     test_output.instance['my_optional_bool'] = None
     sample = send_data(test_output, test_input)
