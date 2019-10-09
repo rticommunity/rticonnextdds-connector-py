@@ -9,7 +9,7 @@
 import pytest,time,sys,os,ctypes,json
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
-from test_utils import *
+from test_utils import send_data, wait_for_data, open_test_connector
 
 
 class TestDataAccess:
@@ -687,10 +687,14 @@ class TestDataAccess:
           test_output.instance.set_dictionary({name:"not a number"})
           print("Field " + name + " did not raise an exception")
 
-  def test_error_in_dictionary(self, test_output):
+  def test_error_in_dictionary(self, test_output, test_input):
     with pytest.raises(rti.Error) as excinfo:
       # sequence max length is 10
       test_output.instance.set_dictionary({"my_int_sequence":[10] * 11})
+    # Make sure the previous error didn't corrupt the instance
+    test_output.instance.set_dictionary({"my_int_sequence":[10] * 10})
+    sample = send_data(test_output, test_input)
+    assert sample["my_int_sequence"] == [10] * 10
 
   def test_clear_member_with_setitem(self, test_output, test_input):
     test_output.instance['my_optional_bool'] = None
