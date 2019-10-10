@@ -38,13 +38,13 @@ def tocstring3(s):
 		return None
 	try:
 		return s.encode('utf8')
-	except AttributeError as e:
+	except AttributeError:
 		raise
 
 def fromcstring3(s):
 	try:
 		return s.decode('utf8')
-	except AttributeError as e:
+	except AttributeError:
 		raise
 
 if sys.version_info[0] == 3:
@@ -102,7 +102,7 @@ class _AnyValueKind:
 
 class _ConnectorBinding:
 	def __init__(self):
-		(bits, linkage) = platform.architecture()
+		(bits, _) = platform.architecture()
 		osname = platform.system()
 		isArm = platform.uname()[4].startswith("arm")
 
@@ -324,7 +324,7 @@ class _ConnectorBinding:
 			python_string = _move_native_string(string_value)
 			try:
 				return json.loads(python_string)
-			except ValueError as e:
+			except ValueError:
 				# This is the best way we have to detect that this is not a json
 				# string or an integer
 				return python_string
@@ -875,6 +875,8 @@ class Instance:
 			self.set_string(field_name, value)
 		elif isinstance(value, bool):
 			self.set_boolean(field_name, value)
+		elif isinstance(value, dict):
+			self.set_dictionary({field_name:value})
 		elif value is None:
 			self.clear_member(field_name)
 		else:
@@ -898,7 +900,7 @@ class Instance:
 					tocstring(self.output.name),
 					tocstring(field_name),
 					value))
-			except ctypes.ArgumentError as e:
+			except ctypes.ArgumentError:
 				raise TypeError("value for field '{0}' must be of a numeric type"\
 					.format(field_name))
 
@@ -924,7 +926,7 @@ class Instance:
 						tocstring(self.output.name),
 						tocstring(field_name),
 						value))
-			except ctypes.ArgumentError as e:
+			except ctypes.ArgumentError:
 				raise TypeError("value for field '{0}' must be of type bool"\
 					.format(field_name))
 
@@ -950,7 +952,7 @@ class Instance:
 					tocstring(self.output.name),
 					tocstring(field_name),
 					tocstring(value)))
-			except (AttributeError, ctypes.ArgumentError) as e:
+			except (AttributeError, ctypes.ArgumentError):
 				raise TypeError("value for field '{0}' must be of type str"\
 					.format(field_name))
 
