@@ -72,16 +72,13 @@ To learn more about *RTI Connector* continue to the next section,
 Supported Platforms
 ~~~~~~~~~~~~~~~~~~~
 
-*RTI Connector* has been tested with Python 2.7.5 and 3.7.
+*RTI Connector* works with Python 2.x and 3.x. It uses a native C library that
+runs on most Windows, Linux and MacOS platforms (x86 and x86_64).
 
-*RTI Connector* uses a native C library that works on most Windows, Linux and
-MacOS platforms. It has been tested on the following systems:
-
-(TODO: clarify PAM)
-
-- Windows: 64-bit Windows 10 with VS 2015 and 32-bit Windows 7 with VS 2017
-- Linux: 64-bit CentOS 6.5 with gcc 4.8.2, 32-bit Ubuntu 16.04 gcc 5.4.0, and ARM Yocto Linux 2.0.3 with gcc 5.2.0
-- MacOS: Darwin 18 with clang 10
+*RTI Connector* has been tested with Python 2.6+ and 3.6.8+ on the following systems:
+- Windows: Windows 7 and Windows 10
+- Linux: CentOS 6.1, 7.6, 8.0; Ubuntu 12.04, 18.04; SUSE 12, 15; and Raspberry Pi (arm)
+- MacOS: OS X 10.10.2, macOS 10.12.2, macOS 10.14
 
 (TODO: link to main Connector landing page)
 
