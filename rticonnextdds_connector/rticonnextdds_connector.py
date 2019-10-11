@@ -105,6 +105,7 @@ class _ConnectorBinding:
 		(bits, _) = platform.architecture()
 		osname = platform.system()
 		isArm = platform.uname()[4].startswith("arm")
+		additional_lib = None
 
 		if "64" in bits:
 			if "Linux" in osname:
@@ -119,6 +120,7 @@ class _ConnectorBinding:
 				arch = "x64Win64VS2013"
 				libname = "rtiddsconnector"
 				post = "dll"
+				additional_lib = "msvcr120"
 			else:
 				raise RuntimeError("This platform ({0}) is not supported".format(osname))
 		else:
@@ -134,11 +136,21 @@ class _ConnectorBinding:
 				arch = "i86Win32VS2010"
 				libname = "rtiddsconnector"
 				post = "dll"
+				additional_lib = "msvcr100"
 			else:
 				raise RuntimeError("This platform ({0}) is not supported".format(osname))
 
 		path = os.path.dirname(os.path.realpath(__file__))
 		path = os.path.join(path, "..", "rticonnextdds-connector/lib", arch)
+
+		# Load Visual C++ redistributable if available
+		if additional_lib is not None:
+			try:
+				ctypes.cdll.LoadLibrary(os.path.join(path, additional_lib))
+			except OSError:
+				# Don't fail; try to load rtiddsconnector.dll anyway
+				print("Warning: error loading " + additional_lib)
+
 		libname = libname + "." + post
 		self.library = ctypes.CDLL(os.path.join(path, libname), ctypes.RTLD_GLOBAL)
 
