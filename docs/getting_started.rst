@@ -76,10 +76,11 @@ Supported Platforms
 runs on most Windows, Linux and MacOS platforms.
 
 *RTI Connector* has been tested with Python 2.6+ and 3.6.8+ on the following systems:
+
     * Windows: Windows 7 and Windows 10
-    * x86/x86_64 Linux : CentOS 6.1, 7.6, 8.0; Ubuntu 12.04, 18.04; SUSE 12, 15
+    * x86/x86_64 Linux: CentOS 6.1, 7.6, 8.0; Ubuntu 12.04, 18.04; SUSE 12, 15
     * ARM Linux (Raspberry Pi)
-    * MacOS: OS X 10.10.2, macOS 10.12.2, macOS 10.14
+    * Mac: OS X 10.10.2, macOS 10.12.2, macOS 10.14
 
 (TODO: link to main Connector landing page)
 
