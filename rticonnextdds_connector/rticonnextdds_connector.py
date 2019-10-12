@@ -887,7 +887,7 @@ class Instance:
 			self.set_string(field_name, value)
 		elif isinstance(value, bool):
 			self.set_boolean(field_name, value)
-		elif isinstance(value, dict):
+		elif isinstance(value, dict) or isinstance(value, list):
 			self.set_dictionary({field_name:value})
 		elif value is None:
 			self.clear_member(field_name)
