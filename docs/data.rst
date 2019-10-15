@@ -248,12 +248,13 @@ It is possible to obtain the dictionary of a nested struct using
       point = sample.get_dictionary("my_point")
 
 ``member_name`` must be one of the following types: array, sequence,
-struct, value or union. If not, the call to get_dictionary will fail:
+struct, value or union. If not, the call to get_dictionary will fail::
 
-.. testcode::
-
-   # for sample in input.samples.valid_data_iter:
-      # long = sample.get_dictionary("my_long") # ERROR, the_long is a basic type
+   for sample in input.samples.valid_data_iter:
+      try:
+        long = sample.get_dictionary("my_long")
+      except rti.Error:
+        print("ERROR, my_long is a basic type")
 
 It is also possible to obtain the dictionary of a struct using the ``__getitem__``
 operator:
@@ -278,6 +279,12 @@ where ``0 <= index < length``:
     value = input.samples[0].get_number("my_int_sequence[1]")
     value = input.samples[0].get_number("my_point_sequence[2].y")
 
+You can get the length of a sequence:
+
+.. testcode::
+
+    length = input.samples[0].get_number("my_int_sequence#")
+
 Another option is to use ``SampleIterator.get_dictionary("field_name")`` to obtain
 a dictionary containing all of the elements of the array or sequence with name ``field_name``:
 
@@ -286,8 +293,8 @@ a dictionary containing all of the elements of the array or sequence with name `
     for sample in input.samples.valid_data_iter:
         the_point_sequence = sample.get_dictionary("my_point_sequence")
 
-It is also possible to supply ``member_name`` as an element of an array (if the
-type of the array is complex):
+It is also possible to supply ``member_name`` as an element of an array or sequence
+(if the member type is complex):
 
 .. testcode::
 
@@ -319,13 +326,6 @@ You can clear a sequence:
 .. testcode::
 
     output.instance.clear_member("my_int_sequence") # my_int_sequence is now empty
-
-To get the length of a sequence in an Input sample:
-
-.. testcode::
-
-    length = input.samples[0].get_number("my_int_sequence#")
-
 
 In dictionaries, sequences and arrays are represented as lists. For example:
 
@@ -435,10 +435,12 @@ You can change it later:
 
     output.instance.set_number("my_union.my_long", 10)
 
-In an Input, you can obtain the selected member as a string::
+In an Input, you can obtain the selected member as a string:
+
+.. testcode::
 
     if input.samples[0].get_string("my_union#") == "point":
-        value = input.samples[0].get_number("my_union.point")
+        value = input.samples[0].get_number("my_union.point.x")
 
 The ``__getitem__`` operator can be used to obtain unions:
 

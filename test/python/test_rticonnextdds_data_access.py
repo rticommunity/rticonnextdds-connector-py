@@ -681,7 +681,7 @@ class TestDataAccess:
     # For each numeric field, test that set_dictionary fails when the value we
     # try to set is a string that doesn't represent a number
     field_names = ["my_long", "my_int64", "my_double",
-      "my_point_array[1].x", "my_int_sequence[1], my_enum"] # TODO: add "my_uint64" when CORE-9768 is fixed
+      "my_point_array[1].x", "my_int_sequence[1]", "my_enum", "my_uint64"]
     for name in field_names:
         with pytest.raises(rti.Error, match=r".*cannot convert field to string.*") as excinfo:
           test_output.instance.set_dictionary({name:"not a number"})
@@ -719,3 +719,12 @@ class TestDataAccess:
     sample = send_data(test_output, test_input)
     assert sample["my_point_sequence[2]"] == {"x":111, "y":153}
     assert sample["my_point_sequence[3]"] == {"x":444, "y":555}
+
+  def test_set_list_with_setitem(self, test_output, test_input):
+    int_seq = [11, 22, 33]
+    point_seq = [{"x":100, "y":200}, {"x":300, "y":400}]
+    test_output.instance["my_int_sequence"] = int_seq
+    test_output.instance["my_point_sequence"] = point_seq
+    sample = send_data(test_output, test_input)
+    assert sample["my_int_sequence"] == int_seq
+    assert sample["my_point_sequence"] == point_seq
