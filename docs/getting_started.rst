@@ -67,7 +67,7 @@ that publishes or subscribes to the *Square* topic. For example, you can use
 `RTI Shapes Demo <https://www.rti.com/free-trial/shapes-demo>`__.
 
 To learn more about *RTI Connector* continue to the next section,
-:ref:`Using a Connector`.
+:ref:`Loading a Connector`.
 
 Supported Platforms
 ~~~~~~~~~~~~~~~~~~~

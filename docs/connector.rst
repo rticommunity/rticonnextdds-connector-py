@@ -1,5 +1,5 @@
-Using a Connector
-=================
+Loading a Connector
+===================
 
 .. py:currentmodule:: rticonnextdds_connector
 
