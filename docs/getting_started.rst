@@ -69,7 +69,7 @@ that publishes or subscribes to the *Square* topic. For example, you can use
 To learn more about *RTI Connector* continue to the next section,
 :ref:`Loading a Connector`.
 
-Supported Platforms
+Supported platforms
 ~~~~~~~~~~~~~~~~~~~
 
 *RTI Connector* works with Python 2.x and 3.x. It uses a native C library that

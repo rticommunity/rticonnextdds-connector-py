@@ -28,6 +28,7 @@ Table of Contents
 
    intro
    getting_started
+   configuration
    connector
    output
    input
