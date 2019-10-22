@@ -33,17 +33,17 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.4.5',
+    version='1.0.0',
 
-    description='RTI Connector for Connext DDS',
+    description='RTI Connector for Python',
     long_description=long_description,
 
     # The project's main homepage.
     url='https://github.com/rticommunity/rticonnextdds-connector-py',
 
     # Author details
-    author='Gianpiero Napoli',
-    author_email='gianpiero@rti.com',
+    author='RTI',
+    author_email='support@rti.com',
 
     # Choose your license
     license='RTI',
