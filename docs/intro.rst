@@ -12,8 +12,6 @@ applications. It uses the publish-subscribe communications model to make
 data distribution efficient and robust. At its core Connext DDS is the world's
 leading ultra-high performance, distributed networking databus.
 
-RTI Connext DDS provides programming APIs in C, C++, Java, and .NET.
-
 .. note::
 
     This documentation assumes you are already familiar with the basic DDS concepts.
@@ -25,9 +23,8 @@ RTI Connext DDS provides programming APIs in C, C++, Java, and .NET.
 RTI Connector
 ~~~~~~~~~~~~~
 
-Connector is a family of simplified APIs that allow publishing and subscribing
-to the Connext DDS Databus in other programming languages, such as Python
-and JavaScript.
+*Connector* is a family of simplified APIs that allow publishing and subscribing
+to the Connext DDS Databus in programming languages such as Python and JavaScript.
 
 In *Connector*, the DDS system is defined in XML. This includes the DDS entities
 and their data types and quality of service. Applications instantiate a

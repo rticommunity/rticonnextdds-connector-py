@@ -92,3 +92,12 @@ class TestDataIterators:
       count = count + 1
 
     assert count == populatedInput.expected_count - 1
+
+  def test_no_data(self, populatedInput):
+    populatedInput.take() # First take removes samples (they were read() before)
+    populatedInput.take() # Second take returns no data, leaves samples empty
+    assert populatedInput.samples.length == 0
+    had_data = False
+    for _ in populatedInput.samples:
+      had_data = True
+    assert not had_data

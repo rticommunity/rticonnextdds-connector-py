@@ -11,9 +11,12 @@ and DataWriters, data types and quality of service.
 .. image:: static/xml_doc.png
     :align: center
 
-*Connector* used the XML schema defined by RTI's
-`XML-Based Application Creation <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/xml_application_creation/html_files/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted/index.htm>`__,
-which can be loaded by the *Connext DDS* C, C++, Java and .NET APIs.
+*Connector* uses the XML schema defined by RTI's
+`XML-Based Application Creation <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/xml_application_creation/html_files/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted/index.htm>`__.
+
+.. hint::
+    The *Connext DDS* C, C++, Java and .NET APIs can also load the same XML files
+    you write for *Connector*.
 
 The following table summarizes the XML tags, the DDS concepts they define, and
 how they are exposed in the *Connector* API:
@@ -67,7 +70,6 @@ and *shapesize*:
             <member name="y" type="int32"/>
             <member name="shapesize" type="int32"/>
         </struct>
-        ...
     </types>
 
 Types are associated with topics, as explained in the next section, :ref:`Domain Library`.
@@ -169,7 +171,6 @@ configures all data readers and data writers with reliable and transient-local Q
                 </durability>
             </datawriter_qos>
         </qos_profile>
-        ...
     </qos_library>
 
 You can define the Qos for each individual entity:
@@ -177,9 +178,9 @@ You can define the Qos for each individual entity:
 .. code-block:: xml
 
     <domain_participant name="MyPubParticipant" domain_ref="MyDomainLibrary::MyDomain">
-        <participant_qos> ... </participant_qos>
+        <participant_qos> <!-- ... --> </participant_qos>
         <publisher name="MyPublisher">
-            <publisher_qos> ... </publisher_qos>
+            <publisher_qos> <!-- ... --> </publisher_qos>
             <data_writer name="MySquareWriter" topic_ref="Square">
                 <datawriter_qos>
                     <reliability>
@@ -191,7 +192,6 @@ You can define the Qos for each individual entity:
                 </datawriter_qos>
             </data_writer>
         </publisher>
-        ...
     </domain_participant>
 
 Or you can use profiles and override or define additional Qos policies for each
@@ -215,28 +215,18 @@ entity:
         </publisher>
     </domain_participant>
 
-In all cases, you can specify a built-in profile as the value for the *base_name*
-attribute. For example, you can use *BuiltinQosLib::Generic.StrictReliable*
-instead of defining the reliability policy yourself:
+You can also use built-in profiles and Qos snippets. For example, the following
+profile is equivalent to *MyQosProfile* above:
 
 .. code-block:: xml
 
     <qos_library name="MyQosLibrary">
-        <qos_profile name="MyQosProfile"
-                     base_name="BuiltinQosLib::Generic.StrictReliable"
-                     is_default_qos="true">
-            <datareader_qos>
-                <durability>
-                    <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
-                </durability>
-            </datareader_qos>
-            <datawriter_qos>
-                <durability>
-                    <kind>TRANSIENT_LOCAL_DURABILITY_QOS</kind>
-                </durability>
-            </datawriter_qos>
+        <qos_profile name="MyQosProfile" is_default_qos="true">
+            <base_name>
+                <element>BuiltinQosSnippetLib::QosPolicy.Durability.TransientLocal</element>
+                <element>BuiltinQosSnippetLib::QosPolicy.Reliability.Reliable</element>
+            </base_name>
         </qos_profile>
-        ...
     </qos_library>
 
 You can read more in the *Connext DDS Core Libraries User's Manual*, `Configuring Qos profiles in XML <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/XMLConfiguration.htm>`__.
