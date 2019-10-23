@@ -5,8 +5,8 @@ Defining the DDS system in XML
 ==============================
 
 *Connector* loads the definition of a DDS system from an XML configuration file
-that includes the definition of domains, domain participants, topics, data readers
-and data writers, data types and quality of service.
+that includes the definition of domains, DomainParticipants, Topics, DataReaders
+and DataWriters, data types and quality of service.
 
 .. image:: static/xml_doc.png
     :align: center
@@ -25,12 +25,12 @@ how they are exposed in the *Connector* API:
      - DDS Concept
      - Connector API
    * - *<types>*
-     - *DDS Topic-Type* (the type associated to a *Topic*)
-     - Types used by :class:`Output` and :class:`Input`
+     - *DDS data type* (the type associated with a *Topic*)
+     - Types used by :class:`Output`\ s and :class:`Input`\ s
    * - *<domain_library>*, *<domain>*, *<register_type>*, and *<topic>*
      - *DDS Domain*, *Topic*
      - Defines the domain joined by a :class:`Connector` and the topics used by
-       its :class:`Output`'s and :class:`Input`'s.
+       its :class:`Output`\ s and :class:`Input`\ s.
    * - *<domain_participant_library>* and *<domain_participant>*
      - *DomainParticipant*
      - Each :class:`Connector` instance loads a *<domain_participant>*. See :ref:`Loading a Connector`
@@ -52,7 +52,7 @@ how they are exposed in the *Connector* API:
 Data types
 ~~~~~~~~~~
 
-The *<types>* tags defines the data types associated to the topics to be published
+The *<types>* tags defines the data types associated with the topics to be published
 or subscribed to.
 
 The following example defines a *ShapeType* with four members, *color*, *x*, *y*
@@ -70,11 +70,11 @@ and *shapesize*:
         ...
     </types>
 
-Types are associated to topics, as explained in the next section, :ref:`Domain Library`.
+Types are associated with topics, as explained in the next section, :ref:`Domain Library`.
 
 .. hint::
     You can define your types in IDL and convert them to XML with `rtiddsgen <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/code_generator/html_files/RTI_CodeGenerator_UsersManual/index.htm#code_generator/UsersManual/UsersManual_Title.htm>`__.
-    (for example, ``rtiddsgen -converToXml MyTypes.idl``).
+    (for example, ``rtiddsgen -convertToXml MyTypes.idl``).
 
 For more information about defining types, see
 `Creating User Data Types with XML <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Creating_User_Data_Types_with_Extensible.htm>`__
@@ -112,10 +112,10 @@ Participant library
 A domain participant joins a domain and contains publishers and subscribers,
 which contain data writers and data readers, respectively.
 
-Each :class:`Connector` instance created by your application is associated to a
+Each :class:`Connector` instance created by your application is associated with a
 *<domain_participant>*, as explained in :ref:`Loading a Connector`.
 
-Data writers and data readers are associated to a domain participant and to a
+Data writers and data readers are associated with a domain participant and to a
 topic. In *Connector*, each *<data_writer>* tag defines an :class:`Output`, as described in
 :ref:`Writing data (Output)`; and each *<data_reader>* tag defines an :class:`Input`,
 as described in :ref:`Reading data (Input)`.
