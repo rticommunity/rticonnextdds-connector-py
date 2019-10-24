@@ -1,7 +1,7 @@
 RTI Connector for Python
 ========================
 
-RTI® Connext® DDS is a connectivity software framework for integrating
+*RTI® Connext® DDS* is a connectivity software framework for integrating
 data sources of all types. At its core is the world’s leading ultra-high
 performance, distributed networking databus.
 
@@ -24,14 +24,14 @@ The ``examples/python`` directory provides several examples: \*
 ``simple`` shows how to create basic publisher and subscriber
 applications \* In ``transformation``, an application reads, transforms
 and publishes back the data \* ``images`` shows how to manipulate more
-complex data types
+complex data types.
 
 License
 -------
 
 With the sole exception of the contents of the “examples” subdirectory,
 all use of the software shall be governed by this license. RTI Connector
-for JavaScript and RTI Connector for Python is part of the Connext DDS
+for JavaScript and RTI Connector for Python are part of the Connext DDS
 Professional Package. If you have a valid license for the RTI Connext
 DDS Professional Package, such license shall govern your use of RTI
 Connector for Python and RTI Connector for JavaScript. All other use of

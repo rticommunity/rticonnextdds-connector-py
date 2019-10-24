@@ -12,27 +12,27 @@ Writing data (Output)
 Getting the Output
 ~~~~~~~~~~~~~~~~~~
 
-To write a data sample, first look up an output:
+To write a data sample, first look up an :class:`Output`:
 
 .. testcode::
 
    output = connector.get_output("MyPublisher::MySquareWriter")
 
-:meth:`Connector.get_output()` returns an :class:`Output` object. This example,
-obtains the output defined by the *data_writer* named *MySquareWriter* within
-the *publisher* named *MyPublisher*::
+:meth:`Connector.get_output()` returns an :class:`Output` object. This example 
+obtains the output defined by the ``<data_writer>`` named *MySquareWriter* within
+the ``<publisher>`` named *MyPublisher*::
 
    <publisher name="MyPublisher">
      <data_writer name="MySquareWriter" topic_ref="Square" />
    </publisher>
 
-This *publisher* is defined inside the *domain_participant* selected to create
+This ``<publisher>`` is defined inside the ``<domain_participant>`` selected to create
 this ``connector`` (see :ref:`Creating a new Connector`).
 
 Populating the data sample
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Then set the ``Output.instance`` fields. You can set them member by member:
+Then set the ``output.instance`` fields. You can set them member by member:
 
 .. testcode::
 
@@ -62,13 +62,13 @@ See :class:`Instance` and :ref:`Accessing the data` for more information.
 Writing the data sample
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-To write the values you set in ``Output.instance`` call :meth:`Output.write()`::
+To write the values you set in ``output.instance``, call :meth:`Output.write()`::
 
    output.write()
 
-If the *datawriter_qos* is reliable, you can use :meth:`Output.wait()`
-to block until all matching reliable subscribers acknowledge the reception of the
-data sample::
+If the ``<datawriter_qos>`` is set up for reliable communication, you can use 
+:meth:`Output.wait()` to block until all matching reliable *Subscribers* 
+acknowledge reception of the data sample::
 
     output.wait()
 
@@ -86,12 +86,12 @@ It is also possible to dispose or unregister an instance:
   output.write(action="dispose")
   output.write(action="unregister")
 
-In these two cases, only the *key* fields in the ``Output.instance`` are relevant.
+In these two cases, only the *key* fields in the ``output.instance`` are relevant.
 
 Matching with a Subscription
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Before writing, the method :meth:`Output.wait_for_subscriptions()` can be used to
+Before writing, you can use the method :meth:`Output.wait_for_subscriptions()` to 
 detect when a compatible DDS subscription is matched or stops matching. It returns
 the change in the number of matched subscriptions since the last time it was called::
 

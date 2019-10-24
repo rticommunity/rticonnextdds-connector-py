@@ -3,8 +3,8 @@ Connext DDS Features
 
 .. py:currentmodule:: rticonnextdds_connector
 
-*RTI Connector*, as a simplified API, provides access to a subset of the
-features that *RTI Connext DDS* provides.
+Because *RTI Connector* is a simplified API, it provides access to a subset of the
+features in *RTI Connext DDS*.
 
 In addition to the functionality described in the rest of this documentation, this
 section summarizes the support that *RTI Connector* provides for some notable
@@ -50,7 +50,7 @@ General features
         * Property - Properties can be set in XML, but they can't be looked up in Connector
    * - `Entity Statuses <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Statuses.htm>`__
      - Partial
-     - Only :meth:`Input.wait` (data available), :meth:`Input.wait_for_publications`, :meth:`Output.wait_for_subscriptions` are supported
+     - Only :meth:`Input.wait` (data available), :meth:`Input.wait_for_publications`, :meth:`Output.wait_for_subscriptions` are supported.
    * - `Managing Data Instances <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Managing_Data_Instances__Working_with_Ke.htm>`__
      - Partial
      - It is possible to dispose or unregister an instance (see :meth:`Output.write`), and instances are automatically registered when first written, but on the ``Input`` side, the instance status is not currently exposed. Instance handles are not exposed.
@@ -69,19 +69,21 @@ General features
 
    * - `Topic Queries <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/TopicQueries.htm#23._Topic_Queries>`__
      - Partial
-     - ``Input`` doesn't have the API to create a *TopicQuery*, but in the configuration file a *data_writer* can enable support for *TopicQuery* so other *RTI Connext DDS* subscribers can query the Connector publisher.
+     - ``Input`` doesn't have the API to create a *TopicQuery*, but in the configuration file a *data_writer* can enable support for *TopicQuery* so other *Connext DDS Subscribers* can query the *Connector Publisher*.
    * - `Zero Copy Transfer Over Shared Memory <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/SendingLDZeroCopy.htm>`__
      - Not supported
      - Only available in C and C++.
    * - `Built-in Topics <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/builtintopics.htm#builtintopics_3745276171_40053%3FTocPath%3DPart%25203%253A%2520Advanced%2520Concepts%7C17.%2520Built-In%2520Topics%7C_____0>`__
      - Not supported
-     - API not available
+     - API not available.
    * - `Transport Plugins <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/transports.htm>`__
      - Partial
-     - The built-in transports can be configured in XML, but add-ons cannot be loaded (see next)
-   * - Add-on Libraries (`Monitoring <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/PartMonitoringLib.htm>`__, `Security Plugins <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/dds_security/html_files/RTI_SecurityPlugins_GettingStarted/index.htm>`__ ...)
+     - The built-in transports can be configured in XML, but add-ons cannot be loaded (see next).
+   * - Add-on Libraries 
+       (such as `Monitoring <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/PartMonitoringLib.htm>`__, 
+       `Security Plugins <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/dds_security/html_files/RTI_SecurityPlugins_GettingStarted/index.htm>`__ )
      - Not supported
-     - Connector can't currently load dynamically-linked add-on libraries.
+     - *Connector* currently cannot load dynamically linked add-on libraries.
 
 Features related to sending data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -95,19 +97,19 @@ Features related to sending data
      - Notes
    * - `Waiting for Acknowledgments <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/WaitingForAcksDataWriter.htm#6.3.11_Waiting_for_Acknowledgments_in_a_DataWriter>`__
      - Supported
-     - See :meth:`Output.wait`
+     - See :meth:`Output.wait`.
    * - `Coherent Sets <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/WritingCoherentSetsSample.htm#6.3.10_Writing_Coherent_Sets_of_DDS_Data_Samples>`__
      - Not supported
-     - API not available
+     - API not available.
    * - `Flow Controllers <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/FlowControllers__DDS_Extension_.htm>`__
      - Partial
-     - Most functionality is available via XML QoS configuration
+     - Most functionality is available via XML QoS configuration.
    * - `Asserting Liveliness Manually <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Asserting_Liveliness.htm>`__
      - Not supported
-     - API not available
+     - API not available.
    * - `Collaborative DataWriters <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Config_Collaborative_DWs.htm>`__
      - Limited
-     - The virtual guid can be set per writer in XML, but not per sample.
+     - The virtual GUID can be set per writer in XML, but not per sample.
 
 Features related to receiving data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -147,10 +149,10 @@ Features related to the type system
      - Notes
    * - `DDS type system <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Introduction_to_the_Type_System.htm>`__
      - Supported
-     - Connector can use any DDS type. Types are defined in XML.
+     - *Connector* can use any DDS type. Types are defined in XML.
    * - `Type extensibility <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/getting_started_extras/html_files/RTI_ConnextDDS_CoreLibraries_GettingStarted_ExtensibleAddendum/index.htm#ExtensibleTypesAddendum/Type_Safety_and_System_Evolution.htm>`__
      - Supported
-     - Connector supports type extensibility, including mutable types in the XML definition of types. It also supports type-consistency enforcement, sample-assignability enforcement; these checks are performed by the *RTI Connext DDS* Core.
+     - *Connector* supports type extensibility, including mutable types in the XML definition of types. It also supports type-consistency enforcement, sample-assignability enforcement; these checks are performed by the *RTI Connext DDS* Core.
    * - `Optional members <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/getting_started_extras/html_files/RTI_ConnextDDS_CoreLibraries_GettingStarted_ExtensibleAddendum/index.htm#ExtensibleTypesAddendum/Optional_Members.htm>`__
      - Supported
      - See :ref:`Accessing optional members`
@@ -165,8 +167,8 @@ Features related to the type system
 
         Now the value for *my_int* when you call :meth:`Output.write` without
         setting it explicitly is 20. And when you receive a data sample in an
-        ``Input`` from a publisher whose type is compatible but doesn't have the
-        field *my_int*, the value you receive is 20.
+        ``Input`` from a *Publisher* whose type is compatible, but doesn't have the
+        field *my_int*, the value you receive will be 20.
 
    * - `Unbounded data <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Sequences.htm>`__
      - Supported
@@ -178,7 +180,7 @@ Features related to the type system
             </struct>
 
         For any ``Output`` using a topic for a type with unbounded members, set the
-        following *property* QoS policy::
+        following in the ``<property>`` QoS policy::
 
             <datawriter_qos>
              <!-- ... -->
@@ -194,7 +196,7 @@ Features related to the type system
              </property>
             </datawriter_qos>
 
-        The value *4096* is a threshold that indicates *RTI Connext DDS* to allocate
+        The value *4096* is a threshold that indicates *Connext DDS* should allocate
         memory dynamically for data samples that exceed that size. For samples below
         that threshold, memory comes from pre-allocated buffers.
 
@@ -217,5 +219,5 @@ Features related to the type system
 
    * - `FlatData Language Binding <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/SendingLDFlatData.htm%3FTocPath%3DPart%25203%253A%2520Advanced%2520Concepts%7C22.%2520Sending%2520Large%2520Data%7C22.4%2520FlatData%2520Language%2520Binding%7C_____0>`__
      - Not supported
-     - However, an ``Input`` can receive data published by other *RTI Connext DDS* applications that use FlatData
+     - However, an ``Input`` can receive data published by other *Connext DDS* applications that use FlatData
 

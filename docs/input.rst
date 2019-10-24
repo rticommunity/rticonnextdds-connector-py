@@ -18,23 +18,23 @@ To read/take samples, first get a reference to the :class:`Input`:
 
    input = connector.get_input("MySubscriber::MySquareReader")
 
-:meth:`Connector.get_input()` returns a :class:`Input` object. This example,
-obtains the input defined by the *data_reader* named *MySquareReader* within
-the *subscriber* named *MySubscriber*::
+:meth:`Connector.get_input()` returns a :class:`Input` object. This example 
+obtains the input defined by the ``<data_reader>`` named *MySquareReader* within
+the ``<subscriber>`` named *MySubscriber*::
 
    <subscriber name="MySubscriber">
      <data_reader name="MySquareReader" topic_ref="Square" />
    </subscriber>
 
-This *subscriber* is defined inside the *domain_participant* selected to create
-this ``connector`` (see :ref:`Creating a new Connector`).
+This ``<subscriber>`` is defined inside the ``<domain_participant>`` selected 
+to create this ``connector`` (see :ref:`Creating a new Connector`).
 
 Reading or taking the data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The method :meth:`Input.wait()` can be used to identify when there is new data
 available on a specific :class:`Input`. It will block until either the supplied
-timeout expires (in which case it will raise :class:`TimeoutError`) or until new
+timeout expires (in which case it will raise a :class:`TimeoutError`) or until new
 data is available::
 
   input.wait()
@@ -49,7 +49,7 @@ Call :meth:`Input.take()` to access and remove the samples::
 
    input.take()
 
-or :meth:`Input.read()` to access the samples but leaving them available for
+or :meth:`Input.read()` to access the samples but leave them available for
 a future ``read()`` or ``take()``::
 
    input.read()
@@ -77,7 +77,7 @@ samples with invalid data:
    for sample in input.samples.valid_data_iter:
       print(sample.get_dictionary())
 
-It is possible to access an individual sample too:
+It is also possible to access an individual sample:
 
 .. testcode::
 
@@ -90,11 +90,11 @@ It is possible to access an individual sample too:
    Calling read/take again invalidates all iterators currently in
    use. For that reason, it is not recommended to store any iterator.
 
-``get_dictionary`` can receive a ``field_name`` to only return the fields of a
-complex member. In addition to ``get_dictionary``, you can get the values of
+``get_dictionary()`` can receive a ``field_name`` to only return the fields of a
+complex member. In addition to ``get_dictionary()``, you can get the values of
 specific primitive fields using :meth:`SampleIterator.get_number()`,
-:meth:`SampleIterator.get_boolean()` and :meth:`SampleIterator.get_string()`,
-for example:
+:meth:`SampleIterator.get_boolean()` and :meth:`SampleIterator.get_string()`.
+For example:
 
 .. testcode::
 
@@ -110,8 +110,8 @@ Accessing the SampleInfo
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 *Connect DDS* can produce samples with invalid data, which contain meta-data only.
-For more information about this see `Valid Data Flag <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#receiving_2076951295_727613>`__
-in the *Connect DDS Core Libraries* User's Manual.
+For more information about this, see `Valid Data Flag <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#receiving_2076951295_727613>`__
+in the *RTI Connect DDS Core Libraries User's Manual*.
 
 You can access a field of the sample meta-data, the *SampleInfo*, as follows:
 
@@ -121,12 +121,12 @@ You can access a field of the sample meta-data, the *SampleInfo*, as follows:
       source_timestamp = sample.info["source_timestamp"]
 
 
-See :meth:`SampleIterator.info` for the list of meta-data fields available
+See :meth:`SampleIterator.info` for the list of available meta-data fields.
 
 Matching with a Publication
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The method :meth:`Input.wait_for_publications()` can be used to detect when a compatible
+Use the method :meth:`Input.wait_for_publications()` to detect when a compatible
 DDS publication is matched or stops matching. It returns the change in the number of
 matched publications since the last time it was called::
 

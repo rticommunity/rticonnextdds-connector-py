@@ -7,8 +7,8 @@ Threading model
 
    import rticonnextdds_connector as rti
 
-Operations on the same :class:`Connector` instance or any contained :class:`Input`,
-:class:`Output` are in general not protected for multi-threaded access. The only
+Operations on the same :class:`Connector` instance or any contained :class:`Input` 
+or :class:`Output` are, in general, not protected for multi-threaded access. The only
 exceptions are the following *wait* operations.
 
 Thread-safe operations:
@@ -24,7 +24,7 @@ a different thread.
 .. note::
 
    Currently :meth:`Input.wait` and :meth:`Input.wait_for_publications` cannot
-   be both called at the same time on the same ``Input`` instance.
+   both be called at the same time on the same ``Input`` instance.
 
 .. note::
 
@@ -36,8 +36,8 @@ All operations on **different** :class:`Connector` instances are thread-safe.
 Applications can implement their own thread-safety mechanism around a ``Connector``
 instance. The following section provides an example.
 
-Protecting calls to *Connector*
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Protecting calls to Connector
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This example shows how to use the Python ``threading`` package to
 protect calls to the same :class:`Connector`:

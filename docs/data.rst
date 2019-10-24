@@ -20,7 +20,7 @@ Accessing the data
 The types you use to write or read data may included nested structs, sequences and
 arrays of primitive types or structs, etc.
 
-These types are defined in the XML as described in :ref:`Data Types`.
+These types are defined in XML, as described in :ref:`Data Types`.
 
 To access the data, :class:`Instance` and :class:`SampleIterator` provide
 setters and getters that expect a ``fieldName`` string. This section describes
@@ -64,7 +64,7 @@ We will use the following type definition of MyType::
         </struct>
     </types>
 
-Which corresponds to the following IDL definition::
+The above XML corresponds to the following IDL definition::
 
     enum Color {
         RED,
@@ -100,24 +100,25 @@ Which corresponds to the following IDL definition::
 .. hint::
     You can get the XML definition of an IDL file with *rtiddsgen -convertToXml MyType.idl*.
 
-We will refer to an ``Output`` named ``output`` and
-``Input`` named ``input`` such that ``input.samples.length > 0``.
+We will refer to an Output named ``output`` and
+an Input named ``input`` such that ``input.samples.length > 0``.
 
-Using dictionaries vs accessing individual members
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Using dictionaries vs. accessing individual members
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-In an Input or an Output you can access the data all at once, using a dictionary,
+For an Input or Output, you can access the data all at once by using a dictionary,
 or member by member. Using a dictionary is usually more efficient if you intend
 to access most or all of the data members of a large type.
 
 In an Output, :meth:`Instance.set_dictionary` receives a dictionary with all or
-some of the Output type members, and in an Input, :meth:`SampleIterator.get_dictionary`
+some of the Output type members. In an Input, :meth:`SampleIterator.get_dictionary`
 retrieves all the members.
 
-It is also possible to provide a ``member_name`` to :meth:`SampleIterator.get_dictionary` to obtain
-a dictionary containing the fields of that nested member only.
+It is also possible to provide a ``member_name`` to 
+:meth:`SampleIterator.get_dictionary` to obtain
+a dictionary that only contains the fields of that nested member.
 
-On the other hand the methods described in the following section receive a
+The methods described in the following section receive a
 ``field_name`` argument to get or set a specific member.
 
 Accessing basic members (numbers, strings and booleans)
@@ -138,10 +139,12 @@ To set any numeric type, including enumerations:
     used to define that field in the configuration file. However, ``set_number`` and
     ``get_number`` can't handle 64-bit integers (*int64* and *uint64*)
     whose absolute values are larger than 2^53. This is a *Connector* limitation
-    due to the use of *double* as an intermediate representation. When ``set_number``
-    or ``get_number`` detect this situation, they raise an :class:`Error`.
-    ``get_dictionary`` and ``set_dictionary`` do not have this limitation and can
-    handle any 64-bit integer. ``Instance``'s ``__setitem__`` method doesn't have
+    due to the use of *double* as an intermediate representation. 
+    
+    When ``set_number`` or ``get_number`` detect this situation, they will raise 
+    an :class:`Error`. ``get_dictionary`` and ``set_dictionary`` do not have this 
+    limitation and can handle any 64-bit integer.    
+    ``Instance``'s ``__setitem__`` method doesn't have
     this limitation either, but ``SampleIterator``'s ``__getitem__`` does.
 
 To set booleans:
@@ -157,8 +160,8 @@ To set strings:
     output.instance.set_string("my_string", "Hello, World!")
 
 
-As an alternative to the previous setters, the special method ``__setitem__``
-can be used as follows:
+As an alternative to the setters mentioned above, you can use the special 
+method ``__setitem__`` as follows:
 
 .. testcode::
 
@@ -167,9 +170,9 @@ can be used as follows:
     output.instance["my_string"] = "Hello, World!"
 
 In all cases, the type of the assigned value must be consistent with the type
-of the field as defined in the configuration file.
+of the field, as defined in the configuration file.
 
-Similarly, to get a field in a :class:`Input` sample, use the appropriate
+Similarly, to get a field in an :class:`Input` sample, use the appropriate
 getter: :meth:`SampleIterator.get_number()`, :meth:`SampleIterator.get_boolean()`,
 :meth:`SampleIterator.get_string()`, or ``__getitem__``. ``get_string`` also works
 with numeric fields, returning the number as a string. For example:
@@ -193,19 +196,19 @@ with numeric fields, returning the number as a string. For example:
 .. note::
     The typed getters and setters perform better than ``__setitem__``
     and ``__getitem__`` in applications that write or read at high rates.
-    Also prefer ``get_dictionary`` or ``set_dictionary`` over ``__setitem__``
+    We also recommend ``get_dictionary`` or ``set_dictionary`` over ``__setitem__``
     or ``__getitem__`` when accessing all or most of the fields of a sample
     (see previous section).
 
 .. note::
-    If a field *my_string*, defined as a string in the configuration file contains
-    a value that can be interpreted as a number, ``sample["my_string"]`` returns
-    a number, not a string.
+    If a field ``my_string``, defined as a string in the configuration file, 
+    contains a value that can be interpreted as a number, ``sample["my_string"]`` 
+    returns a number, not a string.
 
 Accessing structs
 ^^^^^^^^^^^^^^^^^
 
-To access a nested member, use ``.`` to identify the fully-qualified ``field_name``
+To access a nested member, use ``.`` to identify the fully qualified ``field_name``
 and pass it to the corresponding setter or getter.
 
 .. testcode::
@@ -238,7 +241,7 @@ the following code after the previous call to ``set_dictionary``:
 
 The value of ``my_point`` is now ``{"x":10, "y":200}``
 
-It is possible to obtain the dictionary of a nested struct using
+To obtain the dictionary of a nested struct, use 
 `SampleIterator.get_dictionary("member_name")`:
 
 .. testcode::
@@ -247,7 +250,7 @@ It is possible to obtain the dictionary of a nested struct using
       point = sample.get_dictionary("my_point")
 
 ``member_name`` must be one of the following types: array, sequence,
-struct, value or union. If not, the call to get_dictionary will fail::
+struct, value or union. If not, the call to ``get_dictionary()`` will fail::
 
    for sample in input.samples.valid_data_iter:
       try:
@@ -255,8 +258,7 @@ struct, value or union. If not, the call to get_dictionary will fail::
       except rti.Error:
         print("ERROR, my_long is a basic type")
 
-It is also possible to obtain the dictionary of a struct using the ``__getitem__``
-operator:
+To obtain the dictionary of a struct, use the ``__getitem__`` operator:
 
 .. testcode::
 
@@ -264,8 +266,9 @@ operator:
         point = sample["my_point"]
         # point is a dict
 
-The same limitations described in :ref:`Accessing basic members (numbers, strings and booleans)`
-of using ``__getitem__`` apply here.
+The same limitations described in 
+:ref:`Accessing basic members (numbers, strings and booleans)`
+about using ``__getitem__`` apply here.
 
 Accessing arrays and sequences
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -292,7 +295,7 @@ a dictionary containing all of the elements of the array or sequence with name `
     for sample in input.samples.valid_data_iter:
         the_point_sequence = sample.get_dictionary("my_point_sequence")
 
-It is also possible to supply ``member_name`` as an element of an array or sequence
+To supply ``member_name`` as an element of an array or sequence
 (if the member type is complex):
 
 .. testcode::
@@ -300,7 +303,7 @@ It is also possible to supply ``member_name`` as an element of an array or seque
    for sample in input.samples.valid_data_iter:
       point_element = sample.get_dictionary("my_point_sequence[1]")
 
-The ``__getitem__`` operator can be used to obtain arrays and sequences:
+You can use the ``__getitem__`` operator to obtain arrays and sequences:
 
 .. testcode::
 
@@ -308,10 +311,11 @@ The ``__getitem__`` operator can be used to obtain arrays and sequences:
         point_sequence = sample["my_point_sequence"]
         # point is a list
 
-The type returned by the ``__getitem__`` operator is a list for arrays and sequences.
+The type returned by the ``__getitem__`` operator is a list of arrays and sequences.
 
-The same limitations described in :ref:`Accessing basic members (numbers, strings and booleans)`
-of using ``__getitem__`` apply here.
+The same limitations described in 
+:ref:`Accessing basic members (numbers, strings and booleans)` 
+about using ``__getitem__`` apply here.
 
 In an Output, sequences are automatically resized:
 
@@ -320,7 +324,7 @@ In an Output, sequences are automatically resized:
     output.instance.set_number("my_int_sequence[5]", 10) # length is now 6
     output.instance.set_number("my_int_sequence[4]", 9) # length still 6
 
-You can clear a sequence:
+To clear a sequence:
 
 .. testcode::
 
@@ -334,7 +338,7 @@ In dictionaries, sequences and arrays are represented as lists. For example:
         "my_int_sequence":[1, 2],
         "my_point_sequence":[{"x":1, "y":1}, {"x":2, "y":2}]})
 
-Arrays have a constant length that can't be changed. When you don't set all the elements
+Arrays have a constant length that can't be changed. If you don't set all the elements
 of an array, the remaining elements retain their previous value. However, sequences
 are always overwritten. See the following example:
 
@@ -348,17 +352,17 @@ are always overwritten. See the following example:
         "my_point_sequence":[{"x":100}],
         "my_point_array":[{"x":100}, {"y":200}]})
 
-After the second call to ``set_dictionary``, the contents of ``my_point_sequence``
-are ``[{"x":100, "y":0}]``, but the contents of ``my_point_array`` are:
+After the second call to ``set_dictionary()``, the contents of ``my_point_sequence``
+are ``[{"x":100, "y":0}]``, but the contents of ``my_point_array`` are 
 ``[{"x":100, "y":1}, {"x":2, "y":200}, {"x":3, "y":3}]``.
 
 Accessing optional members
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A optional member is a member that applications can decide to send or not as
-part of every published sample. Therefore, optional members may have a value or not.
-They are accessed the same way as non-optional members, except that ``None`` is
-a possible value.
+An (optional member is a member that applications can decide to send or not as
+part of every published sample. Therefore, optional members may or may not have 
+a value. They are accessed the same way as non-optional members, except that 
+``None`` is a possible value.
 
 On an Input, any of the getters may return ``None`` if the field is optional:
 
@@ -422,7 +426,7 @@ Addendum for Extensible Types*,
 Accessing unions
 ^^^^^^^^^^^^^^^^
 
-In an Output the union member is automatically selected when you set it:
+In an Output, the union member is automatically selected when you set it:
 
 .. testcode::
 
@@ -451,5 +455,6 @@ The ``__getitem__`` operator can be used to obtain unions:
 
 The type returned by the operator is a dict for unions.
 
-The same limitations described in :ref:`Accessing basic members (numbers, strings and booleans)`
-of using ``__getitem__`` apply here.
+The same limitations described in 
+:ref:`Accessing basic members (numbers, strings and booleans)` 
+about using ``__getitem__`` apply here.
