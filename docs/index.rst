@@ -25,6 +25,7 @@ Table of Contents
 
 .. toctree::
    :maxdepth: 2
+   :numbered:
 
    intro
    getting_started

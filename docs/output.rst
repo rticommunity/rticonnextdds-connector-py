@@ -20,7 +20,9 @@ To write a data sample, first look up an :class:`Output`:
 
 :meth:`Connector.get_output()` returns an :class:`Output` object. This example 
 obtains the output defined by the ``<data_writer>`` named *MySquareWriter* within
-the ``<publisher>`` named *MyPublisher*::
+the ``<publisher>`` named *MyPublisher*:
+
+.. code-block:: xml
 
    <publisher name="MyPublisher">
      <data_writer name="MySquareWriter" topic_ref="Square" />
@@ -48,7 +50,9 @@ Or using a dictionary:
    output.instance.set_dictionary({"x":1, "y":2, "shapesize":30, "color":"BLUE"})
 
 The name of each member corresponds to the type assigned to this output in XML.
-For example::
+For example:
+
+.. code-block:: xml
 
    <struct name="ShapeType">
      <member name="color" type="string" stringMaxLength="128" key="true" default="RED"/>
@@ -66,8 +70,8 @@ To write the values you set in ``output.instance``, call :meth:`Output.write()`:
 
    output.write()
 
-If the ``<datawriter_qos>`` is set up for reliable communication, you can use 
-:meth:`Output.wait()` to block until all matching reliable *Subscribers* 
+If the ``<datawriter_qos>`` is set up for reliable communication, you can use
+:meth:`Output.wait()` to block until all matching reliable *Subscribers*
 acknowledge reception of the data sample::
 
     output.wait()
@@ -88,19 +92,22 @@ It is also possible to dispose or unregister an instance:
 
 In these two cases, only the *key* fields in the ``output.instance`` are relevant.
 
+See :meth:`Output.write` for more information on the supported parameters.
+
 Matching with a Subscription
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Before writing, you can use the method :meth:`Output.wait_for_subscriptions()` to 
+Before writing, you can use the method :meth:`Output.wait_for_subscriptions()` to
 detect when a compatible DDS subscription is matched or stops matching. It returns
 the change in the number of matched subscriptions since the last time it was called::
 
    change_in_matches = output.wait_for_subscriptions()
 
 For example, if a new compatible subscription is discovered within the specified
-``timeout``, the function returns 1.
+``timeout``, the function returns 1; if an previously matching subscription
+no longer matches (for example, due to the application being closed), it returns -1.
 
-You can obtain information about the existing matched subscriptions with
+You can obtain information about the currently matched subscriptions with
 :attr:`Output.matched_subscriptions`:
 
 .. testcode::

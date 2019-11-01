@@ -18,19 +18,30 @@ To read/take samples, first get a reference to the :class:`Input`:
 
    input = connector.get_input("MySubscriber::MySquareReader")
 
-:meth:`Connector.get_input()` returns a :class:`Input` object. This example 
+:meth:`Connector.get_input()` returns a :class:`Input` object. This example
 obtains the input defined by the ``<data_reader>`` named *MySquareReader* within
-the ``<subscriber>`` named *MySubscriber*::
+the ``<subscriber>`` named *MySubscriber*:
+
+.. code-block:: xml
 
    <subscriber name="MySubscriber">
      <data_reader name="MySquareReader" topic_ref="Square" />
    </subscriber>
 
-This ``<subscriber>`` is defined inside the ``<domain_participant>`` selected 
+This ``<subscriber>`` is defined inside the ``<domain_participant>`` selected
 to create this ``connector`` (see :ref:`Creating a new Connector`).
 
 Reading or taking the data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Call :meth:`Input.take()` to access and remove the samples::
+
+   input.take()
+
+or :meth:`Input.read()` to access the samples but leave them available for
+a future ``read()`` or ``take()``::
+
+   input.read()
 
 The method :meth:`Input.wait()` can be used to identify when there is new data
 available on a specific :class:`Input`. It will block until either the supplied
@@ -45,20 +56,11 @@ the :class:`Connector`::
 
   connector.wait()
 
-Call :meth:`Input.take()` to access and remove the samples::
-
-   input.take()
-
-or :meth:`Input.read()` to access the samples but leave them available for
-a future ``read()`` or ``take()``::
-
-   input.read()
-
 Accessing the data samples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-After calling the read/take operations, :attr:`Input.samples` contains the data
-samples:
+After calling :meth:`Input.read()` or :meth:`Input.take()`, :attr:`Input.samples`
+contains the data samples:
 
 .. testcode::
 
@@ -69,7 +71,7 @@ samples:
 :meth:`SampleIterator.get_dictionary()` retrieves all the fields of a sample.
 
 If you don't need to access the meta-data (see :ref:`Accessing the SampleInfo`),
-the simplest way to access the data uses :attr:`Samples.valid_data_iter` to skip
+the simplest way to access the data is to use :attr:`Samples.valid_data_iter` to skip
 samples with invalid data:
 
 .. testcode::
@@ -104,7 +106,7 @@ For example:
       size = sample.get_number("shapesize")
       color = sample.get_string("color") # or just sample["color"]
 
-See more information in :ref:`Accessing the data`.
+See more information and examples in :ref:`Accessing the data`.
 
 Accessing the SampleInfo
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,7 +135,8 @@ matched publications since the last time it was called::
    change_in_matches = input.wait_for_publications()
 
 For example, if a new compatible publication is discovered within the specified
-``timeout``, the function returns 1.
+``timeout``, the function returns 1; if a previously matching publication
+no longer matches, it returns -1.
 
 You can obtain information about the existing matched publications with
 :attr:`Input.matched_publication`:

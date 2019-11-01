@@ -26,7 +26,9 @@ To access the data, :class:`Instance` and :class:`SampleIterator` provide
 setters and getters that expect a ``fieldName`` string. This section describes
 the format of this string.
 
-We will use the following type definition of MyType::
+We will use the following type definition of MyType:
+
+.. code-block:: xml
 
     <types>
         <enum name="Color">
@@ -64,7 +66,9 @@ We will use the following type definition of MyType::
         </struct>
     </types>
 
-The above XML corresponds to the following IDL definition::
+The above XML corresponds to the following IDL definition:
+
+.. code-block:: idl
 
     enum Color {
         RED,
@@ -98,7 +102,7 @@ The above XML corresponds to the following IDL definition::
     };
 
 .. hint::
-    You can get the XML definition of an IDL file with *rtiddsgen -convertToXml MyType.idl*.
+    You can get the XML definition of an IDL file with ``rtiddsgen -convertToXml MyType.idl``.
 
 We will refer to an Output named ``output`` and
 an Input named ``input`` such that ``input.samples.length > 0``.
@@ -114,7 +118,7 @@ In an Output, :meth:`Instance.set_dictionary` receives a dictionary with all or
 some of the Output type members. In an Input, :meth:`SampleIterator.get_dictionary`
 retrieves all the members.
 
-It is also possible to provide a ``member_name`` to 
+It is also possible to provide a ``member_name`` to
 :meth:`SampleIterator.get_dictionary` to obtain
 a dictionary that only contains the fields of that nested member.
 
@@ -139,11 +143,11 @@ To set any numeric type, including enumerations:
     used to define that field in the configuration file. However, ``set_number`` and
     ``get_number`` can't handle 64-bit integers (*int64* and *uint64*)
     whose absolute values are larger than 2^53. This is a *Connector* limitation
-    due to the use of *double* as an intermediate representation. 
-    
-    When ``set_number`` or ``get_number`` detect this situation, they will raise 
-    an :class:`Error`. ``get_dictionary`` and ``set_dictionary`` do not have this 
-    limitation and can handle any 64-bit integer.    
+    due to the use of *double* as an intermediate representation.
+
+    When ``set_number`` or ``get_number`` detect this situation, they will raise
+    an :class:`Error`. ``get_dictionary`` and ``set_dictionary`` do not have this
+    limitation and can handle any 64-bit integer.
     ``Instance``'s ``__setitem__`` method doesn't have
     this limitation either, but ``SampleIterator``'s ``__getitem__`` does.
 
@@ -160,7 +164,7 @@ To set strings:
     output.instance.set_string("my_string", "Hello, World!")
 
 
-As an alternative to the setters mentioned above, you can use the special 
+As an alternative to the setters mentioned above, you can use the special
 method ``__setitem__`` as follows:
 
 .. testcode::
@@ -201,8 +205,8 @@ with numeric fields, returning the number as a string. For example:
     (see previous section).
 
 .. note::
-    If a field ``my_string``, defined as a string in the configuration file, 
-    contains a value that can be interpreted as a number, ``sample["my_string"]`` 
+    If a field ``my_string``, defined as a string in the configuration file,
+    contains a value that can be interpreted as a number, ``sample["my_string"]``
     returns a number, not a string.
 
 Accessing structs
@@ -241,8 +245,7 @@ the following code after the previous call to ``set_dictionary``:
 
 The value of ``my_point`` is now ``{"x":10, "y":200}``
 
-To obtain the dictionary of a nested struct, use 
-`SampleIterator.get_dictionary("member_name")`:
+It is possible to obtain the dictionary of a nested struct:
 
 .. testcode::
 
@@ -258,7 +261,8 @@ struct, value or union. If not, the call to ``get_dictionary()`` will fail::
       except rti.Error:
         print("ERROR, my_long is a basic type")
 
-To obtain the dictionary of a struct, use the ``__getitem__`` operator:
+It is also possible to obtain the dictionary of a struct using the ``__getitem__``
+operator:
 
 .. testcode::
 
@@ -266,7 +270,7 @@ To obtain the dictionary of a struct, use the ``__getitem__`` operator:
         point = sample["my_point"]
         # point is a dict
 
-The same limitations described in 
+The same limitations described in
 :ref:`Accessing basic members (numbers, strings and booleans)`
 about using ``__getitem__`` apply here.
 
@@ -293,29 +297,15 @@ a dictionary containing all of the elements of the array or sequence with name `
 .. testcode::
 
     for sample in input.samples.valid_data_iter:
-        the_point_sequence = sample.get_dictionary("my_point_sequence")
+        point_sequence = sample.get_dictionary("my_point_sequence") # or sample["my_point_sequence"]
+        # point_sequence is a list
 
-To supply ``member_name`` as an element of an array or sequence
-(if the member type is complex):
+You can also get a specific element as a dictionary (if the element type is complex):
 
 .. testcode::
 
    for sample in input.samples.valid_data_iter:
       point_element = sample.get_dictionary("my_point_sequence[1]")
-
-You can use the ``__getitem__`` operator to obtain arrays and sequences:
-
-.. testcode::
-
-    for sample in input.samples.valid_data_iter:
-        point_sequence = sample["my_point_sequence"]
-        # point is a list
-
-The type returned by the ``__getitem__`` operator is a list of arrays and sequences.
-
-The same limitations described in 
-:ref:`Accessing basic members (numbers, strings and booleans)` 
-about using ``__getitem__`` apply here.
 
 In an Output, sequences are automatically resized:
 
@@ -353,15 +343,15 @@ are always overwritten. See the following example:
         "my_point_array":[{"x":100}, {"y":200}]})
 
 After the second call to ``set_dictionary()``, the contents of ``my_point_sequence``
-are ``[{"x":100, "y":0}]``, but the contents of ``my_point_array`` are 
+are ``[{"x":100, "y":0}]``, but the contents of ``my_point_array`` are
 ``[{"x":100, "y":1}, {"x":2, "y":200}, {"x":3, "y":3}]``.
 
 Accessing optional members
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 An (optional member is a member that applications can decide to send or not as
-part of every published sample. Therefore, optional members may or may not have 
-a value. They are accessed the same way as non-optional members, except that 
+part of every published sample. Therefore, optional members may or may not have
+a value. They are accessed the same way as non-optional members, except that
 ``None`` is a possible value.
 
 On an Input, any of the getters may return ``None`` if the field is optional:
@@ -421,7 +411,7 @@ To clear a member, set it to ``None`` explicitly::
 
 For more information about optional members in DDS, see the *Getting Started Guide
 Addendum for Extensible Types*,
-`section 3.2 Optional Members <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/getting_started_extras/html_files/RTI_ConnextDDS_CoreLibraries_GettingStarted_ExtensibleAddendum/index.htm#ExtensibleTypesAddendum/Optional_Members.htm#3.2_Optional_Members%3FTocPath%3D3.%2520Type%2520System%2520Enhancements%7C3.2%2520Optional%2520Members%7C_____0>`__. 
+`section 3.2 Optional Members <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/getting_started_extras/html_files/RTI_ConnextDDS_CoreLibraries_GettingStarted_ExtensibleAddendum/index.htm#ExtensibleTypesAddendum/Optional_Members.htm#3.2_Optional_Members%3FTocPath%3D3.%2520Type%2520System%2520Enhancements%7C3.2%2520Optional%2520Members%7C_____0>`__.
 
 Accessing unions
 ^^^^^^^^^^^^^^^^
@@ -455,6 +445,6 @@ The ``__getitem__`` operator can be used to obtain unions:
 
 The type returned by the operator is a dict for unions.
 
-The same limitations described in 
-:ref:`Accessing basic members (numbers, strings and booleans)` 
+The same limitations described in
+:ref:`Accessing basic members (numbers, strings and booleans)`
 about using ``__getitem__`` apply here.
