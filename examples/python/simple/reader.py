@@ -18,8 +18,8 @@ sys_path.append(file_path + "/../../../")
 import rticonnextdds_connector as rti
 
 with rti.open_connector(
-    config_name = "MyParticipantLibrary::MySubParticipant",
-    url = file_path + "/../ShapeExample.xml") as connector:
+        config_name="MyParticipantLibrary::MySubParticipant",
+        url=file_path + "/../ShapeExample.xml") as connector:
 
     input = connector.get_input("MySubscriber::MySquareReader")
 
@@ -40,4 +40,4 @@ with rti.open_connector(
             size = sample.get_number("shapesize")
             color = sample.get_string("color")
             print("Received x: " + repr(x) + " y: " + repr(y) +
-                    " size: " + repr(size) + " color: " + repr(color))
+                  " size: " + repr(size) + " color: " + repr(color))

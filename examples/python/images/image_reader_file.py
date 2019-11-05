@@ -9,12 +9,12 @@
 """Reads images and saves them into a file"""
 
 from __future__ import print_function
-from sys import path as sys_path, stdout
+from sys import path as sys_path
 from os import path as os_path
+from time import sleep
 import matplotlib.pyplot as plot
 import matplotlib
 import numpy
-from time import sleep
 
 # Updating the system path is not required if you have pip-installed
 # rticonnextdds-connector
@@ -25,8 +25,8 @@ import rticonnextdds_connector as rti
 matplotlib.use('Agg') # Non-GUI backend
 
 with rti.open_connector(
-    config_name = "MyParticipantLibrary::ImageSubParticipant",
-    url = file_path + "/ImagesExample.xml") as connector:
+        config_name="MyParticipantLibrary::ImageSubParticipant",
+        url=file_path + "/ImagesExample.xml") as connector:
 
     # Create a blank image
     fig = plot.figure()

@@ -23,8 +23,8 @@ import rticonnextdds_connector as rti
 
 
 with rti.open_connector(
-    config_name = "MyParticipantLibrary::ImageSubParticipant",
-    url = file_path + "/ImagesExample.xml") as connector:
+        config_name="MyParticipantLibrary::ImageSubParticipant",
+        url=file_path + "/ImagesExample.xml") as connector:
 
     # Create a blank image
     fig = plot.figure()
@@ -33,9 +33,10 @@ with rti.open_connector(
 
     input = connector.get_input("MySubscriber::ImageReader")
 
-    # The animation function, called periodically in a set interval, reads the
-    # last image received and draws it
-    def read_and_draw(frame):
+    def read_and_draw(_frame):
+        """The animation function, called periodically in a set interval, reads the
+        last image received and draws it"""
+
         # The Qos configuration guarantees we will only have the last sample;
         # we read (not take) so we can access it again in the next interval if
         # we don't receive a new one

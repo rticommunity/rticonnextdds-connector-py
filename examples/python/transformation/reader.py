@@ -18,8 +18,8 @@ sys_path.append(file_path + "/../../../")
 import rticonnextdds_connector as rti
 
 with rti.open_connector(
-    config_name = "MyParticipantLibrary::CircleSubParticipant",
-    url = file_path + "/../ShapeExample.xml") as connector:
+        config_name="MyParticipantLibrary::CircleSubParticipant",
+        url=file_path + "/../ShapeExample.xml") as connector:
 
     input = connector.get_input("MySubscriber::MyCircleReader")
 

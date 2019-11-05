@@ -21,22 +21,22 @@ sys_path.append(file_path + "/../../../")
 import rticonnextdds_connector as rti
 
 def random_rgb():
-    # Generate a random RGB pixel
+    """Generate a random RGB pixel"""
     return [int(255*random.random()), int(255*random.random()), int(255*random.random())]
 
 def generate_random_image(size):
-    # Generate a random flat list of pixels of 3 different colors
+    """Generate a random flat list of pixels of 3 different colors"""
     random_colors = [random_rgb() for i in range(3)]
     pixels = np.array([random.choice(random_colors) for i in range(size)])
     return pixels.reshape(-1).tolist() # Flatten out and convert to list
 
-def update_image(pixels, iteration):
-    # Shift 3 elements (one pixel)
+def update_image(pixels, _iteration):
+    """Shift 3 elements (one pixel)"""
     return pixels[3:] + pixels[:3]
 
 with rti.open_connector(
-    config_name = "MyParticipantLibrary::ImagePubParticipant",
-    url = file_path + "/ImagesExample.xml") as connector:
+        config_name="MyParticipantLibrary::ImagePubParticipant",
+        url=file_path + "/ImagesExample.xml") as connector:
 
     output = connector.get_output("MyPublisher::ImageWriter")
 
