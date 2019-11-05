@@ -215,9 +215,9 @@ class TestDiscovery:
     assert matched_subs == [{'name': ''}]
 
   def test_no_entity_names(self, discovery_writer_only_output):
-    # We call the _createTestScenario API to create a remote matching reader which
+    # We call the _create_test_scenario API to create a remote matching reader which
     # will not set any entity name.
-    retcode = rti.connector_binding._createTestScenario(
+    retcode = rti.connector_binding._create_test_scenario(
       discovery_writer_only_output.connector.native,
       0, # RTI_Connector_testScenario_createReader
       discovery_writer_only_output.native)
