@@ -23,11 +23,11 @@ import platform
 import json
 from contextlib import contextmanager
 from numbers import Number
+from ctypes import * # pylint: disable=unused-wildcard-import, wildcard-import, ungrouped-imports
 
 # pylint: disable=too-many-lines
 # pylint: disable=line-too-long
-# pylint: disable=unused-wildcard-import, wildcard-import, ungrouped-imports
-from ctypes import *
+# pylint: disable=too-few-public-methods
 
 def fromcstring(value):
     "Converts string returned from C library"
@@ -82,11 +82,10 @@ class _ReturnCode:
     no_data = 11
 
 def _check_retcode(retcode):
-    if retcode != _ReturnCode.ok and retcode != _ReturnCode.no_data:
+    if retcode not in (_ReturnCode.ok, _ReturnCode.no_data):
         if retcode == _ReturnCode.timeout:
             raise TimeoutError
-        else:
-            raise Error("DDS Exception: " + _get_last_dds_error_message())
+        raise Error("DDS Exception: " + _get_last_dds_error_message())
 
 def _check_entity_creation(entity, entity_name):
     if entity is None:
@@ -100,8 +99,9 @@ class _AnyValueKind:
     connector_boolean = 2
     connector_string = 3
 
+# pylint: disable=too-many-instance-attributes
 class _ConnectorBinding:
-    def __init__(self):
+    def __init__(self): # pylint: disable=too-many-statements
         (bits, _) = platform.architecture()
         osname = platform.system()
         is_arm = platform.uname()[4].startswith("arm")
@@ -304,7 +304,8 @@ class _ConnectorBinding:
         self._create_test_scenario.restype = ctypes.c_int
         self._create_test_scenario.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p]
 
-    def get_any_value(self, getter_function, connector, input_name, index, field_name):
+    @staticmethod
+    def get_any_value(getter_function, connector, input_name, index, field_name):
         "Calls one of the get_any functions and translates the result from ctypes to python"
         number_value = ctypes.c_double()
         bool_value = ctypes.c_int()
@@ -326,9 +327,9 @@ class _ConnectorBinding:
 
         if selection.value == _AnyValueKind.connector_number:
             return number_value.value
-        elif selection.value == _AnyValueKind.connector_boolean:
+        if selection.value == _AnyValueKind.connector_boolean:
             return bool_value.value
-        elif selection.value == _AnyValueKind.connector_string:
+        if selection.value == _AnyValueKind.connector_string:
             # A string can represent three different things:
             #  - An actual string value (handled in the except clause)
             #  - A json string; we parse it and convert it to a dictionary
@@ -416,9 +417,8 @@ class Samples:
         return ValidSampleIterator(self.input)
 
     # Deprecated function
-    # pylint: disable=invalid-name
-    # pylint: disable=missing-docstring
     def getLength(self):
+        # pylint: disable=invalid-name, missing-docstring
         c_value = ctypes.c_double()
         retcode = connector_binding.get_sample_count(
             self.input.connector.native,
@@ -428,9 +428,8 @@ class Samples:
         return int(c_value.value)
 
     # Deprecated function
-    # pylint: disable=invalid-name
-    # pylint: disable=missing-docstring
     def getNumber(self, index, field_name):
+        # pylint: disable=invalid-name, missing-docstring
         if not isinstance(index, int):
             raise ValueError("index must be an integer")
         if index < 0:
@@ -453,9 +452,8 @@ class Samples:
         return c_value.value
 
     # Deprecated function
-    # pylint: disable=invalid-name
-    # pylint: disable=missing-docstring
     def getBoolean(self, index, field_name):
+        # pylint: disable=invalid-name, missing-docstring
         if not isinstance(index, int):
             raise ValueError("index must be an integer")
         if index < 0:
@@ -478,9 +476,8 @@ class Samples:
         return c_value.value
 
     # Deprecated function
-    # pylint: disable=invalid-name
-    # pylint: disable=missing-docstring
     def getString(self, index, field_name):
+        # pylint: disable=invalid-name, missing-docstring
         if not isinstance(index, int):
             raise ValueError("index must be an integer")
         if index < 0:
@@ -500,7 +497,9 @@ class Samples:
 
         return _move_native_string(c_value)
 
+    # Deprecated
     def getDictionary(self, index, member_name=None):
+        # pylint: disable=invalid-name, missing-docstring
         if not isinstance(index, int):
             raise ValueError("index must be an integer")
         if index < 0:
@@ -529,8 +528,10 @@ class Samples:
             return None
         return json.loads(_move_native_string(native_json_str))
 
+    # Deprecated
     def getNative(self, index):
-        #Adding 1 to index because the C API was based on Lua where indexes start from 1
+        # pylint: disable=invalid-name, missing-docstring
+        # Adding 1 to index because the C API was based on Lua where indexes start from 1
         index = index + 1
         dynamic_data_ptr = connector_binding.get_native_sample(
             self.input.connector.native,
@@ -546,9 +547,8 @@ class Infos:
         self.input = input
 
     # Deprecated function
-    # pylint: disable=invalid-name
-    # pylint: disable=missing-docstring
     def getLength(self):
+        # pylint: disable=invalid-name, missing-docstring
         c_value = ctypes.c_double()
         retcode = connector_binding.get_sample_count(
             self.input.connector.native,
@@ -558,9 +558,8 @@ class Infos:
         return c_value.value
 
     # Deprecated function
-    # pylint: disable=invalid-name
-    # pylint: disable=missing-docstring
     def isValid(self, index):
+        # pylint: disable=invalid-name, missing-docstring
         if not isinstance(index, int):
             raise ValueError("index must be an integer")
         if index < 0:
@@ -580,10 +579,9 @@ class Infos:
             return None
         return c_value.value
 
-    # Deprecated function
-    # pylint: disable=invalid-name
-    # pylint: disable=missing-docstring
+    # Deprecated
     def getSampleIdentity(self, index):
+        # pylint: disable=invalid-name, missing-docstring
         native_json_str = ctypes.c_char_p()
         retcode = connector_binding.get_json_from_infos(
             self.input.connector.native,
@@ -594,7 +592,9 @@ class Infos:
         _check_retcode(retcode)
         return json.loads(fromcstring(native_json_str))
 
+    # Deprecated
     def getRelatedSampleIdentity(self, index):
+        # pylint: disable=invalid-name, missing-docstring
         native_json_str = ctypes.c_char_p()
         retcode = connector_binding.get_json_from_infos(
             self.input.connector.native,
@@ -731,11 +731,12 @@ class SampleIterator:
     def __next__(self):
         """Moves to the next sample"""
 
-        if self.index + 1 < self.length:
-            self.index = self.index + 1
-            return self
-        else:
+        if self.index + 1 >= self.length:
             raise StopIteration
+
+        self.index = self.index + 1
+        return self
+
 
     def next(self):
         """Moves to the next sample"""
@@ -915,7 +916,7 @@ class Instance:
             self.set_string(field_name, value)
         elif isinstance(value, bool):
             self.set_boolean(field_name, value)
-        elif isinstance(value, dict) or isinstance(value, list):
+        elif isinstance(value, (dict, list)):
             self.set_dictionary({field_name:value})
         elif value is None:
             self.clear_member(field_name)
@@ -931,7 +932,8 @@ class Instance:
 
         if field_name is None:
             raise AttributeError("field_name cannot be None")
-        elif value is None:
+
+        if value is None:
             self.clear_member(field_name)
         else:
             try:
@@ -945,9 +947,8 @@ class Instance:
                     .format(field_name))
 
     # Deprecated: use set_number
-    # pylint: disable=invalid-name
-    # pylint: disable=missing-docstring
     def setNumber(self, field_name, value):
+        # pylint: disable=invalid-name, missing-docstring
         self.set_number(field_name, value)
 
     def set_boolean(self, field_name, value):
@@ -959,7 +960,8 @@ class Instance:
 
         if field_name is None:
             raise AttributeError("field_name cannot be None")
-        elif value is None:
+
+        if value is None:
             self.clear_member(field_name)
         else:
             try:
@@ -974,6 +976,7 @@ class Instance:
 
     # Deprecated: use set_boolean
     def setBoolean(self, field_name, value):
+        # pylint: disable=invalid-name, missing-docstring
         self.set_boolean(field_name, value)
 
     def set_string(self, field_name, value):
@@ -985,7 +988,8 @@ class Instance:
 
         if field_name is None:
             raise AttributeError("field_name cannot be None")
-        elif value is None:
+
+        if value is None:
             self.clear_member(field_name)
         else:
             try:
@@ -1000,6 +1004,7 @@ class Instance:
 
     # Deprecated: use set_string
     def setString(self, field_name, value):
+        # pylint: disable=invalid-name, missing-docstring
         self.set_string(field_name, value)
 
     def set_dictionary(self, dictionary):
@@ -1020,14 +1025,15 @@ class Instance:
         :param dict dictionary: The dictionary containing the keys (member names) and values (values for the members)
         """
 
-        jsonStr = json.dumps(dictionary)
+        json_str = json.dumps(dictionary)
         _check_retcode(connector_binding.set_json_instance(
             self.output.connector.native,
             tocstring(self.output.name),
-            tocstring(jsonStr)))
+            tocstring(json_str)))
 
     # Deprecated: use set_dictionary
     def setDictionary(self, dictionary):
+        # pylint: disable=invalid-name, missing-docstring
         self.set_dictionary(dictionary)
 
     @property
@@ -1047,6 +1053,7 @@ class Instance:
 
     # Deprecated: use native property
     def getNative(self):
+        # pylint: disable=invalid-name, missing-docstring
         return self.native
 
 
@@ -1257,9 +1264,9 @@ class Connector:
         return Output(self, output_name)
 
     # Deprecated: use get_output
-    # pylint: disable=invalid-name
-    # pylint: disable=missing-docstring
     def getOutput(self, output_name):
+        # pylint: disable=invalid-name
+        # pylint: disable=missing-docstring
         return self.get_output(output_name)
 
     def get_input(self, input_name):
@@ -1293,9 +1300,8 @@ class Connector:
         return Input(self, input_name)
 
     # Deprecated: use get_input()
-    # pylint: disable=invalid-name
-    # pylint: disable=missing-docstring
     def getInput(self, input_name):
+        # pylint: disable=invalid-name, missing-docstring
         return self.get_input(input_name)
 
     def wait(self, timeout=None):
