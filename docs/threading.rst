@@ -18,7 +18,7 @@ Thread-safe operations:
    * :meth:`Input.wait` (wait for data on this ``Input``)
    * :meth:`Input.wait_for_publications`
 
-These operations can block a thread while the same ``Connector`` is used in
+These operations can block a thread while the same :class:`Connector` is used in
 a different thread.
 
 .. note::
@@ -33,7 +33,7 @@ a different thread.
 
 All operations on **different** :class:`Connector` instances are thread-safe.
 
-Applications can implement their own thread-safety mechanism around a ``Connector``
+Applications can implement their own thread-safety mechanism around a :class:`Connector` 
 instance. The following section provides an example.
 
 Protecting calls to Connector

@@ -34,6 +34,8 @@ Table of Contents
    output
    input
    advanced
+   release_notes
+   copyright_license
 
 * :ref:`genindex`
 * :ref:`search`

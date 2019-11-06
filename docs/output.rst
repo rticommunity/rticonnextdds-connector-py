@@ -90,7 +90,8 @@ It is also possible to dispose or unregister an instance:
   output.write(action="dispose")
   output.write(action="unregister")
 
-In these two cases, only the *key* fields in the ``output.instance`` are relevant.
+In these two cases, only the *key* fields in the ``output.instance`` are relevant
+when determining the instance that is disposed or unregistered.
 
 See :meth:`Output.write` for more information on the supported parameters.
 
@@ -104,7 +105,7 @@ the change in the number of matched subscriptions since the last time it was cal
    change_in_matches = output.wait_for_subscriptions()
 
 For example, if a new compatible subscription is discovered within the specified
-``timeout``, the function returns 1; if an previously matching subscription
+``timeout``, the function returns 1; if a previously matching subscription
 no longer matches (for example, due to the application being closed), it returns -1.
 
 You can obtain information about the currently matched subscriptions with

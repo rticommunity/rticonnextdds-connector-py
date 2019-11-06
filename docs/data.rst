@@ -148,7 +148,7 @@ To set any numeric type, including enumerations:
     When ``set_number`` or ``get_number`` detect this situation, they will raise
     an :class:`Error`. ``get_dictionary`` and ``set_dictionary`` do not have this
     limitation and can handle any 64-bit integer.
-    ``Instance``'s ``__setitem__`` method doesn't have
+    An ``Instance``'s ``__setitem__`` method doesn't have
     this limitation either, but ``SampleIterator``'s ``__getitem__`` does.
 
 To set booleans:
@@ -349,7 +349,7 @@ are ``[{"x":100, "y":0}]``, but the contents of ``my_point_array`` are
 Accessing optional members
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-An (optional member is a member that applications can decide to send or not as
+An optional member is a member that applications can decide to send or not as
 part of every published sample. Therefore, optional members may or may not have
 a value. They are accessed the same way as non-optional members, except that
 ``None`` is a possible value.
@@ -410,8 +410,8 @@ To clear a member, set it to ``None`` explicitly::
 
 
 For more information about optional members in DDS, see the *Getting Started Guide
-Addendum for Extensible Types*,
-`section 3.2 Optional Members <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/getting_started_extras/html_files/RTI_ConnextDDS_CoreLibraries_GettingStarted_ExtensibleAddendum/index.htm#ExtensibleTypesAddendum/Optional_Members.htm#3.2_Optional_Members%3FTocPath%3D3.%2520Type%2520System%2520Enhancements%7C3.2%2520Optional%2520Members%7C_____0>`__.
+Addendum for Extensible Types*, 
+`Section 3.2 Optional Members <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/getting_started_extras/html_files/RTI_ConnextDDS_CoreLibraries_GettingStarted_ExtensibleAddendum/index.htm#ExtensibleTypesAddendum/Optional_Members.htm>`__.
 
 Accessing unions
 ^^^^^^^^^^^^^^^^

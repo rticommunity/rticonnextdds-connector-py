@@ -36,24 +36,24 @@ file ``ShapeExample.xml``::
 
 See the full file here: `ShapeExample.xml <https://github.com/rticommunity/rticonnextdds-connector-py/blob/master/examples/python/ShapeExample.xml>`__.
 
-When you create a ``Connector``, the DDS *DomainParticipant* that you selected
+When you create a :class:`Connector`, the DDS *DomainParticipant* that you selected
 and all its contained entities (*Topics*, *Subscribers*, *DataReaders*,
 *Publishers*, *DataWriters*) are created.
 
 For more information about the DDS entities, see `Part 2 - Core Concepts <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/PartCoreConcepts.htm#partcoreconcepts_4109331811_915546%3FTocPath%3DPart%25202%253A%2520Core%2520Concepts%7C_____0>`__
-from the *RTI Connext DDS Core Libraries User's Manual*.
+in the *RTI Connext DDS Core Libraries User's Manual*.
 
 .. note::
 
-  Operations on the same ``Connector`` instance or its contained entities are
+  Operations on the same :class:`Connector` instance or its contained entities are
   not protected for multi-threaded access. See :ref:`Threading model` for more
   information.
 
 Closing a Connector
 ~~~~~~~~~~~~~~~~~~~
 
-To destroy all the DDS entities that belong to a *Connector* previously
-created, call :meth:`Connector.close()`:
+To destroy all the DDS entities that belong to a previously created :class:`Connector`, 
+call :meth:`Connector.close()`:
 
 .. testcode::
 
@@ -75,7 +75,7 @@ and automatically close the connector:
 Getting the Inputs and Outputs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Once you have created a ``Connector`` instance, :meth:`Connector.get_output()`
+Once you have created a :class:`Connector` instance, :meth:`Connector.get_output()`
 returns the :class:`Output` that allows writing data, and :meth:`Connector.get_input()`
 returns the :class:`Input` that allows reading data.
 
