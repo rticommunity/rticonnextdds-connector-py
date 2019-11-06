@@ -8,12 +8,12 @@
 Welcome to RTI Connector for Python!
 ====================================
 
-RTI® Connext® DDS is a connectivity software framework for integrating data
+*RTI® Connext® DDS* is a connectivity software framework for integrating data
 sources of all types. At its core is the world's leading ultra-high performance,
 distributed networking databus.
 
 *RTI Connector* provides a quick and easy way to write applications that
-publish and subscribe to the *RTI Connext DDS databus* in Python and other
+publish and subscribe to the *RTI Connext DDS* databus in Python and other
 languages.
 
 You can learn how to use *RTI Connector* by reading the following sections, which
@@ -25,12 +25,17 @@ Table of Contents
 
 .. toctree::
    :maxdepth: 2
+   :numbered:
 
+   intro
    getting_started
+   configuration
    connector
    output
    input
    advanced
+   release_notes
+   copyright_license
 
 * :ref:`genindex`
 * :ref:`search`

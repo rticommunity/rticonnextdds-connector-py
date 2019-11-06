@@ -14,7 +14,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
     <!-- Qos Library -->
     <qos_library name="QosLibrary">
         <qos_profile name="DefaultProfile"
-                     base_name="BuiltinQosLibExp::Generic.StrictReliable"
+                     base_name="BuiltinQosLib::Generic.StrictReliable"
                      is_default_qos="true">
             <participant_qos>
                 <participant_name>

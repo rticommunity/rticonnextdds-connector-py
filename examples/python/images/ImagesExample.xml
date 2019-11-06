@@ -15,7 +15,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
 			image, so it only needs a history of 1 sample and it doesn't need
 			reliable delivery.
 		-->
-		<qos_profile name="DefaultProfile" base_name="BuiltinQosLibExp::Generic.BestEffort" is_default_qos="true">
+		<qos_profile name="DefaultProfile" base_name="BuiltinQosLib::Generic.BestEffort" is_default_qos="true">
 			<datareader_qos>
 				<history>
 					<kind>KEEP_LAST_HISTORY_QOS</kind>
