@@ -235,3 +235,23 @@ profile is equivalent to *MyQosProfile* above:
 You can read more in the *RTI Connext DDS Core Libraries User's Manual*, 
 `Configuring QoS with XML 
 <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/XMLConfiguration.htm>`__.
+
+Logging
+^^^^^^^
+
+Logging can be configured as explained in `Configuring Logging via XML <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Configuring_Logging_via_XML1.htm>`__.
+
+For example, to increase the logging verbosity from the default (ERROR) to
+WARNING, define a ``qos_profile`` with the attribute
+``is_default_participant_factory_profile="true"``:
+
+.. code-block:: xml
+
+    <qos_profile name="Logging" is_default_participant_factory_profile="true">
+        <participant_factory_qos>
+            <logging>
+                <verbosity>WARNING</verbosity>
+            </logging>
+        </participant_factory_qos>
+    </qos_profile>
+
