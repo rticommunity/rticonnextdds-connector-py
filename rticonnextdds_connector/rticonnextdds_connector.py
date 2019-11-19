@@ -270,6 +270,10 @@ class _ConnectorBinding:
         self.get_json_sample.restype = ctypes.c_int
         self.get_json_sample.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, POINTER(c_char_p)]
 
+        self.get_json_instance = self.library.RTIDDSConnector_getJSONInstance
+        self.get_json_instance.restype = POINTER(ctypes.c_char)
+        self.get_json_instance.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+
         self.get_json_member = self.library.RTI_Connector_get_json_member
         self.get_json_member.restype = ctypes.c_int
         self.get_json_member.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, POINTER(c_char_p)]
@@ -1030,6 +1034,16 @@ class Instance:
             self.output.connector.native,
             tocstring(self.output.name),
             tocstring(json_str)))
+
+    def get_dictionary(self):
+        "Retrieves the values of this instance as a dictionary"
+        native_json_str = connector_binding.get_json_instance(
+            self.output.connector.native,
+            tocstring(self.output.name))
+
+        if not native_json_str:
+            raise Error("Failed to create dictionary")
+        return json.loads(_move_native_string(native_json_str))
 
     # Deprecated: use set_dictionary
     def setDictionary(self, dictionary):

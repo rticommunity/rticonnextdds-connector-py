@@ -85,6 +85,10 @@ class TestDataAccess:
 
     return test_input
 
+  def test_instance_get_dictionary(self, test_output, test_dictionary):
+    test_output.instance.set_dictionary(test_dictionary)
+    assert test_output.instance.get_dictionary() == test_dictionary
+
   def test_numbers(self, populated_input):
     sample = populated_input.samples[0]
     assert sample.get_number("my_long") == 10
