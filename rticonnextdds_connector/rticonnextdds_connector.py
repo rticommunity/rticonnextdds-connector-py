@@ -1107,7 +1107,7 @@ class Output:
 
         The supported parameters are:
 
-        :param action str: One of ``"write"`` (default), ``"dispose"`` or ``"unregister"``
+        :param str action: One of ``"write"`` (default), ``"dispose"`` or ``"unregister"``
         :param integer source_timestamp: The source timestamp, an integer representing the total number of nanoseconds
         :param dict identity: A dictionary containing the keys ``"writer_guid"`` (a list of 16 bytes) and ``"sequence_number"`` (an integer) that uniquely identifies this sample.
         :param dict related_sample_identity: Used for request-reply communications. It has the same format as ``identity``
