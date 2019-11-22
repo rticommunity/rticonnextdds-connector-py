@@ -1,7 +1,7 @@
 # Example: Data Transformation
 
 ## Example description
-In this example `transformation.py` subscribes to the *Square* topic, applies
+In this example `transform.py` subscribes to the *Square* topic, applies
 a simple transformation to the data it receives, and publishes it into a topic of
 the same type, *Circle*.
 
@@ -16,4 +16,4 @@ To run the example:
   run `python reader.py`; or run
   [RTI Shapes Demo](https://www.rti.com/free-trial/shapes-demo) and create a
   *Circle* subscriber.
-* Run the transformation application: `python transformation.py`
+* Run the transformation application: `python transform.py`
