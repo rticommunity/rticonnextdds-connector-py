@@ -30,8 +30,8 @@ General features
 
         * Reliability
         * Durability
+        * History
         * Ownership
-        * Time-Based Filter
 
        A few examples of QoS policies that are supported but can't be changed in
        *Connector* even though they are mutable by design and changeable in other APIs:
@@ -40,6 +40,7 @@ General features
         * Lifespan
         * Ownership Strength
         * Property and User Data
+        * Time-Based Filter
 
        A few examples of QoS policies that have limited support because they require
        a supporting API that is not available in *Connector*:
