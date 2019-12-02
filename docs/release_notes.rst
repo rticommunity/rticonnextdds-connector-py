@@ -21,3 +21,7 @@ runs on most Windows, Linux and macOS platforms.
 *RTI Connector* is supported in other languages in addition to Python, see the 
 `main Connector
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
+
+RTI Connext DDS Version
+~~~~~~~~~~~~~~~~~~~~~~~
+The library used by *Connector* is built on top of *RTI Connext DDS* 6.0.1.
