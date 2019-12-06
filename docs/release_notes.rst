@@ -5,6 +5,18 @@
 Release Notes
 =============
 
+Version 1.0.0
+-------------
+
+1.0.0 is the first official release of *RTI Connector for Python* as well as
+`RTI Connector for JavaScript <https://community.rti.com/static/documentation/connector/1.0.0/api/javascript/index.html>`__.
+
+If you had access to previous experimental releases, this release makes the product
+more robust, modifies most of APIs and adds new functionality. However the old 
+APIs have been preserved for backward compatibility as much as possible.
+
+*RTI Connector* 1.0.0 is built on `RTI Connext DDS 6.0.1 <https://community.rti.com/documentation/rti-connext-dds-601>`__.
+
 Supported Platforms
 --------------------
 
@@ -22,6 +34,3 @@ runs on most Windows, Linux and macOS platforms.
 `main Connector
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
-RTI Connext DDS Version
-~~~~~~~~~~~~~~~~~~~~~~~
-The library used by *Connector* is built on top of *RTI Connext DDS* 6.0.1.

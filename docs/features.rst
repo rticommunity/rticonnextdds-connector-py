@@ -49,8 +49,8 @@ General features
         * Entity Factory - *autoenable_created_entities* can be set to *false* only for a *subscriber*, in
           order to enable an `Input` only when :meth:`Connector.get_input` is called.
         * Property - Properties can be set in XML, but they can't be looked up in *Connector*
-
-      `Topic Qos <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Setting_Topic_QosPolicies.htm>`__ is not supported in *Connector*. Use DataReader QoS and DataWriter QoS directly.
+        
+        `Topic Qos <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Setting_Topic_QosPolicies.htm>`__ is not supported in *Connector*. Use DataReader QoS and DataWriter QoS directly.
    * - `Entity Statuses <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Statuses.htm>`__
      - Partial
      - Only :meth:`Input.wait` (data available), :meth:`Input.wait_for_publications`, and :meth:`Output.wait_for_subscriptions` are supported.
