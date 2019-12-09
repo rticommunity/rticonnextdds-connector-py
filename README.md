@@ -18,6 +18,7 @@ To get started and learn more about *RTI Connector for Python* see the
 ## Examples
 
 The `examples/python` directory provides several examples:
+
 * `simple` shows how to create basic publisher and subscriber applications
 * In `transformation`, an application reads, transforms and publishes back the data
 * `images` shows how to manipulate more complex data types
