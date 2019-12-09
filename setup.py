@@ -54,11 +54,11 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Build Tools',
+        'Topic :: System :: Distributed Computing',
 
         # Pick your license as you wish (should match "license" above)
         'License :: Other/Proprietary License',
@@ -76,7 +76,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages= [module_dir],
+    packages=[module_dir],
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:ex
