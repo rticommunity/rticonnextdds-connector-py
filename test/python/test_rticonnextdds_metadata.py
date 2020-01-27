@@ -146,3 +146,38 @@ class TestMetadata:
 
     assert reply.info['related_sample_identity'] == request_id
 
+#   def test_sample_state(self, one_use_output, one_use_input):
+#     # Sample State can either be DDS_READ_SAMPLE_STATE or DDS_NOT_READ_SAMPLE_STATE
+#     sample = send_data(one_use_output, one_use_input)
+#     # Since this is the first time we are calling read(), the state should be not read
+#     assert sample.info['sample_state'] == "DDS_NOT_READ_SAMPLE_STATE"
+#     # Reading (or taking again) should change this state
+#     one_use_input.read()
+#     assert input.samples[0].info['sample_state'] == "DDS_READ_SAMPLE_STATE"
+#     one_use_input.take()
+#     assert input.samples[0].info['sample_state'] == "DDS_READ_SAMPLE_STATE"
+
+  def test_instance_state(self, one_use_output, one_use_input):
+    # Instance State can be ALIVE, DISPOSED or NO WRITERS
+    # A normal write() should result in an ALIVE instance state
+    sample = send_data(one_use_output, one_use_input)
+    print(sample.info['instance_state'])
+    assert sample.info['instance_state'] == "DDS_ALIVE_INSTANCE_STATE"
+    # Take the sample to remove it from the queue
+    one_use_input.take()
+    sample = send_data(one_use_output, one_use_input, action="dispose")
+    assert sample.info['instane_state'] == "DDS_NOT_ALIVE_DISPOSED_INSTANCE_STATE"
+    one_use_input.take()
+    sample = send_data(one_use_output, one_use_input, action="unregister")
+    assert sample.info['instane_state'] == "DDS_NOT_ALIVE_NO_WRITERS_INSTANCE_STATE"
+    one_use_input.take()
+
+#   def test_view_state(Self, one_use_output, one_use_input):
+    # View State can be NEW or NOT NEW
+
+    # switch(state) {
+    # case DDS_NEW_VIEW_STATE:
+    #     str = "DDS_NEW_VIEW_STATE";
+    #     break;
+    # case DDS_NOT_NEW_VIEW_STATE:
+    #     str = "DDS_NOT_NEW_VIEW_STATE";
