@@ -42,6 +42,9 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                     <initial_instances>1</initial_instances>
                     <max_instances>5</max_instances>
                 </resource_limits>
+                <writer_data_lifecycle>
+                    <autodispose_unregistered_instances>false</autodispose_unregistered_instances>
+                </writer_data_lifecycle>
             </datawriter_qos>
             <datareader_qos>
                 <reliability>
@@ -176,7 +179,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
 
         <domain_participant name="SingleUseParticipant" domain_ref="MyDomainLibrary::MyDomain">
             <publisher name="MyPublisher">
-                <data_writer name="MySquareWriter" topic_ref="SingleUseShape" />
+                <data_writer name="MySquareWriter" topic_ref="SingleUseShape"/>
             </publisher>
 
             <subscriber name="MySubscriber">
