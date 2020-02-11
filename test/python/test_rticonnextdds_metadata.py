@@ -146,3 +146,46 @@ class TestMetadata:
 
     assert reply.info['related_sample_identity'] == request_id
 
+  def test_sample_state(self, one_use_output, one_use_input):
+    # Sample State can either be READ or NOT_READ
+    one_use_output.write()
+    one_use_input.wait(10000)
+    one_use_input.read()
+    # Since this is the first time we are calling read(), the state should be not read
+    assert one_use_input.samples[0].info['sample_state'] == "NOT_READ"
+    # Reading (or taking again) should change this state
+    one_use_input.read()
+    assert one_use_input.samples[0].info['sample_state'] == "READ"
+    one_use_input.take()
+    assert one_use_input.samples[0].info['sample_state'] == "READ"
+
+  def test_instance_state(self, one_use_output, one_use_input):
+    # Instance State can be ALIVE, NOT_ALIVE_DISPOSED or NOT_ALIVE_NO_WRITERS
+    # A normal write() should result in an ALIVE instance state
+    sample = send_data(one_use_output, one_use_input)
+    assert sample.info['instance_state'] == "ALIVE"
+    # Take the sample to remove it from the queue
+    sample = send_data(one_use_output, one_use_input, action="dispose")
+    assert sample.info['instance_state'] == "NOT_ALIVE_DISPOSED"
+    one_use_input.take()
+    sample = send_data(one_use_output, one_use_input, action="write")
+    assert sample.info['instance_state'] == "ALIVE"
+    one_use_input.take()
+    sample = send_data(one_use_output, one_use_input, action="unregister")
+    assert sample.info['instance_state'] == "NOT_ALIVE_NO_WRITERS"
+
+  def test_view_state(self, one_use_output, one_use_input):
+    # View State can be NEW or NOT NEW, and is per-instance
+    one_use_output.instance["color"] = "Brown"
+    one_use_output.write()
+    one_use_input.wait(10000)
+    one_use_input.take()
+    # Since this is the first time we are calling read(), the state should be not read
+    assert one_use_input.samples[0].info['view_state'] == "NEW"
+    sample = send_data(one_use_output, one_use_input)
+    assert sample.info['view_state'] == "NOT_NEW"
+    one_use_output.instance["color"] = "Maroon"
+    one_use_output.write()
+    one_use_input.wait(10000)
+    one_use_input.take()
+    assert one_use_input.samples[0].info['view_state'] == "NEW"

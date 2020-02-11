@@ -667,6 +667,9 @@ class SampleIterator:
         * ``"sample_identity"``, or ``"identity"`` returns a dictionary (see :meth:`Output.write`)
         * ``"related_sample_identity"`` returns a dictionary (see :meth:`Output.write`)
         * ``"valid_data"``, returns a boolean (equivalent to ``sample_it.valid_data``)
+        * ``"view_state"``, returns a string (either "NEW" or "NOT_NEW")
+        * ``"instance_state"``, returns a string (one of "ALIVE", "NOT_ALIVE_DISPOSED" or "NOT_ALIVE_NO_WRITERS")
+        * ``"sample_state"``, returns a string (either "READ" or "NOT_READ")
 
         These fields are documented in `The SampleInfo Structure <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#7.4.6_The_SampleInfo_Structure%3FTocPath%3DPart%25202%253A%2520Core%2520Concepts%7C7.%2520Receiving%2520Data%7C7.4%2520Using%2520DataReaders%2520to%2520Access%2520Data%2520(Read%2520%2526%2520Take)%7C7.4.6%2520The%2520SampleInfo%2520Structure%7C_____0>`__
         section in the *Connext DDS Core Libraries User's Manual*.
