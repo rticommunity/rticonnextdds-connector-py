@@ -448,3 +448,49 @@ The type returned by the operator is a dict for unions.
 The same limitations described in
 :ref:`Accessing basic members (numbers, strings and booleans)`
 about using ``__getitem__`` apply here.
+
+Accessing key values of disposed samples
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Using the :meth:`Output.write` API, an :class:`Output` can perform write, dispose
+and unregister operations.
+Depending on which of these operations is performed, the ``instance_state`` of the
+received sample will be ``"ALIVE"``, ``"NOT_ALIVE_NO_WRITERS"`` or ``"NOT_ALIVE_DISPOSED"``.
+If the instance was disposed, this ``instance_state`` will be ``"NOT_ALIVE_DISPOSED"``.
+In this state, it is possible to access the key fields of the received sample.
+
+.. warning::
+    The ``valid_data`` flag will be false when the sample is in the ``"NOT_ALIVE_DISPOSED"``
+    state. This is the only situation where it is supported to access the received
+    sample's fields even though the ``valid_data`` flag is false.
+
+The key fields can be accessed as follows:
+
+.. code-block::
+
+    # The output and input are using the following type:
+    # struct ShapeType {
+    #     @key string<128> color;
+    #     long x;
+    #     long y;
+    #     long shapesize;
+    # }
+
+    output.instance["x"] = 4
+    output.instance["color"] = "Green"
+    # Assume that some data associated with this instance has already been sent
+    output.write(action="dispose")
+    input.wait()
+    input.take()
+    sample = input.samples.get(0)
+
+    if sample.info["instance_state"] == "NOT_ALIVE_DISPOSED":
+        # sample.info["valid_data"] will be false in this situation
+        # Accessing a non-key field using __getitem__ or getType() APIs returns None
+        x = sample["x"] // None
+        x = sample.getNumber("x") // also None
+        color = sample["color"] // 'Green'
+        # Can also access use get_dictionary() to get all of the key fields in a dictoinary
+        # The obtained dictionary will not contain non-key fields
+        key_values = sample.get_dictionary() // { 'color': 'Green' }
+    }
