@@ -158,9 +158,13 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <member name="keyed_shape" type="nonBasic" nonBasicTypeName="UnkeyedShapeType" key="true"/>
             <member name="unkeyed_shape" type="nonBasic" nonBasicTypeName="UnkeyedShapeType"/>
             <member name="keyed_nested_member" type="nonBasic" nonBasicTypeName="ShapeType" key="true"/>
-            <member name="unkeyed_toplevel_member" type="long"/>
-            <member name="keyed_toplevel_member" type="long" key="true"/>
+            <member name="unkeyed_toplevel_member" type="long" default="12"/>
+            <member name="keyed_toplevel_member" type="long" key="true" default="4"/>
         </struct>
+        <struct name="ShapeTypeWithoutToplevelKeyType">
+            <member name="unkeyed_shape" type="nonBasic" nonBasicTypeName="ShapeType"/>
+            <member name="keyed_shape" type="nonBasic" nonBasicTypeName="ShapeType" key="true"/>
+        </struct>    
     </types>
 
     <!-- Domain Library -->
@@ -171,6 +175,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <register_type name="MultipleKeyedShapeType" type_ref="MultipleKeyedShapeType"/>
             <register_type name="NestedKeyedShapeType" type_ref="NestedKeyedShapeType"/>
             <register_type name="UnboundedType" type_ref="UnboundedType" />
+            <register_type name="ShapeTypeWithoutToplevelKeyType" type_ref="ShapeTypeWithoutToplevelKeyType" />
             <topic name="UnkeyedSquare" register_type_ref="UnkeyedShapeType"/>
             <topic name="MultipleKeyedSquare" register_type_ref="MultipleKeyedShapeType"/>
             <topic name="NestedKeyedSquare" register_type_ref="NestedKeyedShapeType"/>
@@ -178,6 +183,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <topic name="Circle" register_type_ref="ShapeType"/>
             <topic name="SingleUseShape" register_type_ref="ShapeType"/>
             <topic name="UnboundedTopic" register_type_ref="UnboundedType"/>
+            <topic name="ShapeTypeWithoutToplevelKey" register_type_ref="ShapeTypeWithoutToplevelKeyType"/>
         </domain>
         <domain name="DataAccessDomain" domain_id="0">
             <register_type name="MyType" type_ref="MyType" />
@@ -211,6 +217,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                 <data_writer name="MyUnkeyedSquareWriter" topic_ref="UnkeyedSquare"/>
                 <data_writer name="MyMultipleKeyedSquareWriter" topic_ref="MultipleKeyedSquare"/>
                 <data_writer name="MyNestedKeyedSquareWriter" topic_ref="NestedKeyedSquare"/>
+                <data_writer name="MySquareWithoutTopLevelKeyWriter" topic_ref="ShapeTypeWithoutToplevelKey"/>
             </publisher>
 
             <subscriber name="MySubscriber">
@@ -218,6 +225,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                 <data_reader name="MyUnkeyedSquareReader" topic_ref="UnkeyedSquare" />
                 <data_reader name="MyMultipleKeyedSquareReader" topic_ref="MultipleKeyedSquare" />
                 <data_reader name="MyNestedKeyedSquareReader" topic_ref="NestedKeyedSquare" />
+                <data_reader name="MySquareWithoutTopLevelKeyReader" topic_ref="ShapeTypeWithoutToplevelKey" />
             </subscriber>
         </domain_participant>
 

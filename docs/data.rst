@@ -486,11 +486,16 @@ The key fields can be accessed as follows:
 
     if sample.info["instance_state"] == "NOT_ALIVE_DISPOSED":
         # sample.info["valid_data"] will be false in this situation
-        # Accessing a non-key field using __getitem__ or getType() APIs returns None
-        x = sample["x"] // None
-        x = sample.getNumber("x") // also None
-        color = sample["color"] // 'Green'
-        # Can also access use get_dictionary() to get all of the key fields in a dictoinary
-        # The obtained dictionary will not contain non-key fields
-        key_values = sample.get_dictionary() // { 'color': 'Green' }
+        # Only the key fields should be accessed
+        color = sample["color"] # 'Green'
+        x = sample["x"] # unsupported
+        x = sample.getNumber("x") # also unsupported
+        # You can also use get_dictionary() to get all of the key fields in a dictionary.
+        # Again. only the key fields returned within the JSON object should
+        # be used.
+        key_values = sample.get_dictionary() # { color: 'Green', x: 0, y: 0, shapesize: 0 }
     }
+
+.. note::
+    Only the key fields should be accessed when the sample has an instance state
+    of ``'NOT_ALIVE_DISPOSED'``.
