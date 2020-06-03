@@ -452,17 +452,17 @@ about using ``__getitem__`` apply here.
 Accessing key values of disposed samples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Using the :meth:`Output.write` API, an :class:`Output` can perform write, dispose
-and unregister operations.
+Using :meth:`Output.write`, an :class:`Output` can write data, or dispose or 
+unregister an instance.
 Depending on which of these operations is performed, the ``instance_state`` of the
-received sample will be ``"ALIVE"``, ``"NOT_ALIVE_NO_WRITERS"`` or ``"NOT_ALIVE_DISPOSED"``.
-If the instance was disposed, this ``instance_state`` will be ``"NOT_ALIVE_DISPOSED"``.
-In this state, it is possible to access the key fields of the received sample.
+received sample will be ``'ALIVE'``, ``'NOT_ALIVE_NO_WRITERS'`` or ``'NOT_ALIVE_DISPOSED'``.
+If the instance was disposed, this ``instance_state`` will be ``'NOT_ALIVE_DISPOSED'``.
+In this state, it is possible to access the key fields of the instance that was disposed.
 
-.. warning::
-    The ``valid_data`` flag will be false when the sample is in the ``"NOT_ALIVE_DISPOSED"``
-    state. This is the only situation where it is supported to access the received
-    sample's fields even though the ``valid_data`` flag is false.
+.. note::
+    :attr:`SampleInfo.valid_data` will be false when the :attr:`SampleInfo.instance_state`
+    is ``'NOT_ALIVE_DISPOSED'``. In this situation it's possible to access the
+    key fields in the received sample.
 
 The key fields can be accessed as follows:
 
@@ -482,20 +482,19 @@ The key fields can be accessed as follows:
     output.write(action="dispose")
     input.wait()
     input.take()
-    sample = input.samples.get(0)
+    sample = input.samples[0]
 
     if sample.info["instance_state"] == "NOT_ALIVE_DISPOSED":
-        # sample.info["valid_data"] will be false in this situation
-        # Only the key fields should be accessed
+        # sample.info.get('valid_data') will be false in this situation
+        # Only the key-fields should be accessed
         color = sample["color"] # 'Green'
-        x = sample["x"] # unsupported
-        x = sample.getNumber("x") # also unsupported
-        # You can also use get_dictionary() to get all of the key fields in a dictionary.
-        # Again. only the key fields returned within the JSON object should
-        # be used.
-        key_values = sample.get_dictionary() # { color: 'Green', x: 0, y: 0, shapesize: 0 }
-    }
+        # The fields 'x','y' and 'shapesize' cannot be retrieved because they're
+        # not part of the key
+        # You can also call get_dictionary() to get all of the key fields.
+        # Again, only the key fields returned within the dictionary should
+        # be accessed.
+        key_values = sample.get_dictionary() # { "color": "Green", "x": 0, "y": 0, "shapesize": 0 }
 
-.. note::
-    Only the key fields should be accessed when the sample has an instance state
-    of ``'NOT_ALIVE_DISPOSED'``.
+.. warning::
+    When the sample has an instance state of ``'NOT_ALIVE_DISPOSED'`` only the
+    key fields should be accessed.

@@ -209,16 +209,11 @@ class TestMetadata:
     assert sample.get_string("color") == "Yellow"
     # Also access it via __getitem__
     assert sample["color"] == "Yellow"
-    # Any other fields should not be accessed (but we check them here)
-    assert sample.get_number("x") == 0
-    assert sample.get_boolean("z") == False
-    assert sample["x"] == 0
-    assert sample["z"]  == False
-    assert sample["shapesize"] == 0
+    # Any other fields should not be accessed
     # Accessing a nonexistent member should raise an error
     with pytest.raises(rti.Error, match=r".*Cannot find a member.*") as excinfo:
       nonExistentField = sample["IDontExist"]
-    # It should be possible to obtain a dictionary of the sample. The only non-None
+    # It should be possible to obtain a dictionary of the sample. The only valid
     # field will be the key
     expected_dictionary = {
         "color": "Yellow",
@@ -261,7 +256,7 @@ class TestMetadata:
     # Check invalid data + disposed
     assert sample.info['valid_data'] == False
     assert sample.info['instance_state'] == "NOT_ALIVE_DISPOSED"
-    # Check that the key fields are correct, and everything else is None
+    # Check that the key fields are correct
     assert sample.get_string("color") == "Yellow"
     assert sample["color"] == "Yellow"
     assert sample.get_string("other_color") == "Green"
@@ -270,9 +265,6 @@ class TestMetadata:
     assert sample["z"] == False
     assert sample.get_number("y") == 9
     assert sample["y"] == 9
-    assert sample["x"] == 0
-    assert sample.get_number("x") == 0
-    assert sample["shapesize"] == 0
     # Also, can obtain the instance via dictionary
     expected_dictionary = {
         "color": "Yellow",
@@ -339,8 +331,6 @@ class TestMetadata:
     assert sample["keyed_shape.z"] == True
     assert sample["keyed_shape.color"] == "Black"
     assert sample["keyed_nested_member.color"] == "White"
-    assert sample["keyed_nested_member.x"] == 0
-    assert sample["unkeyed_toplevel_member"] == 0
     assert sample["keyed_toplevel_member"] == 4
     expected_dictionary = {
         "color": "",
@@ -356,10 +346,8 @@ class TestMetadata:
     assert sample.get_boolean("keyed_shape.z")== True
     assert sample.get_string("keyed_shape.color") == "Black"
     assert sample.get_string("keyed_nested_member.color") == "White"
-    assert sample.get_number("keyed_nested_member.x") == 0
     assert sample.get_number("keyed_toplevel_member") == 4
     assert sample["keyed_toplevel_member"] == 4
-    assert sample.get_number("unkeyed_toplevel_member") == 0
     # Obtain the entire sample as a dictionary
     expected_dictionary = {
         "keyed_shape": {
@@ -433,7 +421,6 @@ class TestMetadata:
     for sample in one_use_input.samples:
         assert sample.info['instance_state'] == "NOT_ALIVE_DISPOSED"
         # We can still access the sample's fields, but only the key fields
-        assert sample["x"] == 0
         assert sample["color"] == "Maroon"
 
   # struct ShapeType {
