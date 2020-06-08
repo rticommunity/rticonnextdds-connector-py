@@ -189,3 +189,270 @@ class TestMetadata:
     one_use_input.wait(10000)
     one_use_input.take()
     assert one_use_input.samples[0].info['view_state'] == "NEW"
+
+  # Dispose an instance and check that we can obtain the key value
+  def test_get_disposed_key_value(self, one_use_output, one_use_input):
+    # Set the key field
+    one_use_output.instance['color'] = "Yellow"
+    # Also set some other non-key field
+    one_use_output.instance['x'] = 1
+    # Need to write() in order to register the instance
+    sample = send_data(one_use_output, one_use_input)
+    assert sample.info["valid_data"] == True
+    assert sample.info['instance_state'] == "ALIVE"
+    # Now we can dispose it
+    sample = send_data(one_use_output, one_use_input, action="dispose")
+    # Check invalid data + disposed
+    assert sample.info['valid_data'] == False
+    assert sample.info['instance_state'] == "NOT_ALIVE_DISPOSED"
+    # Accessing the key field should provide us with the disposed instance
+    assert sample.get_string("color") == "Yellow"
+    # Also access it via __getitem__
+    assert sample["color"] == "Yellow"
+    # Any other fields should not be accessed
+    # Accessing a nonexistent member should raise an error
+    with pytest.raises(rti.Error, match=r".*Cannot find a member.*") as excinfo:
+      nonExistentField = sample["IDontExist"]
+    # It should be possible to obtain a dictionary of the sample. The only valid
+    # field will be the key
+    expected_dictionary = {
+        "color": "Yellow",
+        "x": 0,
+        "y": 0,
+        "shapesize": 0,
+        "z": False
+    }
+    assert sample.get_dictionary() == expected_dictionary
+
+  # Dispose a sample with multiple keys.
+  # Uses this type:
+  # struct MultipleKeyedShapeType {
+  #     @key string<128> color;
+  #     @key string<128> other_color;
+  #     long x;
+  #     @key long y;
+  #     @key bool z;
+  #     long shapesize;
+  # };
+  def test_get_disposed_key_values_multiple_keys(self, one_use_connector):
+    the_output = one_use_connector.get_output("MyPublisher::MyMultipleKeyedSquareWriter")
+    the_input = one_use_connector.get_input("MySubscriber::MyMultipleKeyedSquareReader")
+    # Wait for discovery
+    the_input.wait_for_publications(5000)
+    the_output.wait_for_subscriptions(5000)
+    # Set the sample
+    the_output.instance['color'] = "Yellow" # key
+    the_output.instance['other_color'] = "Green" # key
+    the_output.instance['y'] = 9 # key
+    the_output.instance['z'] = False # key
+    the_output.instance['shapesize'] = 3 # not a key
+    the_output.instance['x'] = 12 # not a key
+    # Need to write() in order to register the instance
+    sample = send_data(the_output, the_input)
+    assert sample.info['valid_data'] == True
+    assert sample.info['instance_state'] == "ALIVE"
+    # Now we can dispose it
+    sample = send_data(the_output, the_input, action="dispose")
+    # Check invalid data + disposed
+    assert sample.info['valid_data'] == False
+    assert sample.info['instance_state'] == "NOT_ALIVE_DISPOSED"
+    # Check that the key fields are correct
+    assert sample.get_string("color") == "Yellow"
+    assert sample["color"] == "Yellow"
+    assert sample.get_string("other_color") == "Green"
+    assert sample["other_color"] == "Green"
+    assert sample.get_boolean("z") == False
+    assert sample["z"] == False
+    assert sample.get_number("y") == 9
+    assert sample["y"] == 9
+    # Also, can obtain the instance via dictionary
+    expected_dictionary = {
+        "color": "Yellow",
+        "other_color": "Green",
+        "y": 9,
+        "x": 0,
+        "shapesize": 0,
+        "z": False
+    }
+    assert sample.get_dictionary() == expected_dictionary
+
+  # Test getting the key values of a more complex disposed sample
+  # Uses this type:
+  # struct ShapeType {
+  #     @key string<128> color;
+  #     long x;
+  #     long y;
+  #     bool z;
+  #     long shapesize;
+  # };
+  #
+  # struct UnkeyedShapeType {
+  #     string<128> color;
+  #     long x;
+  #     long y;
+  #     bool z;
+  #     long shapesize;
+  # };
+  #
+  # struct NestedKeyedShapeType {
+  #     @key UnkeyedShapeType keyed_shape;
+  #     UnkeyedShapeType unkeyed_shape;
+  #     @key ShapeType keyed_nested_member;
+  #     @default(12) long unkeyed_toplevel_member;
+  #     @default(4) @key long keyed_toplevel_member;
+  # };
+  def test_get_disposed_key_values_nested_keys(self, one_use_connector):
+    the_input = one_use_connector.get_input("MySubscriber::MyNestedKeyedSquareReader")
+    the_output = one_use_connector.get_output("MyPublisher::MyNestedKeyedSquareWriter")
+    # Wait for discovery
+    the_input.wait_for_publications(5000)
+    the_output.wait_for_subscriptions(5000)
+    # Set the sample
+    the_output.instance["keyed_shape.color"] = "Black"
+    the_output.instance["keyed_shape.x"] = 2
+    the_output.instance["keyed_shape.y"] = 0
+    the_output.instance["keyed_shape.shapesize"] = 100
+    the_output.instance["keyed_shape.z"] = True
+    the_output.instance["unkeyed_toplevel_member"] = 1
+    # Do not set keyed_toplevel_member. Let the @default value be used
+    the_output.instance["unkeyed_shape.shapesize"] = 100
+    the_output.instance["keyed_nested_member.color"] = "White"
+    the_output.instance["keyed_nested_member.x"] = 4
+    # Write the sample and take it on the input
+    sample = send_data(the_output, the_input)
+    the_input.take()
+    # Now we can dispose the instance
+    sample = send_data(the_output, the_input, action="dispose")
+    assert sample.info["valid_data"] == False
+    assert sample.info["instance_state"] == "NOT_ALIVE_DISPOSED"
+    assert sample["keyed_shape.x"] == 2
+    assert sample["keyed_shape.y"] == 0
+    assert sample["keyed_shape.shapesize"] == 100
+    assert sample["keyed_shape.z"] == True
+    assert sample["keyed_shape.color"] == "Black"
+    assert sample["keyed_nested_member.color"] == "White"
+    assert sample["keyed_toplevel_member"] == 4
+    expected_dictionary = {
+        "color": "",
+        "z": False,
+        "x": 0,
+        "y": 0,
+        "shapesize": 0
+    }
+    assert sample["unkeyed_shape"] == expected_dictionary
+    assert sample.get_number("keyed_shape.x") == 2
+    assert sample.get_number("keyed_shape.y") == 0
+    assert sample.get_number("keyed_shape.shapesize") == 100
+    assert sample.get_boolean("keyed_shape.z")== True
+    assert sample.get_string("keyed_shape.color") == "Black"
+    assert sample.get_string("keyed_nested_member.color") == "White"
+    assert sample.get_number("keyed_toplevel_member") == 4
+    assert sample["keyed_toplevel_member"] == 4
+    # Obtain the entire sample as a dictionary
+    expected_dictionary = {
+        "keyed_shape": {
+            "color": "Black",
+            "x": 2,
+            "y": 0,
+            "shapesize": 100,
+            "z": True
+        },
+        "unkeyed_shape": {
+            "color": "",
+            "x": 0,
+            "y": 0,
+            "shapesize": 0,
+            "z": False
+        },
+        "keyed_nested_member": {
+            "color": "White",
+            "x": 0,
+            "y": 0,
+            "shapesize": 0,
+            "z": False
+        },
+        "unkeyed_toplevel_member": 0,
+        "keyed_toplevel_member": 4
+    }
+    assert sample.get_dictionary() == expected_dictionary
+    # We can also obtain, as a dictionary, the complex keyed members
+    expected_dictionary = {
+        "color": "Black",
+        "x": 2,
+        "y": 0,
+        "shapesize": 100,
+        "z": True
+    }
+    assert sample.get_dictionary("keyed_shape") == expected_dictionary
+    assert sample["keyed_shape"] == expected_dictionary
+    expected_dictionary = {
+        "color": "White",
+        "x": 0,
+        "y": 0,
+        "shapesize": 0,
+        "z": False
+    }
+    assert sample.get_dictionary("keyed_nested_member") == expected_dictionary
+    assert sample["keyed_nested_member"] == expected_dictionary
+    expected_dictionary = {
+        "color": "",
+        "x": 0,
+        "y": 0,
+        "shapesize": 0,
+        "z": False
+    }
+    assert sample.get_dictionary("unkeyed_shape") == expected_dictionary
+    assert sample["unkeyed_shape"] == expected_dictionary
+
+  def test_accessing_keyed_values_using_iterators(self, one_use_output, one_use_input):
+    one_use_output.instance["color"] = "Maroon"
+    one_use_output.instance["x"] = 12
+    # Send the sample
+    send_data(one_use_output, one_use_input)
+    one_use_input.take()
+    # Now dispose the instance we just registered
+    send_data(one_use_output, one_use_input, action="dispose")
+    # There should be no data accessible using the valid_data_iter (dispose sample is invalid)
+    had_data = False
+    for sample in one_use_input.samples.valid_data_iter:
+        had_data = True
+    assert had_data == False
+    # However, there should be one sample in data_iter
+    for sample in one_use_input.samples:
+        assert sample.info['instance_state'] == "NOT_ALIVE_DISPOSED"
+        # We can still access the sample's fields, but only the key fields
+        assert sample["color"] == "Maroon"
+
+  # struct ShapeType {
+  #     @key string<128> color;
+  #     long x;
+  #     long y;
+  #     bool z;
+  #     long shapesize;
+  # };
+  # struct ShapeTypeWithoutToplevelKeyType {
+  #     @key ShapeType keyed_shape;
+  #     ShapeType unkeyed_shape;
+  # };
+  def test_key_within_unkeyed_structure(self, one_use_connector):
+    # Test the corner-case of unkeyed_shape.color. It is not a key (even though
+    # it has the @key annotation)
+    the_input = one_use_connector.get_input("MySubscriber::MySquareWithoutTopLevelKeyReader")
+    the_output = one_use_connector.get_output("MyPublisher::MySquareWithoutTopLevelKeyWriter")
+    # Wait for discovery
+    the_input.wait_for_publications(5000)
+    the_output.wait_for_subscriptions(5000)
+    # Set some fields
+    the_output.instance["keyed_shape.color"] = "Green"
+    the_output.instance["unkeyed_shape.color"] = "Green"
+    the_output.instance["keyed_shape.x"] = 12
+    the_output.instance["unkeyed_shape.x"] = 12
+    sample = send_data(the_output, the_input)
+    the_input.take()
+    # Dispose the instance
+    sample = send_data(the_output, the_input, action="dispose")
+    # Even though unkeyed_shape.color has the @key annotation, since the top level
+    # structure is not keyed, that field is not either
+    assert sample["unkeyed_shape.color"] == ""
+    # The keyed_shape on the other hand does make up part of the key
+    assert sample["keyed_shape.color"] == "Green"

@@ -70,7 +70,13 @@ contains the data samples:
 
 :meth:`SampleIterator.get_dictionary()` retrieves all the fields of a sample.
 
-If you don't need to access the meta-data (see :ref:`Accessing the SampleInfo`),
+Unless the :attr:`Samples.valid_data_iter` is used, it is necessary to check if the
+sample contains valid data before accessing the fields. The only exception to this
+rule is if the ``instance_state`` of the sample is ``"NOT_ALIVE_DISPOSED"``.
+See :ref:`Accessing key values of disposed samples` for more information on this use
+case.
+
+If you don't need to access the meta-data (see :ref:`Accessing sample meta-data`),
 the simplest way to access the data is to use :attr:`Samples.valid_data_iter` to skip
 samples with invalid data:
 
@@ -108,14 +114,11 @@ For example:
 
 See more information and examples in :ref:`Accessing the data`.
 
-Accessing the SampleInfo
-~~~~~~~~~~~~~~~~~~~~~~~~
+Accessing sample meta-data
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-*Connect DDS* can produce samples with invalid data, which contain meta-data only.
-For more information about this, see `Valid Data Flag <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#receiving_2076951295_727613>`__
-in the *RTI Connect DDS Core Libraries User's Manual*.
-
-You can access a field of the sample meta-data, the *SampleInfo*, as follows:
+Every sample contains an associated *SampleInfo* with meta-information about
+the sample:
 
 .. testcode::
 
@@ -124,6 +127,21 @@ You can access a field of the sample meta-data, the *SampleInfo*, as follows:
 
 
 See :meth:`SampleIterator.info` for the list of available meta-data fields.
+
+
+*Connext DDS* can produce samples with invalid data, which contain meta-data only.
+For more information about this, see `Valid Data Flag 
+<https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#receiving_2076951295_727613>`__
+in the *RTI Connext DDS Core Libraries User's Manual*.
+These samples indicate a change in the instance state. Samples with invalid data
+still provide the following information:
+
+* The :class:`SampleInfo`
+* When an instance is disposed (``sample.info.get('instance_state')`` is
+  ``'NOT_ALIVE_DISPOSED'``), the sample data contains the value of the key that
+  has been disposed. You can access the key fields only. See
+  :ref:`Accessing key values of disposed samples`.
+  
 
 Matching with a Publication
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
