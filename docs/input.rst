@@ -117,7 +117,7 @@ See more information and examples in :ref:`Accessing the data`.
 Accessing sample meta-data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Every sample contains an associatedf *SampleInfo* with meta-information about
+Every sample contains an associated *SampleInfo* with meta-information about
 the sample:
 
 .. testcode::
