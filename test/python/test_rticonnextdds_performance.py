@@ -12,7 +12,7 @@ import rticonnextdds_connector as rti
 from test_utils import *
 
 # These tests currently take around 25 minutes to run with 100 repeats.
-# we do. They were added to help verify performance of anothe product pyrti API.
+# They were added to help verify performance of another product, connextdds-py.
 # If you want to run them, remove this decorator.
 # Maybe once CON-42 is implemented we can run them by default.
 @pytest.mark.skip(reason="Takes too long to run these tests, remove this line and run manually")
