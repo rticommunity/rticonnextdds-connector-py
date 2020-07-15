@@ -12,6 +12,7 @@ import rticonnextdds_connector as rti
 from test_utils import *
 
 # iterations is configured by passing `--iterations <>` on the command line.
+# By default, pytest captures the stdout. Supply -s to view the results.
 
 # These tests currently take around 25 minutes to run with 100 iterations.
 # They were added to help verify performance of another product, connextdds-py.
@@ -100,5 +101,5 @@ class TestPerformance:
             myOctSeq = sample['myOctSeq']
             total_time += (time.time() - start_time)
         average_time = total_time / iterations
-        print("Average time: " + str(average_time))
+        print("Average time to get sequence as a list: " + str(average_time))
         # Note to self Average time: 0.20733366489410401
