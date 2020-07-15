@@ -11,7 +11,9 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__))+ "/../../")
 import rticonnextdds_connector as rti
 from test_utils import *
 
-# These tests currently take around 25 minutes to run with 100 repeats.
+# iterations is configured by passing `--iterations <>` on the command line.
+
+# These tests currently take around 25 minutes to run with 100 iterations.
 # we do. They were added to help verify performance of anothe product pyrti API.
 # If you want to run them, remove this decorator.
 # Maybe once CON-42 is implemented we can run them by default.
@@ -21,15 +23,10 @@ class TestPerformance:
     This class tests the performance of Connector
     """
 
-    # How many times to repeat each test
-    @pytest.fixture(scope="class")
-    def num_iterations(self):
-        return 100
-
     # The use-case of setting a sequence in Connector is slow, and likely will
     # be until we implement CON-42.
     # Here we time how long it takes to set a sequence element by element.
-    def test_set_sequence_element_by_element(self, one_use_connector, num_iterations):
+    def test_set_sequence_element_by_element(self, one_use_connector, iterations):
         # Get the input and output which communicate using the performance test type
         the_input = one_use_connector.get_input("MySubscriber::PerformanceTestReader")
         the_output = one_use_connector.get_output("MyPublisher::PerformanceTestWriter")
@@ -40,12 +37,12 @@ class TestPerformance:
 
         # Set each element of the sequence separately
         total_time = 0
-        for i in range(0, num_iterations):
+        for i in range(0, iterations):
             start_time = time.time()
             for i in range (0, 600000):
                 the_output.instance['myOctSeq[%d]' % (i)] = 2
             total_time += (time.time() - start_time)
-        average_time = total_time / num_iterations
+        average_time = total_time / iterations
         print("Average time setting element-by-element: " + str(average_time))
         # Average time setting element-by-element: 2.9646800351142883
 
@@ -53,7 +50,7 @@ class TestPerformance:
     # be until we implement CON-42.
     # Here we time how long it takes to set a sequence from a Python list.
     # i.e., output.instance['myOctSeq'] = [1, 2, 3, 4, 5, ....]
-    def test_set_sequence_from_list(self, one_use_connector, num_iterations):
+    def test_set_sequence_from_list(self, one_use_connector, iterations):
         # Get the input and output which communicate using the performance test type
         the_input = one_use_connector.get_input("MySubscriber::PerformanceTestReader")
         the_output = one_use_connector.get_output("MyPublisher::PerformanceTestWriter")
@@ -69,11 +66,11 @@ class TestPerformance:
         for i in range (1, 600000):
             myOctSeq.append(i)
 
-        for i in range (0, num_iterations):
+        for i in range (0, iterations):
             start_time = time.time()
             the_output.instance['myOctSeq'] = myOctSeq
             total_time += (time.time() - start_time)
-        average_time = total_time / num_iterations
+        average_time = total_time / iterations
         print("Average time setting entire list in one go: " + str(average_time))
         # Note to self Average time: 6.60276771068573
 
@@ -81,7 +78,7 @@ class TestPerformance:
     # is slow, and likely will be until we implement CON-42.
     # Here we have a sequence with 600000 elements. We time how long it takes to
     # obtain this sequence as a Python list
-    def test_get_sequence(self, one_use_connector, num_iterations):
+    def test_get_sequence(self, one_use_connector, iterations):
         # Get the input and output which communicate using the performance test type
         the_input = one_use_connector.get_input("MySubscriber::PerformanceTestReader")
         the_output = one_use_connector.get_output("MyPublisher::PerformanceTestWriter")
@@ -98,10 +95,10 @@ class TestPerformance:
         # Now we can test the performance. We time how long it takes to retrieve the
         # sequence as a dictionary, repeat x times and take the average
         total_time = 0
-        for i in range (0, num_iterations):
+        for i in range (0, iterations):
             start_time = time.time()
             myOctSeq = sample['myOctSeq']
             total_time += (time.time() - start_time)
-        average_time = total_time / num_iterations
+        average_time = total_time / iterations
         print("Average time: " + str(average_time))
         # Note to self Average time: 0.20733366489410401
