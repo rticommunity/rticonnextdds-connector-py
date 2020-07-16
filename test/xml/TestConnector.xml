@@ -164,7 +164,11 @@ This code contains trade secrets of Real-Time Innovations, Inc.
         <struct name="ShapeTypeWithoutToplevelKeyType">
             <member name="unkeyed_shape" type="nonBasic" nonBasicTypeName="ShapeType"/>
             <member name="keyed_shape" type="nonBasic" nonBasicTypeName="ShapeType" key="true"/>
-        </struct>    
+        </struct>
+        <struct name="PerformanceTestType" extensibility="extensible">
+            <member name='myID' type="long"/>
+            <member name="myOctSeq" type="byte" sequenceMaxLength="600000"/>
+        </struct>
     </types>
 
     <!-- Domain Library -->
@@ -176,6 +180,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <register_type name="NestedKeyedShapeType" type_ref="NestedKeyedShapeType"/>
             <register_type name="UnboundedType" type_ref="UnboundedType" />
             <register_type name="ShapeTypeWithoutToplevelKeyType" type_ref="ShapeTypeWithoutToplevelKeyType" />
+            <register_type name="PerformanceTestType" type_ref="PerformanceTestType" />
             <topic name="UnkeyedSquare" register_type_ref="UnkeyedShapeType"/>
             <topic name="MultipleKeyedSquare" register_type_ref="MultipleKeyedShapeType"/>
             <topic name="NestedKeyedSquare" register_type_ref="NestedKeyedShapeType"/>
@@ -184,6 +189,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
             <topic name="SingleUseShape" register_type_ref="ShapeType"/>
             <topic name="UnboundedTopic" register_type_ref="UnboundedType"/>
             <topic name="ShapeTypeWithoutToplevelKey" register_type_ref="ShapeTypeWithoutToplevelKeyType"/>
+            <topic name="PerformanceTopic" register_type_ref="PerformanceTestType"/>
         </domain>
         <domain name="DataAccessDomain" domain_id="0">
             <register_type name="MyType" type_ref="MyType" />
@@ -218,6 +224,22 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                 <data_writer name="MyMultipleKeyedSquareWriter" topic_ref="MultipleKeyedSquare"/>
                 <data_writer name="MyNestedKeyedSquareWriter" topic_ref="NestedKeyedSquare"/>
                 <data_writer name="MySquareWithoutTopLevelKeyWriter" topic_ref="ShapeTypeWithoutToplevelKey"/>
+                <data_writer name="PerformanceTestWriter" topic_ref="PerformanceTopic">
+                    <datawriter_qos>
+                        <reliability>
+                            <kind> RELIABLE_RELIABILITY_QOS </kind>
+                        </reliability>
+                        <history>
+                            <kind> KEEP_ALL_HISTORY_QOS </kind>
+                        </history>
+                        <durability>
+                            <kind> TRANSIENT_LOCAL_DURABILITY_QOS </kind>
+                        </durability>
+                        <publish_mode>
+                            <kind>ASYNCHRONOUS_PUBLISH_MODE_QOS</kind>
+                        </publish_mode>
+                    </datawriter_qos>
+                </data_writer>
             </publisher>
 
             <subscriber name="MySubscriber">
@@ -226,6 +248,7 @@ This code contains trade secrets of Real-Time Innovations, Inc.
                 <data_reader name="MyMultipleKeyedSquareReader" topic_ref="MultipleKeyedSquare" />
                 <data_reader name="MyNestedKeyedSquareReader" topic_ref="NestedKeyedSquare" />
                 <data_reader name="MySquareWithoutTopLevelKeyReader" topic_ref="ShapeTypeWithoutToplevelKey" />
+                <data_reader name="PerformanceTestReader" topic_ref="PerformanceTopic" />
             </subscriber>
         </domain_participant>
 
