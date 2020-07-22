@@ -19,7 +19,7 @@ import ctypes
 # They were added to help verify performance of another product, connextdds-py.
 # If you want to run them, remove this decorator.
 # Maybe once CON-42 is implemented we can run them by default.
-# @pytest.mark.skip(reason="Takes too long to run these tests, remove this line and run manually")
+@pytest.mark.skip(reason="Takes too long to run these tests, remove this line and run manually")
 class TestPerformance:
     """
     This class tests the performance of Connector
