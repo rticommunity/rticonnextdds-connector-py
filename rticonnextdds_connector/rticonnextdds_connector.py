@@ -1224,7 +1224,7 @@ class Connector:
     A ``Connector`` instance must be deleted with :meth:`close()`.
 
     :param str config_name: The configuration to load. The ``config_name`` format is ``"LibraryName::ParticipantName"``, where ``LibraryName`` is the ``name`` attribute of a ``<domain_participant_library>`` tag, and ``ParticipantName`` is the ``name`` attribute of a ``<domain_participant>`` tag inside the library.
-    :param str url: An URL locating the XML document. The ``url`` can be a file path (for example, ``'/tmp/my_dds_config.xml'``) or a string containing the full XML document with the following format ``'str://"<dds>...</dds>"'``)
+    :param str url: An URL locating the XML document. The ``url`` can be a file path (for example, ``'/tmp/my_dds_config.xml'``), a string containing the full XML document with the following format ``'str://"<dds>...</dds>"'``), or a combination of multiple files or strings, as explained in the `URL Groups <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/URL_Groups.htm>`__ section of the *Connext DDS Core Libraries User's Manual*.
 
     """
 
