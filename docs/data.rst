@@ -466,7 +466,7 @@ In this state, it is possible to access the key fields of the instance that was 
 
 The key fields can be accessed as follows:
 
-.. code-block::
+.. testcode::
 
     # The output and input are using the following type:
     # struct ShapeType {
