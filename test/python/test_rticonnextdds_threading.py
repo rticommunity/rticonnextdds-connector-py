@@ -14,7 +14,7 @@ import threading
 
 # In order to be able to catch failures in threads, we need to wrap the
 # threading.Thread class such that it re-raises exceptions
-class RtiTestThread(threading.Thread):
+class ConnectorCreationThread(threading.Thread):
     def __init__(self, target):
         threading.Thread.__init__(self, target=target)
         self.error = None
@@ -26,7 +26,7 @@ class RtiTestThread(threading.Thread):
             self.error = e
 
     def join(self, timeout=None):
-        super(RtiTestThread, self).join(timeout)
+        super(ConnectorCreationThread, self).join(timeout)
         if self.error is not None:
             raise self.error
 
@@ -46,35 +46,26 @@ class TestThreading:
   def test_creation_of_multiple_connectors(self):
     sem = threading.Semaphore()
     xml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "../xml/TestConnector3.xml")
-    def outputThread():
-        connector = None
-        try:
-            sem.acquire(True)
-            connector = rti.Connector("MyParticipantLibrary::MyPubParticipant", xml_path)
-            assert connector is not None
-            the_output = connector.getOutput("MyPublisher::MySquareWriter")
-            sem.release()
-            assert the_output is not None
-        finally:
-            if connector is not None:
-                connector.delete()
+    def output_thread():
+        with sem:
+            with rti.open_connector(
+                    config_name="MyParticipantLibrary::MyParticipant",
+                    url=xml_path) as connector:
+                assert connector is not None
+                the_output = connector.getOutput("MyPublisher::MyWriter")
+                assert the_output is not None
 
-    def inputThread():
-        connector = None
-        try:
-            sem.acquire(True)
-            connector = rti.Connector("MyParticipantLibrary::MySubParticipant", xml_path)
-            assert connector is not None
-            the_input = connector.getInput("MySubscriber::MySquareReader")
-            sem.release()
-            assert the_input is not None
+    def input_thread():
+        with sem:
+            with rti.open_connector(
+                    config_name="MyParticipantLibrary::MyParticipant",
+                    url=xml_path) as connector:
+                assert connector is not None
+                the_input = connector.getInput("MySubscriber::MyReader")
+                assert the_input is not None
 
-        finally:
-            if connector is not None:
-                connector.delete()
-
-    input_thread = RtiTestThread(inputThread)
-    output_thread = RtiTestThread(outputThread)
+    input_thread = ConnectorCreationThread(input_thread)
+    output_thread = ConnectorCreationThread(output_thread)
     input_thread.start()
     output_thread.start()
     input_thread.join(5000)
