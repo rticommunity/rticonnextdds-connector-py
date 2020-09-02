@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+(c) 2005-2020 Copyright, Real-Time Innovations.  All rights reserved.
+No duplications, whole or partial, manual or electronic, may be made
+without express written permission.  Any such copies, or revisions thereof,
+must display this notice unaltered.
+This code contains trade secrets of Real-Time Innovations, Inc.
+ -->
+
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:noNamespaceSchemaLocation="http://community.rti.com/schema/6.0.0/rti_dds_profiles.xsd" 
+     version="6.0.0">
+    <!-- types -->
+    <types>
+        <struct name="SimpleType">
+            <member name="first" type="long"/>
+         </struct>
+    </types>
+
+    <!-- Domain Library -->
+    <domain_library name="MyDomainLibrary">
+        <domain name="MyDomain" domain_id="0">
+            <register_type name="SimpleType" type_ref="SimpleType" />
+            <topic name="Simple" register_type_ref="SimpleType"/>
+        </domain>
+    </domain_library>
+
+    <!-- Participant library -->
+    <domain_participant_library name="MyParticipantLibrary">
+        <domain_participant name="MyParticipant" domain_ref="MyDomainLibrary::MyDomain">
+            <publisher name="MyPublisher">
+                <data_writer name="MyWriter" topic_ref="Simple" />
+            </publisher>
+            <subscriber name="MySubscriber">
+                <data_reader name="MyReader" topic_ref="Simple" />
+            </subscriber>
+        </domain_participant>
+    </domain_participant_library>
+</dds>
