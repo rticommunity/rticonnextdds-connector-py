@@ -91,3 +91,17 @@ class TestConnector:
             assert connector is not None
             output = connector.get_output("MyPublisher2::MySquareWriter2")
             assert output is not None
+
+    def test_connector_creation_with_participant_qos(self):
+        """
+        Tests that a domain_participant defined in XML alonside participant_qos
+        can be used to create a Connector object.
+        """
+        participant_profile = "MyParticipantLibrary::ConnectorWithParticipantQos"
+        xml_path = os.path.join(os.path.dirname(
+                os.path.realpath(__file__)),
+                "../xml/TestConnector.xml")
+        with rti.open_connector(
+                config_name=participant_profile,
+                url=xml_path) as connector:
+            assert connector is not None
