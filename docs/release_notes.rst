@@ -6,7 +6,7 @@ Release Notes
 =============
 
 Supported Platforms
---------------------
+~~~~~~~~~~~~~~~~~~~
 
 *RTI Connector* works with Python 2.x and 3.x. It uses a native C library that
 runs on most Windows, Linux and macOS platforms.
@@ -23,13 +23,13 @@ runs on most Windows, Linux and macOS platforms.
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
 Version 2.0.0 (TODO Numebring)
-------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 What's New in 2.0.0
-~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^
 
 Sample state, instance state and view state can now be obtained in Connector
-############################################################################
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The SampleInfo class in Connector has been extended to provide access to the
 sample state, view state and instance state fields. These new fields work the
@@ -40,10 +40,10 @@ JSON Object).
 [RTI Issue ID CON-177]
 
 What's Fixed in 2.0.0
-~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^
 
 Some larger integer values may have been corrupted by Connector's internal JSON parser
-######################################################################################
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The internal JSON parser used in Connector failed to identify integer numbers
 from double-precision floating-point numbers for certain values.
@@ -54,7 +54,7 @@ become corrupted. This problem has been resolved.
 [RTI Issue ID CON-170]
 
 Creating two instances of Connector resulted in a license error
-###############################################################
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Under some circumstances, it was not possible to create two Connector objects.
 The creation of the second Connector object failed due to a license error.
@@ -64,7 +64,7 @@ This issue has been fixed.
 [RTI Issue ID CON-163]
 
 Creating a Connector instance with a participant_qos tag in the XML may have resulted in a license error
-########################################################################################################
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 In some cases, if the XML configuration file of RTI Connector contained a
 `<participant_qos>` tag within the definition of the DomainParticipant,
@@ -74,7 +74,7 @@ This problem has been resolved.
 [RTI Issue ID CON-214]
 
 Version 1.0.0
--------------
+~~~~~~~~~~~~~
 
 1.0.0 is the first official release of *RTI Connector for Python* as well as
 `RTI Connector for JavaScript <https://community.rti.com/static/documentation/connector/1.0.0/api/javascript/index.html>`__.
