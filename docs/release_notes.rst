@@ -67,6 +67,8 @@ files:
 
   c = rti.Connector("my_profiles.xml;my_types.xml;my_participants.xml", configName)
 
+[RTI Issue ID CON-209]
+
 Some larger integer values may have been corrupted by Connector's internal JSON parser
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
