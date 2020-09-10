@@ -39,6 +39,20 @@ JSON Object).
 
 [RTI Issue ID CON-177]
 
+ Support for accessing the key values of disposed instances
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Support for disposing instances was added in RTI Connector version 1.0.0.
+However, it was not possible to access the key values of the disposed instance.
+This functionality is now available in the Python and JavaScript bindings.
+When a disposed sample is received, the key values can be accessed.
+The syntax for accessing these key values is the same as when the sample
+contains valid data (i.e., using type-specific getters, or obtaining the entire
+sample as an object). When the instance state is NOT_ALIVE_DISPOSED, only the
+key values in the sample should be accessed.
+
+[RTI Issue ID CON-188]
+
 What's Fixed in 2.0.0
 ^^^^^^^^^^^^^^^^^^^^^
 
