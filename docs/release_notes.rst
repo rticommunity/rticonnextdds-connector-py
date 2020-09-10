@@ -28,8 +28,8 @@ Version 2.0.0 (TODO Numebring)
 What's New in 2.0.0
 ~~~~~~~~~~~~~~~~~~~
 
-Sample state, instance state and view state can now be obtained in Connector [RTI Issue ID CON-177]
-###################################################################################################
+Sample state, instance state and view state can now be obtained in Connector
+############################################################################
 
 The SampleInfo class in Connector has been extended to provide access to the
 sample state, view state and instance state fields. These new fields work the
@@ -37,11 +37,13 @@ same as the existing fields in the structure (in Connector for Python they are
 the keys to the dictionary, in Connector for JavaScript they are the keys to the
 JSON Object).
 
+[RTI Issue ID CON-177]
+
 What's Fixed in 2.0.0
 ~~~~~~~~~~~~~~~~~~~~~
 
-Some larger integer values may have been corrupted by Connector's internal JSON parser [RTI Issue ID CON-170]
-#############################################################################################################
+Some larger integer values may have been corrupted by Connector's internal JSON parser
+######################################################################################
 
 The internal JSON parser used in Connector failed to identify integer numbers
 from double-precision floating-point numbers for certain values.
@@ -49,21 +51,27 @@ For example, if a number could not be represented as a 64-bit integer, the
 parser may have incorrectly identified it as an integer, causing the value to
 become corrupted. This problem has been resolved.
 
-Creating two instances of Connector resulted in a license error [RTI Issue ID CON-163]
-######################################################################################
+[RTI Issue ID CON-170]
+
+Creating two instances of Connector resulted in a license error
+###############################################################
 
 Under some circumstances, it was not possible to create two Connector objects.
 The creation of the second Connector object failed due to a license error.
 This issue affected all of the Connector APIs (Python, JavaScript).
 This issue has been fixed.
 
-Creating a Connector instance with a participant_qos tag in the XML may have resulted in a license error [RTI Issue ID CON-214]
-###############################################################################################################################
+[RTI Issue ID CON-163]
+
+Creating a Connector instance with a participant_qos tag in the XML may have resulted in a license error
+########################################################################################################
 
 In some cases, if the XML configuration file of RTI Connector contained a
 `<participant_qos>` tag within the definition of the DomainParticipant,
 the creation of the Connector would fail with a "license not found" error.
 This problem has been resolved.
+
+[RTI Issue ID CON-214]
 
 Version 1.0.0
 -------------
@@ -76,4 +84,3 @@ more robust, modifies most of APIs and adds new functionality. However the old
 APIs have been preserved for backward compatibility as much as possible.
 
 *RTI Connector* 1.0.0 is built on `RTI Connext DDS 6.0.1 <https://community.rti.com/documentation/rti-connext-dds-601>`__.
-
