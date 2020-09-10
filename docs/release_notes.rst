@@ -63,7 +63,7 @@ A Connector object now supports loading multiple files. This allows separating
 the definition of types, QoS profiles, and domain participants into different
 files:
 
-.. code-block::
+.. testcode::
 
   c = rti.Connector("my_profiles.xml;my_types.xml;my_participants.xml", configName)
 
