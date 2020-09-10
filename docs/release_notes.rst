@@ -22,10 +22,10 @@ runs on most Windows, Linux and macOS platforms.
 `main Connector
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
-Version 2.0.0 (TODO Numebring)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Version 1.1.0
+~~~~~~~~~~~~~
 
-What's New in 2.0.0
+What's New in 1.1.0
 ^^^^^^^^^^^^^^^^^^^
 
 Sample state, instance state and view state can now be obtained in Connector
