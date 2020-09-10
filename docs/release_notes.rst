@@ -39,7 +39,7 @@ JSON Object).
 
 [RTI Issue ID CON-177]
 
- Support for accessing the key values of disposed instances
+Support for accessing the key values of disposed instances
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Support for disposing instances was added in RTI Connector version 1.0.0.
@@ -55,6 +55,17 @@ key values in the sample should be accessed.
 
 What's Fixed in 2.0.0
 ^^^^^^^^^^^^^^^^^^^^^
+
+Support for loading multiple configuration files
+""""""""""""""""""""""""""""""""""""""""""""""""
+
+A Connector object now supports loading multiple files. This allows separating
+the definition of types, QoS profiles, and domain participants into different
+files:
+
+.. code-block::
+
+  c = rti.Connector("my_profiles.xml;my_types.xml;my_participants.xml", configName)
 
 Some larger integer values may have been corrupted by Connector's internal JSON parser
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
