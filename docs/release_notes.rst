@@ -28,19 +28,37 @@ Version 2.0.0 (TODO Numebring)
 What's New in 2.0.0
 ~~~~~~~~~~~~~~~~~~~
 
+Sample state, instance state and view state can now be obtained in Connector [RTI Issue ID CON-177]
+###################################################################################################
+
+The SampleInfo class in Connector has been extended to provide access to the
+sample state, view state and instance state fields. These new fields work the
+same as the existing fields in the structure (in Connector for Python they are
+the keys to the dictionary, in Connector for JavaScript they are the keys to the
+JSON Object).
+
 What's Fixed in 2.0.0
 ~~~~~~~~~~~~~~~~~~~~~
 
-CON-163: Creating two instances of Connector resulted in a license error 
-########################################################################
+Some larger integer values may have been corrupted by Connector's internal JSON parser [RTI Issue ID CON-170]
+#############################################################################################################
+
+The internal JSON parser used in Connector failed to identify integer numbers
+from double-precision floating-point numbers for certain values.
+For example, if a number could not be represented as a 64-bit integer, the
+parser may have incorrectly identified it as an integer, causing the value to
+become corrupted. This problem has been resolved.
+
+Creating two instances of Connector resulted in a license error [RTI Issue ID CON-163]
+######################################################################################
 
 Under some circumstances, it was not possible to create two Connector objects.
 The creation of the second Connector object failed due to a license error.
 This issue affected all of the Connector APIs (Python, JavaScript).
 This issue has been fixed.
 
-CON-214: Creating a Connector instance with a participant_qos tag in the XML may have resulted in a license error
-#################################################################################################################
+Creating a Connector instance with a participant_qos tag in the XML may have resulted in a license error [RTI Issue ID CON-214]
+###############################################################################################################################
 
 In some cases, if the XML configuration file of RTI Connector contained a
 `<participant_qos>` tag within the definition of the DomainParticipant,
