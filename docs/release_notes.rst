@@ -53,7 +53,7 @@ key values in the sample should be accessed.
 
 [RTI Issue ID CON-188]
 
-What's Fixed in 2.0.0
+What's Fixed in 1.1.0
 ^^^^^^^^^^^^^^^^^^^^^
 
 Support for loading multiple configuration files
