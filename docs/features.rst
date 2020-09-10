@@ -1,4 +1,4 @@
-Connext DDS Features
+Connext DDS features
 ====================
 
 .. py:currentmodule:: rticonnextdds_connector
