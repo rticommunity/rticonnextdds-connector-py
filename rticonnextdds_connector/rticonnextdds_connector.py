@@ -1338,7 +1338,7 @@ class Connector:
     def set_max_objects_per_thread(value):
         """Allows increasing the number of Connector instances that can be created
 
-        The default value is 1024. If your application creates more than eight
+        The default value is 2048. If your application creates more than fifteen
         ``Connector`` instances approximately, you may have to increase this
         value.
 
