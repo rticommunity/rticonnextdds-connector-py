@@ -411,7 +411,7 @@ To clear a member, set it to ``None`` explicitly::
 
 For more information about optional members in DDS, see the *Getting Started Guide
 Addendum for Extensible Types*, 
-`Section 3.2 Optional Members <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/getting_started_extras/html_files/RTI_ConnextDDS_CoreLibraries_GettingStarted_ExtensibleAddendum/index.htm#ExtensibleTypesAddendum/Optional_Members.htm>`__.
+`Optional Members <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/Optional_Members.htm>`__.
 
 Accessing unions
 ^^^^^^^^^^^^^^^^

@@ -40,7 +40,6 @@ Table of Contents
 * :ref:`genindex`
 * :ref:`search`
 
-To learn more about *RTI Connext DDS*, see
-`An Introduction to DDS <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_GettingStarted/index.htm#GettingStarted/An_Introduction_to_.htm#dds_2424438477_346722%3FTocPath%3D3.%2520A%25C2%25A0Quick%2520Overview%7C3.3%2520An%2520Introduction%2520to%2520DDS%7C_____0>`__
-in the *RTI Connext DDS Core Libraries Getting Started Guide*. More documentation
-is available in the `RTI Community Portal <https://community.rti.com/documentation>`__.
+To learn more about *RTI Connext DDS*, see the 
+`RTI Connext DDS Getting Started Guide <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/getting_started_guide/index.html>`__. 
+More documentation is available in the `RTI Community Portal <https://community.rti.com/documentation>`__.
