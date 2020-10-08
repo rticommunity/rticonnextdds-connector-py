@@ -150,7 +150,7 @@ Features related to the type system
    * - Feature
      - Level of support
      - Notes
-   * - `DDS type system <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Introduction_to_the_Type_System.htm>`__
+   * - `DDS type system <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Introduction_to_the_Type_System.htm>`__
      - Supported
      - *Connector* can use any DDS type. Types are defined in XML.
    * - `Type extensibility <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/Type_Safety_and_System_Evolution.htm>`__

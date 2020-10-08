@@ -140,8 +140,8 @@ an :class:`Input`, as described in :ref:`Reading data (Input)`.
         </domain_participant>
     </domain_participant_library>
 
-For more information about the format of a participant library, see the 
-`XML-Based Application Creation Getting Started Guide   
+For more information about the format of a participant library, see 
+`XML-Based Application Creation: Participant Library 
 <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/xml_application_creation/index.htm#xml_based_app_creation_guide/UnderstandingXMLBased/ParticipantLibrary.htm>`__.
 
 Quality of service
