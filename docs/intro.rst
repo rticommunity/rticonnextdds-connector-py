@@ -15,7 +15,7 @@ to the *Connext DDS* Databus in programming languages such as Python and JavaScr
 .. note::
 
     This documentation assumes you are already familiar with basic DDS 
-    concepts. You can learn about DDS in the *RTI Connext DDS Core Libraries 
+    concepts. You can learn about DDS in the *RTI Connext DDS 
     Getting Started Guide*, *RTI Connext DDS Core Libraries User's Manual*, 
     and the *Connext DDS* API documentation for C,
     C++, Java and .NET. These documents are available from the
