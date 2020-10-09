@@ -40,7 +40,7 @@ JSON Object).
 
 
 Support for accessing the key values of disposed instances
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .. CON-188 
 
 Support for disposing instances was added in *Connector* 1.0.0.
