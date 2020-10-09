@@ -1,7 +1,7 @@
 
 .. py:currentmodule:: rticonnextdds_connector
 
-Defining a DDS system in XML
+Defining a DDS System in XML
 ============================
 
 *Connector* loads the definition of a DDS system from an XML configuration file

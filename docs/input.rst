@@ -1,4 +1,4 @@
-Reading data (Input)
+Reading Data (Input)
 ====================
 
 .. py:currentmodule:: rticonnextdds_connector
@@ -143,7 +143,7 @@ still provide the following information:
   :ref:`Accessing key values of disposed samples`.
   
 
-Matching with a Publication
+Matching with a publication
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Use the method :meth:`Input.wait_for_publications()` to detect when a compatible
