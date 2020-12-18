@@ -108,6 +108,7 @@ class _ConnectorBinding:
 
         if "64" in bits:
             if "Linux" in osname:
+                # Check if the underlying platform is ARM
                 if "aarch64" in platform.uname()[4]:
                     arch = "armv8Linux4gcc7.3.0
                 else:
