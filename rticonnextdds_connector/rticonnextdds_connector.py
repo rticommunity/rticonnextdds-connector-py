@@ -104,12 +104,14 @@ class _ConnectorBinding:
     def __init__(self): # pylint: disable=too-many-statements
         (bits, _) = platform.architecture()
         osname = platform.system()
-        is_arm = platform.uname()[4].startswith("arm")
         additional_lib = None
 
         if "64" in bits:
             if "Linux" in osname:
-                arch = "x64Linux2.6gcc4.4.5"
+                if "aarch64" in platform.uname()[4]:
+                    arch = "armv8Linux4gcc7.3.0
+                else:
+                    arch = "x64Linux2.6gcc4.4.5"
                 libname = "librtiddsconnector"
                 post = "so"
             elif "Darwin" in osname:
@@ -124,11 +126,7 @@ class _ConnectorBinding:
             else:
                 raise RuntimeError("This platform ({0}) is not supported".format(osname))
         else:
-            if is_arm:
-                arch = "armv6vfphLinux3.xgcc4.7.2"
-                libname = "librtiddsconnector"
-                post = "so"
-            elif "Linux" in osname:
+            if "Linux" in osname:
                 arch = "i86Linux3.xgcc4.6.3"
                 libname = "librtiddsconnector"
                 post = "so"
