@@ -12,11 +12,23 @@ Supported Platforms
 runs on most Windows, Linux and macOS platforms.
 
 *Connector* has been tested with Python 2.6+ and 3.6.8+ on the following systems:
-
-    * Windows: Windows 7 and Windows 10
-    * x86/x86_64 Linux: CentOS 6.1, 7.6, 8.0; Ubuntu 12.04, 18.04; SUSE 12, 15
-    * ARM Linux (Raspberry Pi)
-    * Mac: OS X 10.10.2, macOS 10.12.2, macOS 10.14
+     
+**Linux**
+  * CentOS 6.0, 6.2-6.4, 7.0 (x64)
+  * Red Hat Enterprise Linux 6.0-6.5, 6.7, 6.8, 7, 7.3, 7.5, 7.6, 8  (x64)
+  * SUSE Linux Enterprise Server 12 SP2  (x64)
+  * Ubuntu 14.04, 18.04, 20.04 LTS (x64)
+  * Ubuntu 18.04 LTS (64-bit Arm v8)
+  * Wind River Linux 8 (Arm v7) (Custom-supported platform)
+    
+**macOS**  
+  * macOS 10.13-10.15 (x64)
+    
+**Windows**    
+  * Windows 8 (Visual Studio 2013) (x64)
+  * Windows 10 (Visual Studio 2015, 2017, 2019) (x64)
+  * Windows Server 2012 R2 (Visual Studio 2013) (x64)
+  * Windows Server 2016 (Visual Studio 2015, 2017, 2019) (x64)
 
 *Connector* is supported in other languages in addition to Python, see the 
 `main Connector
