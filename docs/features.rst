@@ -86,7 +86,7 @@ General features
        (such as `Monitoring <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/PartMonitoringLib.htm>`__, 
        `Security Plugins <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/dds_security/html_files/RTI_SecurityPlugins_GettingStarted/index.htm>`__ )
      - Supported
-     - *Connector* can load dynamically linked add-on libraries. See :ref:`Loading additional Connext DDS Libraries`.
+     - See :ref:`Loading Connext DDS Add-On Libraries`.
 
 Features related to sending data
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -225,18 +225,26 @@ Features related to the type system
      - Not supported
      - However, an ``Input`` can receive data published by other *Connext DDS* applications that use FlatData.
 
-Loading additional Connext DDS Libraries
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Loading Connext DDS Add-On Libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 *Connector* supports features that require the loading of additional *Connext DDS*
 libraries, such as
-`Monitoring <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/PartMonitoringLib.htm>`__
-and `Security Plugins <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/dds_security/html_files/RTI_SecurityPlugins_GettingStarted/index.htm>`__.
+`Monitoring <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartMonitoringLib.htm>`__
+and `Security Plugins <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_secure/getting_started_guide/index.html>`__.
 
-In order for the Connector libraries to correctly load these libraries, it is necessary
-to either:
+To use RTI Connext DDS add-ons you need an RTI Connext DDS installation. To
+configure your environment so that Connector can load these additional libraries:
 
-- Copy the required library into the same location as the connector library (librtiddsconnector.so on Linux,
-  librtiddsconnector.dylib on Darwin and rtiddsconnector.dll on Windows).
-- Add the path containing the library to the LD_LIBRARY_PATH environment variable.
+- Set your environment using::
+
+  $ source <Connext DDS installation directory>/resource/scripts/rtisetenv_<architecture>.bash
+
+  or::
+
+  > <Connext DDS installation directory>\resource\scripts\rtisetenv_<architecture>.bat
+
+- Or set your system's library path to::
+
+  <Connext DDS installation directory>\lib\<architecture>\
 
