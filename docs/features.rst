@@ -233,6 +233,9 @@ libraries, such as
 `Monitoring <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartMonitoringLib.htm>`__
 and `Security Plugins <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_secure/getting_started_guide/index.html>`__.
 
+The Monitoring and Security plugins are configured in XML, as described in the previous
+links.
+
 To use RTI Connext DDS add-ons you need an RTI Connext DDS installation. To
 configure your environment so that Connector can load these additional libraries:
 
