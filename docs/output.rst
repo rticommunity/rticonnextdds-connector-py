@@ -1,4 +1,4 @@
-Writing data (Output)
+Writing Data (Output)
 =====================
 
 .. py:currentmodule:: rticonnextdds_connector
@@ -95,7 +95,7 @@ when determining the instance that is disposed or unregistered.
 
 See :meth:`Output.write` for more information on the supported parameters.
 
-Matching with a Subscription
+Matching with a subscription
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Before writing, you can use the method :meth:`Output.wait_for_subscriptions()` to

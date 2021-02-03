@@ -104,12 +104,19 @@ class _ConnectorBinding:
     def __init__(self): # pylint: disable=too-many-statements
         (bits, _) = platform.architecture()
         osname = platform.system()
-        is_arm = platform.uname()[4].startswith("arm")
+        machine = platform.uname()[4]
         additional_lib = None
 
         if "64" in bits:
             if "Linux" in osname:
-                arch = "x64Linux2.6gcc4.4.5"
+                # Check if the underlying platform is ARM
+                # Armv8 can have the following strings returned by uname:
+                # aarch64, aarch64_be, armv8b, armv8l
+                # We want to match any of them
+                if "aarch64" in machine or "armv8" in machine:
+                    arch = "armv8Linux4gcc7.3.0"
+                else:
+                    arch = "x64Linux2.6gcc4.4.5"
                 libname = "librtiddsconnector"
                 post = "so"
             elif "Darwin" in osname:
@@ -124,7 +131,7 @@ class _ConnectorBinding:
             else:
                 raise RuntimeError("This platform ({0}) is not supported".format(osname))
         else:
-            if is_arm:
+            if "arm" in machine:
                 arch = "armv6vfphLinux3.xgcc4.7.2"
                 libname = "librtiddsconnector"
                 post = "so"
@@ -1338,7 +1345,7 @@ class Connector:
     def set_max_objects_per_thread(value):
         """Allows increasing the number of Connector instances that can be created
 
-        The default value is 1024. If your application creates more than eight
+        The default value is 2048. If your application creates more than fifteen
         ``Connector`` instances approximately, you may have to increase this
         value.
 

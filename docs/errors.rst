@@ -1,4 +1,4 @@
-Error Handling
+Error handling
 ===============
 
 .. py:currentmodule:: rticonnextdds_connector
