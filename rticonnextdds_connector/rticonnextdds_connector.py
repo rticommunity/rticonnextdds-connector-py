@@ -135,15 +135,6 @@ class _ConnectorBinding:
                 directory = "linux-arm"
                 libname = "librtiddsconnector"
                 post = "so"
-            elif "Linux" in osname:
-                directory = "linux-x86"
-                libname = "librtiddsconnector"
-                post = "so"
-            elif "Windows" in osname:
-                directory = "win-x86"
-                libname = "rtiddsconnector"
-                post = "dll"
-                additional_lib = "msvcr100"
             else:
                 raise RuntimeError("This platform ({0}) is not supported".format(osname))
 
