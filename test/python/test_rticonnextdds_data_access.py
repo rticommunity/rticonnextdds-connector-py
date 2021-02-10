@@ -737,3 +737,23 @@ class TestDataAccess:
     sample = send_data(test_output, test_input)
     assert sample["my_int_sequence"] == int_seq
     assert sample["my_point_sequence"] == point_seq
+
+  def test_clear_within_complex_list(self, test_output, test_input):
+    # Initialize point sequence to contain 3 points
+    point_seq = [{"x":100, "y":200}, {"x":300, "y":400}, {"x":500, "y":600}]
+    test_output.instance["my_point_sequence"] = point_seq
+    sample = send_data(test_output, test_input)
+    assert sample["my_point_sequence"] == point_seq
+    # Now clear one of the complex elements within the sequence
+    point_seq = [{"x":100, "y":200}, None, {"x":500, "y":600}]
+    test_output.instance["my_point_sequence"] = point_seq
+    sample = send_data(test_output, test_input)
+    assert sample["my_point_sequence[0]"] == {"x":100, "y":200}
+    assert sample["my_point_sequence[1]"] == {"x":0, "y":0}
+    assert sample["my_point_sequence[2]"] == {"x":500, "y":600}
+
+  def test_set_enum_with_name(self, test_output, test_input):
+    # Test that it is possible to set an enum via its name
+    test_output.instance.set_dictionary({"my_enum":"GREEN"})
+    sample = send_data(test_output, test_input)
+    assert sample["my_enum"] == 1
