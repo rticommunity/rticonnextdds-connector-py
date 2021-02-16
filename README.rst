@@ -26,7 +26,8 @@ The ``examples/python`` directory provides several examples:
 -  In ``transformation``, an application reads, transforms and publishes
    back the data
 -  ``images`` shows how to manipulate more complex data types
-
+-  ``request-reply`` shows how to create basic application following 
+   the request-reply pattern.
 License
 -------
 
