@@ -106,6 +106,7 @@ class _ConnectorBinding:
         osname = platform.system()
         machine = platform.uname()[4]
         additional_lib = None
+        is_windows = False
 
         if "64" in bits:
             if "Linux" in osname:
@@ -128,6 +129,7 @@ class _ConnectorBinding:
                 libname = "rtiddsconnector"
                 post = "dll"
                 additional_lib = "msvcr120"
+                is_windows = True
             else:
                 raise RuntimeError("This platform ({0}) is not supported".format(osname))
         else:
@@ -148,6 +150,11 @@ class _ConnectorBinding:
             except OSError:
                 # Don't fail; try to load rtiddsconnector.dll anyway
                 print("Warning: error loading " + additional_lib)
+
+        # On Windows we need to explicitly load all of the libraries
+        if is_windows:
+            ctypes.CDLL(os.path.join(path, "nddscore.dll"), ctypes.RTLD_GLOBAL)
+            ctypes.CDLL(os.path.join(path, "nddsc.dll"), ctypes.RTLD_GLOBAL)
 
         libname = libname + "." + post
         self.library = ctypes.CDLL(os.path.join(path, libname), ctypes.RTLD_GLOBAL)
