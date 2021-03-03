@@ -42,7 +42,7 @@ What's New in 1.1.0
 
 Sample state, instance state, and view state can now be obtained in Connector
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-.. CON-177 
+.. CON-177
 
 The SampleInfo class in *Connector* has been extended to provide access to the
 sample state, view state, and instance state fields. These new fields work the
@@ -50,10 +50,10 @@ same as the existing fields in the structure (in *Connector* for Python they are
 the keys to the dictionary, in *Connector* for JavaScript they are the keys to the
 JSON Object).
 
-
 Support for accessing the key values of disposed instances
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""
-.. CON-188 
+
+.. CON-188
 
 Support for disposing instances was added in *Connector* 1.0.0.
 However, it was not possible to access the key values of the disposed instance.
@@ -64,6 +64,14 @@ contains valid data (i.e., using type-specific getters, or obtaining the entire
 sample as an object). When the instance state is NOT_ALIVE_DISPOSED, only the
 key values in the sample should be accessed.
 
+Support for Security, Monitoring and other Connext DDS add-on libraries
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+.. CON-221
+
+It is now possible to load additional Connext DDS libraries at runtime. This means
+that Connext DDS features such as Monitoring and Security Plugins are now supported.
+Refer to :ref:`Loading Connext DDS Add-On Libraries` for more information.
 
 What's Fixed in 1.1.0
 ^^^^^^^^^^^^^^^^^^^^^
