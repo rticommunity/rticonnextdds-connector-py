@@ -106,6 +106,7 @@ class _ConnectorBinding:
         osname = platform.system()
         machine = platform.uname()[4]
         additional_lib = None
+        is_windows = False
 
         if "64" in bits:
             if "Linux" in osname:
@@ -114,41 +115,33 @@ class _ConnectorBinding:
                 # aarch64, aarch64_be, armv8b, armv8l
                 # We want to match any of them
                 if "aarch64" in machine or "armv8" in machine:
-                    arch = "armv8Linux4gcc7.3.0"
+                    directory = "linux-arm64"
                 else:
-                    arch = "x64Linux2.6gcc4.4.5"
+                    directory = "linux-x64"
                 libname = "librtiddsconnector"
                 post = "so"
             elif "Darwin" in osname:
-                arch = "x64Darwin16clang8.0"
+                directory = "osx-x64"
                 libname = "librtiddsconnector"
                 post = "dylib"
             elif "Windows" in osname:
-                arch = "x64Win64VS2013"
+                directory = "win-x64"
                 libname = "rtiddsconnector"
                 post = "dll"
                 additional_lib = "msvcr120"
+                is_windows = True
             else:
                 raise RuntimeError("This platform ({0}) is not supported".format(osname))
         else:
             if "arm" in machine:
-                arch = "armv6vfphLinux3.xgcc4.7.2"
+                directory = "linux-arm"
                 libname = "librtiddsconnector"
                 post = "so"
-            elif "Linux" in osname:
-                arch = "i86Linux3.xgcc4.6.3"
-                libname = "librtiddsconnector"
-                post = "so"
-            elif "Windows" in osname:
-                arch = "i86Win32VS2010"
-                libname = "rtiddsconnector"
-                post = "dll"
-                additional_lib = "msvcr100"
             else:
                 raise RuntimeError("This platform ({0}) is not supported".format(osname))
 
         path = os.path.dirname(os.path.realpath(__file__))
-        path = os.path.join(path, "..", "rticonnextdds-connector/lib", arch)
+        path = os.path.join(path, "..", "rticonnextdds-connector/lib", directory)
 
         # Load Visual C++ redistributable if available
         if additional_lib is not None:
@@ -157,6 +150,11 @@ class _ConnectorBinding:
             except OSError:
                 # Don't fail; try to load rtiddsconnector.dll anyway
                 print("Warning: error loading " + additional_lib)
+
+        # On Windows we need to explicitly load all of the libraries
+        if is_windows:
+            ctypes.CDLL(os.path.join(path, "nddscore.dll"), ctypes.RTLD_GLOBAL)
+            ctypes.CDLL(os.path.join(path, "nddsc.dll"), ctypes.RTLD_GLOBAL)
 
         libname = libname + "." + post
         self.library = ctypes.CDLL(os.path.join(path, libname), ctypes.RTLD_GLOBAL)
