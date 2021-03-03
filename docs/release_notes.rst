@@ -19,7 +19,7 @@ runs on most Windows®, Linux® and macOS® platforms.
   * SUSE® Linux Enterprise Server 12 SP2  (x64)
   * Ubuntu® 14.04, 18.04, 20.04 LTS (x64)
   * Ubuntu 18.04 LTS (64-bit Arm® v8)
-  * Ubuntu 18.04 LTS (32-bit Arm® v7)
+  * Ubuntu 18.04 LTS (32-bit Arm v7)
   * Wind River® Linux 8 (Arm v7) (Custom-supported platform)
     
 **macOS**  
