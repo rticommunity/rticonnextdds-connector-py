@@ -11,7 +11,7 @@ Supported Platforms
 *RTI Connector* works with Python® 2.x and 3.x. It uses a native C library that
 runs on most Windows®, Linux® and macOS® platforms.
 
-*Connector* has been tested with Python 2.6+ and 3.6.8+ on the following systems:
+*Connector* has been tested with Python 2.6+ and 3.6.8+, and on the following systems:
      
 **Linux**
   * CentOS™ 6.0, 6.2-6.4, 7.0 (x64)
@@ -19,16 +19,17 @@ runs on most Windows®, Linux® and macOS® platforms.
   * SUSE® Linux Enterprise Server 12 SP2  (x64)
   * Ubuntu® 14.04, 18.04, 20.04 LTS (x64)
   * Ubuntu 18.04 LTS (64-bit Arm® v8)
+  * Ubuntu 18.04 LTS (32-bit Arm® v7)
   * Wind River® Linux 8 (Arm v7) (Custom-supported platform)
     
 **macOS**  
   * macOS 10.13-10.15 (x64)
     
 **Windows**    
-  * Windows 8 (Visual Studio® 2013) (x64)
-  * Windows 10 (Visual Studio 2015, 2017, 2019) (x64)
-  * Windows Server 2012 R2 (Visual Studio 2013) (x64)
-  * Windows Server 2016 (Visual Studio 2015, 2017, 2019) (x64)
+  * Windows 8 (x64)
+  * Windows 10 (x64)
+  * Windows Server 2012 R2 (x64)
+  * Windows Server 2016 (x64)
 
 *Connector* is supported in other languages in addition to Python, see the 
 `main Connector
