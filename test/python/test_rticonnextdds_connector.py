@@ -105,3 +105,9 @@ class TestConnector:
                 config_name=participant_profile,
                 url=xml_path) as connector:
             assert connector is not None
+
+    def test_connector_version(self):
+        """
+        Test that it is possible to obtain the version of Connector.
+        """
+        assert rti.Connector.version() == "1.1.0.rc2"
