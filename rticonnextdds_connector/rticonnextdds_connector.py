@@ -1357,16 +1357,6 @@ class Connector:
         """
         _check_retcode(connector_binding.set_max_objects_per_thread(value))
 
-    @staticmethod
-    def version():
-        """Allows you to query the current version of Connector being used.
-
-        This operation can be called before creating any ``Connector`` instances.
-
-        Returns the version of Connector.
-        """
-        return "1.1.0.rc2"
-
 @contextmanager
 def open_connector(config_name, url):
     """A resource manager that creates and deletes a Connector
