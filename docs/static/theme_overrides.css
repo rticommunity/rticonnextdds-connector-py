@@ -7,6 +7,10 @@
     white-space: initial;
 }
 
+.wy-side-nav-search {
+    background: #004C97;
+}
+
 /* override table width restrictions */
 @media screen and (min-width: 767px) {
 
