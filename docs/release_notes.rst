@@ -41,8 +41,8 @@ Version 1.1.0
 What's New in 1.1.0
 ^^^^^^^^^^^^^^^^^^^
 
-Support added ARMv8 architectures
-"""""""""""""""""""""""""""""""""
+Support added for ARMv8 architectures
+"""""""""""""""""""""""""""""""""""""
 .. CON-174 
 
 Connector for Python now runs on ARMv8 architectures. Native libraries
