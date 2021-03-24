@@ -41,6 +41,14 @@ Version 1.1.0
 What's New in 1.1.0
 ^^^^^^^^^^^^^^^^^^^
 
+Support added for ARMv8 architectures
+"""""""""""""""""""""""""""""""""""""
+.. CON-174 
+
+Connector for Python now runs on ARMv8 architectures. Native libraries
+built for ARMv8 Ubuntu 16.04 are now shipped alongside Connector. These libraries
+have been tested on ARMv8 Ubuntu 16.04 and ARMv8 Ubuntu 18.04.
+
 Sample state, instance state, and view state can now be obtained in Connector
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .. CON-177
