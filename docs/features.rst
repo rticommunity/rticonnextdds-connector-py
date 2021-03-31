@@ -57,7 +57,7 @@ General features
    * - `Managing Data Instances <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Managing_Data_Instances__Working_with_Ke.htm>`__
      - Partial
      - On an ``Output``, it is possible to dispose or unregister an instance (see :meth:`Output.write`). Instances are automatically registered when first written. On an ``Input`` the instance state can be obtained, alongside the key fields of a disposed instance (see :ref:`Accessing key values of disposed samples`). Instance handles are not exposed.
-   * - `Application Acknowledgment <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Application_Acknowledgment.htm>`__
+   * - `Application Acknowledgment <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Application_Acknowledgment.htm>`__
      - Partial
      - *DDS_APPLICATION_AUTO_ACKNOWLEDGMENT_MODE* is supported. If enabled, when a call to :meth:`Input.take` or :meth:`Input.read` is followed by another call, the second one automatically acknowledges the samples read in the first one.
 
@@ -83,7 +83,7 @@ General features
      - Partial
      - The built-in transports can be configured in XML.
    * - Add-on Libraries
-       (such as `Monitoring <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/PartMonitoringLib.htm>`__, 
+       (such as `Monitoring <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartMonitoringLib.htm>`__, 
        `Security Plugins <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_secure/getting_started_guide/index.html>`__ )
      - Supported
      - See :ref:`Loading Connext DDS Add-On Libraries`.
