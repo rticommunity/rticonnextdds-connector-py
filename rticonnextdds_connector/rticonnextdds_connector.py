@@ -108,37 +108,46 @@ class _ConnectorBinding:
         additional_lib = None
         is_windows = False
 
-        if "64" in bits:
-            if "Linux" in osname:
-                # Check if the underlying platform is ARM
-                # Armv8 can have the following strings returned by uname:
+        if "Linux" in osname:
+            # "Linux" can be ARMv7, ARMv8 or x64
+            if "64" in bits:
+                # ARMv8 can have the following strings returned by uname:
                 # aarch64, aarch64_be, armv8b, armv8l
                 # We want to match any of them
                 if "aarch64" in machine or "armv8" in machine:
+                    # ARMv8
                     directory = "linux-arm64"
                 else:
+                    # x64
                     directory = "linux-x64"
-                libname = "librtiddsconnector"
-                post = "so"
-            elif "Darwin" in osname:
-                directory = "osx-x64"
-                libname = "librtiddsconnector"
-                post = "dylib"
-            elif "Windows" in osname:
-                directory = "win-x64"
-                libname = "rtiddsconnector"
-                post = "dll"
-                additional_lib = "msvcr120"
-                is_windows = True
-            else:
-                raise RuntimeError("This platform ({0}) is not supported".format(osname))
-        else:
-            if "arm" in machine:
+            elif "arm" in machine:
+                # ARMv7
                 directory = "linux-arm"
-                libname = "librtiddsconnector"
-                post = "so"
             else:
-                raise RuntimeError("This platform ({0}) is not supported".format(osname))
+                # (Unsupported) Linux 32 bit, allows user to manually swap libs
+                # for 32-bit version
+                directory = "linux-x64"
+            # All of the above variants have the same libname.post
+            libname = "librtiddsconnector"
+            post = "so"
+        elif "Darwin" in osname:
+            directory = "osx-x64"
+            libname = "librtiddsconnector"
+            post = "dylib"
+        elif "Windows" in osname:
+            directory = "win-x64"
+            libname = "rtiddsconnector"
+            post = "dll"
+            additional_lib = "msvcr120"
+            is_windows = True
+        else:
+            raise RuntimeError("This platform ({0}) is not supported".format(osname))
+
+        # Connector is not supported on a (non ARM) 32-bit platform
+        # We continue, incase the user has manually replaced the libraries within
+        # the directory which we are going to load.
+        if not "64" in bits and not "arm" in machine:
+            print("Warning: 32-bit {0} not supported".format(osname))
 
         path = os.path.dirname(os.path.realpath(__file__))
         path = os.path.join(path, "..", "rticonnextdds-connector/lib", directory)
