@@ -61,11 +61,8 @@ Website: https://support.rti.com/ |br|
 .. rubric:: External Third-Party Software Used in Connector
 
 **Lua**
-  * This software is shipped as part of the native libraries provided by 
-    *RTI Connector*.
-
-  * We have the source code checked into the connextdds repository in the 
-    lua.1.0 module (version 5.2).
+  * The source code of this software is used to build the native libraries
+    provided by *RTI Connector*.
 
   * License (https://www.lua.org/license.html):
     Copyright © 1994–2021 Lua.org, PUC-Rio.
@@ -89,11 +86,8 @@ Website: https://support.rti.com/ |br|
     THE SOFTWARE.
 
 **json-parser**
-  * This software is shipped as part of the native libraries provided by 
-    *RTI Connector*.
-
-  * We have the source code checked into the connextdds repository in the 
-    json.1.0 module (from https://github.com/udp/json-parser)
+  * The source code of this software (from https://github.com/udp/json-parser) 
+    is used to build the native libraries provided by *RTI Connector*.
 
   * License:
 
