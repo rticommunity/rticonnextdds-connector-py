@@ -38,6 +38,8 @@ repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 Version 1.1.0
 ~~~~~~~~~~~~~
 
+*RTI Connector* 1.1.0 is built on `RTI Connext DDS 6.1.0 <https://community.rti.com/documentation/rti-connext-dds-610>`__.
+
 What's New in 1.1.0
 ^^^^^^^^^^^^^^^^^^^
 
