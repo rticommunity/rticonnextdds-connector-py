@@ -114,3 +114,13 @@ def one_use_output(one_use_connector):
 @pytest.fixture
 def one_use_input(one_use_connector):
   return one_use_connector.get_input("MySubscriber::MySquareReader")
+
+def pytest_addoption(parser):
+    parser.addoption("--iterations", action="store", default=100)
+
+def pytest_generate_tests(metafunc):
+    # This is called for every test. Only get/set command line arguments
+    # if the argument is specified in the list of test "fixturenames".
+    option_value = metafunc.config.option.iterations
+    if 'iterations' in metafunc.fixturenames and option_value is not None:
+        metafunc.parametrize("iterations", [int(option_value)])

@@ -10,12 +10,14 @@ data distribution efficient and robust. At its core is the world's
 leading ultra-high performance, distributed networking databus.
 
 *RTI Connector* is a family of simplified APIs for publishing and subscribing
-to the *Connext DDS* Databus in programming languages such as Python and JavaScript.
+to the *Connext DDS* Databus in programming languages such as Python and JavaScript. 
+(RTI also offers a more comprehensive `Python API <https://community.rti.com/static/documentation/connext-dds/current/api/connext_dds/api_python/intro.html>`__, 
+which is experimental.)
 
 .. note::
 
     This documentation assumes you are already familiar with basic DDS 
-    concepts. You can learn about DDS in the *RTI Connext DDS Core Libraries 
+    concepts. You can learn about DDS in the *RTI Connext DDS 
     Getting Started Guide*, *RTI Connext DDS Core Libraries User's Manual*, 
     and the *Connext DDS* API documentation for C,
     C++, Java and .NET. These documents are available from the

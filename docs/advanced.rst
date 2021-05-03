@@ -1,4 +1,4 @@
-Advanced topics
+Advanced Topics
 ===============
 
 .. toctree::
@@ -8,4 +8,3 @@ Advanced topics
    threading
    errors
    features
-

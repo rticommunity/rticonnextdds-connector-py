@@ -104,44 +104,53 @@ class _ConnectorBinding:
     def __init__(self): # pylint: disable=too-many-statements
         (bits, _) = platform.architecture()
         osname = platform.system()
-        is_arm = platform.uname()[4].startswith("arm")
+        machine = platform.uname()[4]
         additional_lib = None
+        is_windows = False
 
-        if "64" in bits:
-            if "Linux" in osname:
-                arch = "x64Linux2.6gcc4.4.5"
-                libname = "librtiddsconnector"
-                post = "so"
-            elif "Darwin" in osname:
-                arch = "x64Darwin16clang8.0"
-                libname = "librtiddsconnector"
-                post = "dylib"
-            elif "Windows" in osname:
-                arch = "x64Win64VS2013"
-                libname = "rtiddsconnector"
-                post = "dll"
-                additional_lib = "msvcr120"
+        if "Linux" in osname:
+            # "Linux" can be ARMv7, ARMv8 or x64
+            if "64" in bits:
+                # ARMv8 can have the following strings returned by uname:
+                # aarch64, aarch64_be, armv8b, armv8l
+                # We want to match any of them
+                if "aarch64" in machine or "armv8" in machine:
+                    # ARMv8
+                    directory = "linux-arm64"
+                else:
+                    # x64
+                    directory = "linux-x64"
+            elif "arm" in machine:
+                # ARMv7
+                directory = "linux-arm"
             else:
-                raise RuntimeError("This platform ({0}) is not supported".format(osname))
+                # (Unsupported) Linux 32 bit, allows user to manually swap libs
+                # for 32-bit version
+                directory = "linux-x64"
+            # All of the above variants have the same libname.post
+            libname = "librtiddsconnector"
+            post = "so"
+        elif "Darwin" in osname:
+            directory = "osx-x64"
+            libname = "librtiddsconnector"
+            post = "dylib"
+        elif "Windows" in osname:
+            directory = "win-x64"
+            libname = "rtiddsconnector"
+            post = "dll"
+            additional_lib = "msvcr120"
+            is_windows = True
         else:
-            if is_arm:
-                arch = "armv6vfphLinux3.xgcc4.7.2"
-                libname = "librtiddsconnector"
-                post = "so"
-            elif "Linux" in osname:
-                arch = "i86Linux3.xgcc4.6.3"
-                libname = "librtiddsconnector"
-                post = "so"
-            elif "Windows" in osname:
-                arch = "i86Win32VS2010"
-                libname = "rtiddsconnector"
-                post = "dll"
-                additional_lib = "msvcr100"
-            else:
-                raise RuntimeError("This platform ({0}) is not supported".format(osname))
+            raise RuntimeError("This platform ({0}) is not supported".format(osname))
+
+        # Connector is not supported on a (non ARM) 32-bit platform
+        # We continue, incase the user has manually replaced the libraries within
+        # the directory which we are going to load.
+        if not "64" in bits and not "arm" in machine:
+            print("Warning: 32-bit {0} not supported".format(osname))
 
         path = os.path.dirname(os.path.realpath(__file__))
-        path = os.path.join(path, "..", "rticonnextdds-connector/lib", arch)
+        path = os.path.join(path, "..", "rticonnextdds-connector/lib", directory)
 
         # Load Visual C++ redistributable if available
         if additional_lib is not None:
@@ -150,6 +159,11 @@ class _ConnectorBinding:
             except OSError:
                 # Don't fail; try to load rtiddsconnector.dll anyway
                 print("Warning: error loading " + additional_lib)
+
+        # On Windows we need to explicitly load all of the libraries
+        if is_windows:
+            ctypes.CDLL(os.path.join(path, "nddscore.dll"), ctypes.RTLD_GLOBAL)
+            ctypes.CDLL(os.path.join(path, "nddsc.dll"), ctypes.RTLD_GLOBAL)
 
         libname = libname + "." + post
         self.library = ctypes.CDLL(os.path.join(path, libname), ctypes.RTLD_GLOBAL)
@@ -667,8 +681,11 @@ class SampleIterator:
         * ``"sample_identity"``, or ``"identity"`` returns a dictionary (see :meth:`Output.write`)
         * ``"related_sample_identity"`` returns a dictionary (see :meth:`Output.write`)
         * ``"valid_data"``, returns a boolean (equivalent to ``sample_it.valid_data``)
+        * ``"view_state"``, returns a string (either "NEW" or "NOT_NEW")
+        * ``"instance_state"``, returns a string (one of "ALIVE", "NOT_ALIVE_DISPOSED" or "NOT_ALIVE_NO_WRITERS")
+        * ``"sample_state"``, returns a string (either "READ" or "NOT_READ")
 
-        These fields are documented in `The SampleInfo Structure <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/The_SampleInfo_Structure.htm#7.4.6_The_SampleInfo_Structure%3FTocPath%3DPart%25202%253A%2520Core%2520Concepts%7C7.%2520Receiving%2520Data%7C7.4%2520Using%2520DataReaders%2520to%2520Access%2520Data%2520(Read%2520%2526%2520Take)%7C7.4.6%2520The%2520SampleInfo%2520Structure%7C_____0>`__
+        These fields are documented in `The SampleInfo Structure <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/The_SampleInfo_Structure.htm>`__
         section in the *Connext DDS Core Libraries User's Manual*.
         """
         return SampleInfo(self.input, self.index)
@@ -1102,7 +1119,7 @@ class Output:
         two cases, only the ``instance`` *key* members are required.
 
         This method receives a number of optional parameters, a subset of those
-        documented in the `Writing Data section <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/Writing_Data.htm?Highlight=DDS_WriteParams_t>`__.
+        documented in the `Writing Data section <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Writing_Data.htm?Highlight=DDS_WriteParams_t>`__.
         of the *Connext DDS Core Libraries* User's Manual.
 
         The supported parameters are:
@@ -1221,7 +1238,7 @@ class Connector:
     A ``Connector`` instance must be deleted with :meth:`close()`.
 
     :param str config_name: The configuration to load. The ``config_name`` format is ``"LibraryName::ParticipantName"``, where ``LibraryName`` is the ``name`` attribute of a ``<domain_participant_library>`` tag, and ``ParticipantName`` is the ``name`` attribute of a ``<domain_participant>`` tag inside the library.
-    :param str url: An URL locating the XML document. The ``url`` can be a file path (for example, ``'/tmp/my_dds_config.xml'``) or a string containing the full XML document with the following format ``'str://"<dds>...</dds>"'``)
+    :param str url: An URL locating the XML document. The ``url`` can be a file path (for example, ``'/tmp/my_dds_config.xml'``), a string containing the full XML document with the following format ``'str://"<dds>...</dds>"'``), or a combination of multiple files or strings, as explained in the `URL Groups <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/URL_Groups.htm>`__ section of the *Connext DDS Core Libraries User's Manual*.
 
     """
 
@@ -1335,14 +1352,14 @@ class Connector:
     def set_max_objects_per_thread(value):
         """Allows increasing the number of Connector instances that can be created
 
-        The default value is 1024. If your application creates more than eight
+        The default value is 2048. If your application creates more than fifteen
         ``Connector`` instances approximately, you may have to increase this
         value.
 
         This operation can only be called before creating any ``Connector``
         instance.
 
-        See `SYSTEM_RESOURCE_LIMITS QoS Policy <https://community.rti.com/static/documentation/connext-dds/6.0.0/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/SYSTEM_RESOURCE_LIMITS_QoS.htm>`__
+        See `SYSTEM_RESOURCE_LIMITS QoS Policy <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/SYSTEM_RESOURCE_LIMITS_QoS.htm>`__
         in the *RTI Connext DDS* User's Manual.
 
         :param number value: The value for *max_objects_per_thread*

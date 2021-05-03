@@ -22,7 +22,7 @@ To create a new :class:`Connector`, pass an XML file and a configuration name:
    connector = rti.Connector("MyParticipantLibrary::MyParticipant", "ShapeExample.xml");
 
 The XML file defines your types, QoS profiles, and DDS Entities. *Connector*
-uses the XML schema of `RTI's XML-Based Application Creation <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/xml_application_creation/html_files/RTI_ConnextDDS_CoreLibraries_XML_AppCreation_GettingStarted/index.htm#XMLBasedAppCreation/UnderstandingPrototyper/XMLTagsConfigEntities.htm%3FTocPath%3D5.%2520Understanding%2520XML-Based%2520Application%2520Creation%7C5.5%2520XML%2520Tags%2520for%2520Configuring%2520Entities%7C_____0>`__.
+uses the XML schema of `RTI's XML-Based Application Creation <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/xml_application_creation/index.htm#xml_based_app_creation_guide/UnderstandingXMLBased/XMLTagsConfigEntities.htm>`__.
 
 The previous code loads the ``<domain_participant>`` named *MyParticipant* in 
 the ``<domain_participant_library>`` named *MyParticipantLibrary*, which is defined in the
@@ -40,7 +40,7 @@ When you create a :class:`Connector`, the DDS *DomainParticipant* that you selec
 and all its contained entities (*Topics*, *Subscribers*, *DataReaders*,
 *Publishers*, *DataWriters*) are created.
 
-For more information about the DDS entities, see `Part 2 - Core Concepts <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds/html_files/RTI_ConnextDDS_CoreLibraries_UsersManual/index.htm#UsersManual/PartCoreConcepts.htm#partcoreconcepts_4109331811_915546%3FTocPath%3DPart%25202%253A%2520Core%2520Concepts%7C_____0>`__
+For more information about the DDS entities, see `Core Concepts <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartCoreConcepts.htm>`__
 in the *RTI Connext DDS Core Libraries User's Manual*.
 
 .. note::

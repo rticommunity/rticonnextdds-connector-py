@@ -685,11 +685,16 @@ class TestDataAccess:
     # For each numeric field, test that set_dictionary fails when the value we
     # try to set is a string that doesn't represent a number
     field_names = ["my_long", "my_int64", "my_double",
-      "my_point_array[1].x", "my_int_sequence[1]", "my_enum", "my_uint64"]
+      "my_point_array[1].x", "my_int_sequence[1]", "my_uint64"]
     for name in field_names:
         with pytest.raises(rti.Error, match=r".*cannot convert field to string.*") as excinfo:
           test_output.instance.set_dictionary({name:"not a number"})
           print("Field " + name + " did not raise an exception")
+    # For enums, the error printed is slightly different
+    with pytest.raises(rti.Error, match=r".*convert enum string to numerical representation.*") as excinfo:
+        test_output.instance.set_dictionary({"my_enum":"not a number"})
+        print("Field my_enum did not raise an exception")
+
 
   def test_error_in_dictionary(self, test_output, test_input):
     with pytest.raises(rti.Error) as excinfo:
@@ -732,3 +737,23 @@ class TestDataAccess:
     sample = send_data(test_output, test_input)
     assert sample["my_int_sequence"] == int_seq
     assert sample["my_point_sequence"] == point_seq
+
+  def test_clear_within_complex_list(self, test_output, test_input):
+    # Initialize point sequence to contain 3 points
+    point_seq = [{"x":100, "y":200}, {"x":300, "y":400}, {"x":500, "y":600}]
+    test_output.instance["my_point_sequence"] = point_seq
+    sample = send_data(test_output, test_input)
+    assert sample["my_point_sequence"] == point_seq
+    # Now clear one of the complex elements within the sequence
+    point_seq = [{"x":100, "y":200}, None, {"x":500, "y":600}]
+    test_output.instance["my_point_sequence"] = point_seq
+    sample = send_data(test_output, test_input)
+    assert sample["my_point_sequence[0]"] == {"x":100, "y":200}
+    assert sample["my_point_sequence[1]"] == {"x":0, "y":0}
+    assert sample["my_point_sequence[2]"] == {"x":500, "y":600}
+
+  def test_set_enum_with_name(self, test_output, test_input):
+    # Test that it is possible to set an enum via its name
+    test_output.instance.set_dictionary({"my_enum":"GREEN"})
+    sample = send_data(test_output, test_input)
+    assert sample["my_enum"] == 1
