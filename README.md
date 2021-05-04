@@ -22,6 +22,8 @@ The `examples/python` directory provides several examples:
 * `simple` shows how to create basic publisher and subscriber applications
 * In `transformation`, an application reads, transforms and publishes back the data
 * `images` shows how to manipulate more complex data types
+* `request-reply` shows how to create basic application following 
+   the request-reply pattern.
 
 ## License
 RTI Connector for JavaScript and RTI Connector for Python are part of the Connext
