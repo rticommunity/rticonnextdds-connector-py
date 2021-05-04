@@ -33,7 +33,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.1.0.rc2',
+    version='1.1.0',
 
     description='RTI Connector for Python',
     long_description=long_description,
@@ -72,7 +72,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='rti dds connext connector pub sub pub-sub',
+    keywords='rti dds connext connector pub sub pub-sub iot',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
