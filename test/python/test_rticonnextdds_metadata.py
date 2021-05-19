@@ -237,9 +237,8 @@ class TestMetadata:
   def test_get_disposed_key_values_multiple_keys(self, one_use_connector):
     the_output = one_use_connector.get_output("MyPublisher::MyMultipleKeyedSquareWriter")
     the_input = one_use_connector.get_input("MySubscriber::MyMultipleKeyedSquareReader")
-    # Wait for discovery
-    the_input.wait_for_publications(5000)
-    the_output.wait_for_subscriptions(5000)
+    wait_for_discovery(the_output, the_input)
+
     # Set the sample
     the_output.instance['color'] = "Yellow" # key
     the_output.instance['other_color'] = "Green" # key
@@ -304,9 +303,7 @@ class TestMetadata:
   def test_get_disposed_key_values_nested_keys(self, one_use_connector):
     the_input = one_use_connector.get_input("MySubscriber::MyNestedKeyedSquareReader")
     the_output = one_use_connector.get_output("MyPublisher::MyNestedKeyedSquareWriter")
-    # Wait for discovery
-    the_input.wait_for_publications(5000)
-    the_output.wait_for_subscriptions(5000)
+    wait_for_discovery(the_output, the_input)
     # Set the sample
     the_output.instance["keyed_shape.color"] = "Black"
     the_output.instance["keyed_shape.x"] = 2
@@ -440,8 +437,7 @@ class TestMetadata:
     the_input = one_use_connector.get_input("MySubscriber::MySquareWithoutTopLevelKeyReader")
     the_output = one_use_connector.get_output("MyPublisher::MySquareWithoutTopLevelKeyWriter")
     # Wait for discovery
-    the_input.wait_for_publications(5000)
-    the_output.wait_for_subscriptions(5000)
+    wait_for_discovery(the_output, the_input)
     # Set some fields
     the_output.instance["keyed_shape.color"] = "Green"
     the_output.instance["unkeyed_shape.color"] = "Green"

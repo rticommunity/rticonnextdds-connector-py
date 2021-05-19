@@ -94,7 +94,7 @@ class TestConnector:
 
     def test_connector_creation_with_participant_qos(self):
         """
-        Tests that a domain_participant defined in XML alonside participant_qos
+        Tests that a domain_participant defined in XML alongside participant_qos
         can be used to create a Connector object.
         """
         participant_profile = "MyParticipantLibrary::ConnectorWithParticipantQos"
@@ -105,3 +105,9 @@ class TestConnector:
                 config_name=participant_profile,
                 url=xml_path) as connector:
             assert connector is not None
+
+    def test_setting_max_objects_per_thread(self):
+        """
+        It should be possible to modify max_objects_per_thread
+        """
+        rti.Connector.set_max_objects_per_thread(2048)

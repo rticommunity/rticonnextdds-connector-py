@@ -9,7 +9,7 @@
 import pytest,time,sys,os,ctypes,json
 sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
-from test_utils import send_data, wait_for_data, open_test_connector
+from test_utils import *
 
 
 class TestDataAccess:
@@ -625,8 +625,6 @@ class TestDataAccess:
     output1 = test_connector.get_output("TestPublisher::TestWriter")
     output2 = test_connector.get_output("TestPublisher::TestWriter2")
 
-    # Ensure matching between all entities occurs
-    # TODO after merging CON-108
     with pytest.raises(rti.TimeoutError) as excinfo:
       input2.wait(2000)
 
