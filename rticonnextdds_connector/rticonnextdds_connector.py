@@ -21,6 +21,7 @@ import os
 import sys
 import platform
 import json
+import pkg_resources
 from contextlib import contextmanager
 from numbers import Number
 from ctypes import * # pylint: disable=unused-wildcard-import, wildcard-import, ungrouped-imports
@@ -98,6 +99,14 @@ class _AnyValueKind:
     connector_number = 1
     connector_boolean = 2
     connector_string = 3
+
+# This class matches the DDS_ProductVersion_t structure in the native libraries.
+# A pointer to this class is returned by the get_library_version native function.
+class _NativeConnectorVersion(Structure):
+    _fields_=[("major", c_char),
+              ("minor", c_char),
+              ("release", c_char),
+              ("revision", c_char)]
 
 # pylint: disable=too-many-instance-attributes
 class _ConnectorBinding:
@@ -322,6 +331,14 @@ class _ConnectorBinding:
         self._create_test_scenario.restype = ctypes.c_int
         self._create_test_scenario.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p]
 
+        self.get_library_version = self.library.RTI_Connector_get_library_version
+        self.get_library_version.restype = POINTER(_NativeConnectorVersion)
+        self.get_library_version.argtypes = None 
+
+        self.get_build_string = self.library.RTI_Connector_get_build_version_string
+        self.get_build_string.restype = ctypes.c_char_p
+        self.get_build_string.argtypes = None 
+
     @staticmethod
     def get_any_value(getter_function, connector, input_name, index, field_name):
         "Calls one of the get_any functions and translates the result from ctypes to python"
@@ -372,6 +389,41 @@ class _ConnectorOptions(ctypes.Structure):
 #
 # Public API
 #
+
+class ConnectorVersion:
+    """This class provides information about the version of Connector being used.
+
+        An instance of this class is returned by the
+        ``Connector.native_library_version`` method, in which case it will contain
+        information regarding the release of the native Connext DDS Pro libraries
+        being used by Connector (e.g., 6.1.0).
+
+        An instance of this class is also returned by the ``Connector.version``
+        method, providing information regarding the release of Connector (e.g.,
+        1.1.0).
+
+        This class provides the version using 4 integer values. For example,
+        the 1.1.0 release of connector would be returned as major = 1, minor = 1,
+        release = 0, revision = 0."""
+    def __init__(self, major = 0, minor = 0, release = 0, revision = 0):
+        self.major = major
+        self.minor = minor
+        self.release = release
+        self.revision = revision
+
+    # This internal method converts an instance of _NativeConnectorVersion into
+    # an instance of ConnectorVersion.
+    def _from_native(self, native):
+        self.major = ord(native.major)
+        self.minor = ord(native.minor)
+        self.release = ord(native.release)
+        self.revision = ord(native.revision)
+        return self
+
+    # overload __str__, which is called internally when str() is used
+    def __str__(self):
+        return str(self.major) + "." + str(self.minor) + "." + str(self.release) + "." + str(self.revision)
+
 
 class Samples:
     """Provides access to the data samples read by an Input (:attr:`Input.samples`)
@@ -1365,6 +1417,39 @@ class Connector:
         :param number value: The value for *max_objects_per_thread*
         """
         _check_retcode(connector_binding.set_max_objects_per_thread(value))
+
+    @staticmethod
+    def native_library_build_string():
+        """Returns the build ID of the native libraries as a string
+
+        :return: The build ID of the native libraries used by Connector.
+        """
+        return fromcstring(connector_binding.get_build_string())
+
+    @staticmethod
+    def native_library_version():
+        """Returns the version of the native libraries used by Connector.
+
+        :return: The version of the native libraries.
+        :rtype: :class:`ConnectorVersion`
+        """
+        nativeVersionPtr = connector_binding.get_library_version()
+        libVersion = ConnectorVersion()
+        return libVersion._from_native(nativeVersionPtr.contents)
+
+    @staticmethod
+    def version():
+        """Returns the version of Connector.
+
+        :return: The version of Connector.
+        :rtype: :class:`ConnectorVersion`
+        """
+        # Use pkg_resources to get the version string from setup.py
+        setup_py_version = pkg_resources.require("rticonnextdds-connector")[0].version
+        # Convert the string obtained above into ConnectorVersion
+        version_ints = setup_py_version.split(".")
+        # The version contained in setup.py contains 3 ints, e.g. 1.1.0
+        return ConnectorVersion(int(version_ints[0]), int(version_ints[1]), int(version_ints[2]))
 
 @contextmanager
 def open_connector(config_name, url):

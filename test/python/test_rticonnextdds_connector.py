@@ -8,10 +8,10 @@
 
 import sys
 import os
+import re
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
 import pytest
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
-
 
 class TestConnector:
     """
@@ -94,7 +94,7 @@ class TestConnector:
 
     def test_connector_creation_with_participant_qos(self):
         """
-        Tests that a domain_participant defined in XML alonside participant_qos
+        Tests that a domain_participant defined in XML alongside participant_qos
         can be used to create a Connector object.
         """
         participant_profile = "MyParticipantLibrary::ConnectorWithParticipantQos"
@@ -105,3 +105,103 @@ class TestConnector:
                 config_name=participant_profile,
                 url=xml_path) as connector:
             assert connector is not None
+
+    def test_native_library_version_getter(self):
+        """
+        native_library_version is a static method that can be can be called
+        either before or after the creation of a Connector instance. It
+        returns a structure containing the release of the native libraries.
+        """
+        # Ensure that we can call native_library_version before creating an
+        # instance of Connector
+        native_library_version = rti.Connector.native_library_version()
+        assert native_library_version is not None
+        assert isinstance(native_library_version, rti.ConnectorVersion)
+
+        # The returned version should contain a major, minor, release and revision
+        # field
+        assert isinstance(native_library_version.major, int)
+        assert isinstance(native_library_version.minor, int)
+        assert isinstance(native_library_version.release, int)
+        assert isinstance(native_library_version.revision, int)
+
+        # Create an instance of Connector and call the method again
+        participant_profile = "MyParticipantLibrary::ConnectorWithParticipantQos"
+        xml_path = os.path.join(os.path.dirname(
+                os.path.realpath(__file__)),
+                "../xml/TestConnector.xml")
+        with rti.open_connector(
+                config_name=participant_profile,
+                url=xml_path) as connector:
+            assert connector is not None
+            native_library_version2 = connector.native_library_version()
+            assert native_library_version2 is not None
+            assert isinstance(native_library_version2, rti.ConnectorVersion)
+
+        # Check that the str() method converts the ConnectorVersion class
+        # into the correct format (e.g., 6.1.0.0)
+        version_str = str(native_library_version)
+        assert bool(re.match("[0-9]\\.[0-9]\\.[0-9]\\.[0-9]", version_str)) == True
+
+    def test_version_getter(self):
+        """
+        Connector.version is a static method that can be can be called
+        either before or after the creation of a Connector instance. It
+        returns a structure containing information about the release of Connector
+        in use.
+        """
+        # Ensure that we can call native_library_version before creating an
+        # instance of Connector
+        version = rti.Connector.version()
+        assert version is not None
+        assert isinstance(version, rti.ConnectorVersion)
+
+        # The returned version should contain a major, minor, release and revision
+        # field
+        assert isinstance(version.major, int)
+        assert isinstance(version.minor, int)
+        assert isinstance(version.release, int)
+        assert isinstance(version.revision, int)
+
+        # Create an instance of Connector and call the method again
+        participant_profile = "MyParticipantLibrary::ConnectorWithParticipantQos"
+        xml_path = os.path.join(os.path.dirname(
+                os.path.realpath(__file__)),
+                "../xml/TestConnector.xml")
+        with rti.open_connector(
+                config_name=participant_profile,
+                url=xml_path) as connector:
+            assert connector is not None
+            version2 = connector.version()
+            assert version2 is not None
+            assert isinstance(version2, rti.ConnectorVersion)
+
+        # Check that the str() method converts the ConnectorVersion class
+        # into the correct format (e.g., "1.1.0.0")
+        version_str = str(version)
+        assert bool(re.match("[0-9]\\.[0-9]\\.[0-9]\\.[0-9]", version_str)) == True
+
+    def test_build_string_getter(self):
+
+        """
+        Connector.native_build_string is a static method that can be can be called
+        either before or after the creation of a Connector instance. It
+        returns a string containing information about the release of native
+        libraries being used by Connector.
+        """
+        build_str = rti.Connector.native_library_build_string()
+        assert build_str is not None
+        assert isinstance(build_str, str)
+
+        # Create an instance of Connector and call the method again
+        participant_profile = "MyParticipantLibrary::ConnectorWithParticipantQos"
+        xml_path = os.path.join(os.path.dirname(
+                os.path.realpath(__file__)),
+                "../xml/TestConnector.xml")
+        with rti.open_connector(
+                config_name=participant_profile,
+                url=xml_path) as connector:
+            assert connector is not None
+            build_str2 = rti.Connector.native_library_build_string()
+            assert build_str2 is not None
+            assert isinstance(build_str2, str)
