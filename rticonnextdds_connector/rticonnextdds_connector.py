@@ -413,12 +413,14 @@ class ConnectorVersion:
 
     # This internal method converts an instance of _NativeConnectorVersion into
     # an instance of ConnectorVersion.
-    def _from_native(self, native):
-        self.major = ord(native.major)
-        self.minor = ord(native.minor)
-        self.release = ord(native.release)
-        self.revision = ord(native.revision)
-        return self
+    @staticmethod
+    def _from_native(native):
+        version = ConnectorVersion()
+        version.major = ord(native.major)
+        version.minor = ord(native.minor)
+        version.release = ord(native.release)
+        version.revision = ord(native.revision)
+        return version
 
     # overload __str__, which is called internally when str() is used
     def __str__(self):
@@ -1434,8 +1436,7 @@ class Connector:
         :rtype: :class:`ConnectorVersion`
         """
         nativeVersionPtr = connector_binding.get_library_version()
-        libVersion = ConnectorVersion()
-        return libVersion._from_native(nativeVersionPtr.contents)
+        return ConnectorVersion._from_native(nativeVersionPtr.contents)
 
     @staticmethod
     def version():
