@@ -102,3 +102,9 @@ Class reference: Connector
    :members:
 
 .. autofunction:: rticonnextdds_connector.open_connector
+
+Class reference: ConnectorVersion
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: rticonnextdds_connector.ConnectorVersion
+   :members:

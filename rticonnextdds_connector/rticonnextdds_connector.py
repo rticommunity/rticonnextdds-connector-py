@@ -393,14 +393,12 @@ class _ConnectorOptions(ctypes.Structure):
 class ConnectorVersion:
     """This class provides information about the version of Connector being used.
 
-        An instance of this class is returned by the
-        ``Connector.native_library_version`` method, in which case it will contain
-        information regarding the release of the native Connext DDS Pro libraries
-        being used by Connector (e.g., 6.1.0).
+        An instance of this class is returned by :meth:`Connector.native_library_version`,
+        in which case it will contain information regarding the release of the
+        native Connext DDS Pro libraries being used by Connector (e.g., 6.1.0).
 
-        An instance of this class is also returned by the ``Connector.version``
-        method, providing information regarding the release of Connector (e.g.,
-        1.1.0).
+        An instance of this class is also returned by :meth:`Connector.version`,
+        providing information regarding the release of Connector (e.g., 1.1.0).
 
         This class provides the version using 4 integer values. For example,
         the 1.1.0 release of connector would be returned as major = 1, minor = 1,
@@ -1425,6 +1423,7 @@ class Connector:
         """Returns the build ID of the native libraries as a string
 
         :return: The build ID of the native libraries used by Connector.
+        :rtype: string
         """
         return fromcstring(connector_binding.get_build_string())
 
