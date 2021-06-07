@@ -107,7 +107,7 @@ class TestConnector:
             assert connector is not None
 
     def test_connector_double_deletion(self):
-        "Verify CON-200, that Connector does not segfault on double deletion"
+        """Verify CON-200, that Connector does not segfault on double deletion"""
         participant_profile = "MyParticipantLibrary::ConnectorWithParticipantQos"
         xml_path = os.path.join(os.path.dirname(
                 os.path.realpath(__file__)),
