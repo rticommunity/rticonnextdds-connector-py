@@ -34,8 +34,7 @@ class TestPerformance:
         the_output = one_use_connector.get_output("MyPublisher::PerformanceTestWriter")
 
         # Wait for discovery between the entities
-        the_input.wait_for_publications(5000)
-        the_output.wait_for_subscriptions(5000)
+        wait_for_discovery(the_output, the_input)
 
         # Set each element of the sequence separately
         total_time = 0
@@ -58,8 +57,7 @@ class TestPerformance:
         the_output = one_use_connector.get_output("MyPublisher::PerformanceTestWriter")
 
         # Wait for discovery between the entities
-        the_input.wait_for_publications(5000)
-        the_output.wait_for_subscriptions(5000)
+        wait_for_discovery(the_output, the_input)
 
         # Create a python list which contains 600000 and set the sequence from it
         total_time = 0
@@ -86,8 +84,7 @@ class TestPerformance:
         the_output = one_use_connector.get_output("MyPublisher::PerformanceTestWriter")
 
         # Wait for discovery between the entities
-        the_input.wait_for_publications(5000)
-        the_output.wait_for_subscriptions(5000)
+        wait_for_discovery(the_output, the_input)
         # Set the sample on the writer (the performance of this operation is tested
         # in the test_set_sequence test)
         the_output.instance['myOctSeq[599999]'] = 2
@@ -114,8 +111,7 @@ class TestPerformance:
         the_input = one_use_connector.get_input("MySubscriber::PerformanceTestReader")
         the_output = one_use_connector.get_output("MyPublisher::PerformanceTestWriter")
         # Wait for discovery between the entities
-        the_input.wait_for_publications(5000)
-        the_output.wait_for_subscriptions(5000)
+        wait_for_discovery(the_output, the_input)
 
         # We need to use the following native API:
         # DDS_ReturnCode_t DDS_DynamicData_set_octet_array(
@@ -162,8 +158,7 @@ class TestPerformance:
         the_input = one_use_connector.get_input("MySubscriber::PerformanceTestReader")
         the_output = one_use_connector.get_output("MyPublisher::PerformanceTestWriter")
         # Wait for discovery between the entities
-        the_input.wait_for_publications(5000)
-        the_output.wait_for_subscriptions(5000)
+        wait_for_discovery(the_output, the_input)
         # Set the sample on the writer (the performance of this operation is tested
         # in the test_set_sequence test)
         the_output.instance['myOctSeq[599999]'] = 2
