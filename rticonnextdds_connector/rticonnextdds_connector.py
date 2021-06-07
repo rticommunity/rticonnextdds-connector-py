@@ -173,7 +173,7 @@ class _ConnectorBinding:
         self.new.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_void_p]
 
         self.delete = self.library.RTI_Connector_delete
-        self.delete.restype = ctypes.c_void_p
+        self.delete.restype = None
         self.delete.argtypes = [ctypes.c_void_p]
 
         self.get_writer = self.library.RTI_Connector_get_datawriter
@@ -1255,8 +1255,8 @@ class Connector:
 
     def close(self):
         """Frees all the resources created by this Connector instance"""
-
         connector_binding.delete(self.native)
+        self.native = 0
 
     # Deprecated: use close()
     # pylint: disable=missing-docstring

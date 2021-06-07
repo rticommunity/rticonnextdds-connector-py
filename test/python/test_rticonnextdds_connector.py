@@ -111,3 +111,16 @@ class TestConnector:
         It should be possible to modify max_objects_per_thread
         """
         rti.Connector.set_max_objects_per_thread(2048)
+
+    def test_connector_double_deletion(self):
+        """Verify CON-200, that Connector does not segfault on double deletion"""
+        participant_profile = "MyParticipantLibrary::ConnectorWithParticipantQos"
+        xml_path = os.path.join(os.path.dirname(
+                os.path.realpath(__file__)),
+                "../xml/TestConnector.xml")
+        with rti.open_connector(
+                config_name=participant_profile,
+                url=xml_path) as connector:
+            assert connector is not None
+            connector.close()
+        # connector.close() will be called again here due to the with clause
