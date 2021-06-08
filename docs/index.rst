@@ -2,8 +2,10 @@
 
 .. py:currentmodule:: rticonnextdds_connector
 
-.. image:: static/py-logo.png
-    :align: left
+.. only:: html
+
+    .. image:: static/py-logo.png
+        :align: left
 
 Welcome to RTI Connector for Python!
 ====================================
@@ -19,9 +21,6 @@ languages.
 You can learn how to use *RTI Connector* by reading the following sections, which
 include examples and detailed API reference. You can also find a specific type
 or function in the :ref:`genindex`.
-
-Table of Contents
-=================
 
 .. toctree::
    :maxdepth: 2

@@ -47,7 +47,7 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 
-# -- Options for HTML output -------------------------------------------------
+# -- Options for HTML output ---------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
@@ -82,3 +82,72 @@ html_logo = "static/rti-logo-FINALv2-White-OrangeDot.png"
 #
 html_favicon = "static/favicon.ico"
 
+# -- Options for LaTeX output -------------------------------------------------------------------------------------------
+latex_engine = 'lualatex'
+latex_use_xindy = False
+
+# latex config taken from connextdds repo
+latex_elements = {
+    # The paper size ('letterpaper' or 'a4paper').
+    'papersize': 'letterpaper',
+
+    # The font size ('10pt', '11pt' or '12pt')
+    'pointsize': '11pt',
+    'preamble': '''\
+\\sphinxsetup{TitleColor={named}{black},InnerLinkColor={named}{black},OuterLinkColor={named}{blue}}
+\\usepackage[utf8]{inputenc}
+\\usepackage[titles]{tocloft}
+\\usepackage{multirow}
+\\usepackage{newunicodechar}
+\\usepackage{hyperref}
+\\usepackage{fontspec}
+\\usepackage{graphicx}
+\\setkeys{Gin}{width=.85\\textwidth}
+\\hypersetup{bookmarksnumbered}
+\\setcounter{tocdepth}{3}
+\\usepackage{fancyhdr}
+\\setlength{\headheight}{14pt}
+\\usepackage[draft]{minted}\\fvset{breaklines=true, breakanywhere=true}''',
+    'printindex': '\\footnotesize\\raggedright\\printindex',
+    'inputenc': '',
+    'utf8extra': '',
+    'classoptions': ',openany,oneside',
+    'releasename': 'Version',
+    'fncychap': '',
+    'maketitle': '''\
+        \\pagenumbering{Roman} %%% to avoid page 1 conflict with actual page 1
+        \\begin{titlepage}
+            \\centering
+
+            \\vspace{40mm} %%% * is used to give space from top
+
+            \\textbf{\\Huge{''' + project + '''}}
+            \\vspace{17mm}
+
+            \\textbf{\\Large{Version ''' + version + '''}}
+
+            \\vspace{100mm}
+            \\vspace{0mm}
+        \\end{titlepage}
+        '''
+}
+
+latex_use_modindex = True
+
+# Grouping the document tree into LaTeX files. List of tuples
+# (source start file, target name, title,
+#  author, documentclass [howto, manual, or own class]).
+latex_documents = [
+    (
+        master_doc,
+        'rticonnectorforpython.tex',
+        'RTI Connector for Python',
+        '2021, Real-Time Innovations, Inc.',
+        'manual'
+    ),
+]
+
+# The name of an image file (relative to this directory) to place at the top of
+# the title page.
+#
+html_logo = "static/rti-logo-FINALv2-White-OrangeDot.png"

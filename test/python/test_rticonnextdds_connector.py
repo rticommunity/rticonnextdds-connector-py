@@ -126,3 +126,22 @@ class TestConnector:
         assert bool(re.match(".*NDDSCORE_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
         assert bool(re.match(".*NDDSC_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
         assert bool(re.match(".*RTICONNECTOR_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
+
+    def test_setting_max_objects_per_thread(self):
+        """
+        It should be possible to modify max_objects_per_thread
+        """
+        rti.Connector.set_max_objects_per_thread(2048)
+
+    def test_connector_double_deletion(self):
+        """Verify CON-200, that Connector does not segfault on double deletion"""
+        participant_profile = "MyParticipantLibrary::ConnectorWithParticipantQos"
+        xml_path = os.path.join(os.path.dirname(
+                os.path.realpath(__file__)),
+                "../xml/TestConnector.xml")
+        with rti.open_connector(
+                config_name=participant_profile,
+                url=xml_path) as connector:
+            assert connector is not None
+            connector.close()
+        # connector.close() will be called again here due to the with clause

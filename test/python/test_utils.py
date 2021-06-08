@@ -39,3 +39,16 @@ def send_data(output, input, **kwargs):
   output.write(**kwargs)
   wait_for_data(input)
   return input.samples[0]
+
+def wait_for_discovery(output, input):
+    """
+    Waits for the input and output to match each other
+    """
+    outputName = output.name.split(':')[-1]
+    inputName = input.name.split(':')[-1]
+    input.wait_for_publications(10000)
+    matches = input.matched_publications
+    assert {'name': outputName } in matches
+    output.wait_for_subscriptions(10000)
+    matches = output.matched_subscriptions
+    assert {'name': inputName } in matches
