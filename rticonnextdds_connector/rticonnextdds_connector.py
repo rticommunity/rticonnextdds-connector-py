@@ -1371,7 +1371,7 @@ class Connector:
         _check_retcode(connector_binding.set_max_objects_per_thread(value))
 
     @staticmethod
-    def version():
+    def get_version():
         """
         Returns the version of Connector.
 
