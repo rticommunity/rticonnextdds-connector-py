@@ -1344,6 +1344,13 @@ class Connector:
         retcode = connector_binding.wait(self.native, timeout)
         _check_retcode(retcode)
 
+    # Deprecated
+    @staticmethod
+    def set_max_objects_per_thread(value):
+        # no-op, depreacted in Ironside release since max_objects_per_thread
+        # now grows dynamically
+        pass
+
 @contextmanager
 def open_connector(config_name, url):
     """A resource manager that creates and deletes a Connector
