@@ -6,12 +6,13 @@
 # This code contains trade secrets of Real-Time Innovations, Inc.             #
 ###############################################################################
 
+from platform import version
 import sys
 import os
+import re
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
 import rticonnextdds_connector as rti
 import pytest
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + "/../../")
-
 
 class TestConnector:
     """
@@ -105,6 +106,26 @@ class TestConnector:
                 config_name=participant_profile,
                 url=xml_path) as connector:
             assert connector is not None
+
+    def test_get_version(self):
+        """
+        version is a static method that can be can be called
+        either before or after the creation of a Connector instance. It returns
+        a string providing information about the versions of the native libraries
+        in use, and the version of the API.
+        """
+        # Ensure that we can call version before creating a Connector instance
+        version_string = rti.Connector.get_version()
+        assert version_string is not None
+        # The returned version should contain 4 pieces of information:
+        # - the API version of Connector
+        # - the build ID of core.1.0
+        # - the build ID of dds_c.1.0
+        # - the build ID of lua_binding.1.0
+        assert bool(re.match("RTI Connector for Python, version ([0-9]\\.){2}[0-9]", version_string, re.DOTALL)) == True
+        assert bool(re.match(".*NDDSCORE_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
+        assert bool(re.match(".*NDDSC_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
+        assert bool(re.match(".*RTICONNECTOR_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
 
     def test_setting_max_objects_per_thread(self):
         """
