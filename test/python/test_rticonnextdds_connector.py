@@ -20,6 +20,13 @@ class TestConnector:
     :class:`rticonnextdds_connector.Connector` object.
     """
 
+    # This must be the first test in this file.
+    def test_setting_max_objects_per_thread(self):
+        """
+        It should be possible to modify max_objects_per_thread
+        """
+        rti.Connector.set_max_objects_per_thread(2048)
+
     def test_invalid_xml_path(self):
         """
         This test function ensures that a ValueError is raised if
@@ -126,12 +133,6 @@ class TestConnector:
         assert bool(re.match(".*NDDSCORE_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
         assert bool(re.match(".*NDDSC_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
         assert bool(re.match(".*RTICONNECTOR_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
-
-    def test_setting_max_objects_per_thread(self):
-        """
-        It should be possible to modify max_objects_per_thread
-        """
-        rti.Connector.set_max_objects_per_thread(2048)
 
     def test_connector_double_deletion(self):
         """Verify CON-200, that Connector does not segfault on double deletion"""
