@@ -140,16 +140,18 @@ To set any numeric type, including enumerations:
 
 .. warning::
     The range of values for a numeric field is determined by the type
-    used to define that field in the configuration file. However, ``set_number`` and
-    ``get_number`` can't handle 64-bit integers (*int64* and *uint64*)
-    whose absolute values are larger than 2^53. This is a *Connector* limitation
-    due to the use of *double* as an intermediate representation.
+    used to define that field in the configuration file.
 
-    When ``set_number`` or ``get_number`` detect this situation, they will raise
-    an :class:`Error`. ``get_dictionary`` and ``set_dictionary`` do not have this
-    limitation and can handle any 64-bit integer.
-    An ``Instance``'s ``__setitem__`` method doesn't have
-    this limitation either, but ``SampleIterator``'s ``__getitem__`` does.
+.. note::
+    64-bit integers (*int64* and *uint64*) can only be set via ``set_dictionary``
+    or ``set_number``. They must be provided as strings (i.e., the integer value
+    surrounded by quotes).
+    An ``Instance``'s ``__setitem__`` method can also be used to set 64-bit integers.
+
+    64-bit integers can only be obtained via ``get_dictionary``.
+
+    Attempting to set or get a 64-bit integer via a different operation will raise
+    a :class:`DDSError`.
 
 To set booleans:
 
@@ -208,6 +210,9 @@ with numeric fields, returning the number as a string. For example:
     If a field ``my_string``, defined as a string in the configuration file,
     contains a value that can be interpreted as a number, ``sample["my_string"]``
     returns a number, not a string.
+
+.. note::
+    ``get_dictionary`` will always return 64-bit integers (*int64* and *uint64*) as strings.
 
 Accessing structs
 ^^^^^^^^^^^^^^^^^

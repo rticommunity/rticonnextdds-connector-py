@@ -475,6 +475,36 @@ class TestDataAccess:
     # largest long long
     self.verify_large_integer(test_output, test_input, 2**63 - 1)
 
+  def test_64_bit_number_communication_with_dictionary(self, test_output, test_input):
+    maxInt64 = 9223372036854775807
+    maxUint64 = 18446744073709551615
+    test_output.instance.set_dictionary({"my_int64":str(maxInt64), "my_uint64": str(maxUint64)})
+    sample = send_data(test_output, test_input)
+    dictionary = sample.get_dictionary()
+    assert dictionary['my_int64'] == maxInt64
+    assert dictionary['my_uint64'] == maxUint64
+
+  def test_64_bit_number_communication_with_set(self, test_output, test_input):
+    maxInt64 = 9223372036854775807
+    maxUint64 = 18446744073709551615
+    test_output.instance.set_number("my_int64", str(maxInt64))
+    test_output.instance.set_number("my_uint64", str(maxUint64))
+    sample = send_data(test_output, test_input)
+    dictionary = sample.get_dictionary()
+    assert dictionary['my_int64'] == maxInt64
+    assert dictionary['my_uint64'] == maxUint64
+
+  # Test that we can set a number with a string
+  def test_set_number_with_numeric_string(self, test_output, test_input):
+    test_output.instance.set_number("my_long", "123")
+
+  # Test that we fail if string is not a valid number
+  def test_set_number_with_invalid_numeric_string(self, test_output, test_input):
+    with pytest.raises(TypeError, match="Value must be valid numeric string, number or None") as execinfo:
+        test_output.instance.set_number("my_long", "a123")
+    with pytest.raises(TypeError, match="Value must be valid numeric string, number or None") as execinfo:
+        test_output.instance.set_number("my_long", "123a")
+
   @pytest.mark.xfail(sys.platform.startswith("win"), reason="symbols not exported")
   def test_access_input_native_dynamic_data(self, populated_input):
     get_member_count = rti.connector_binding.library.DDS_DynamicData_get_member_count

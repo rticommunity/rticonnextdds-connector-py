@@ -952,7 +952,8 @@ class Instance:
         """Sets a numeric field
 
         :param str field_name: The name of the field. See :ref:`Accessing the data`.
-        :param number value: A numeric value or ``None`` to unset an optional member
+        :param number value: A numeric value, a string representation of a numeric value,
+        or ``None`` to unset an optional member
         """
 
         if field_name is None:
@@ -960,6 +961,12 @@ class Instance:
 
         if value is None:
             self.clear_member(field_name)
+        elif isinstance(value, str):
+            # Confirm that is valid numeric string
+            if not value.isnumeric():
+                raise TypeError("Value must be valid numeric string, number or None")
+            else:
+                self.set_dictionary({field_name: value})
         else:
             try:
                 _check_retcode(connector_binding.set_number_into_samples(
