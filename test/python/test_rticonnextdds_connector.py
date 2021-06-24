@@ -20,13 +20,6 @@ class TestConnector:
     :class:`rticonnextdds_connector.Connector` object.
     """
 
-    # This must be the first test in this file.
-    def test_setting_max_objects_per_thread(self):
-        """
-        It should be possible to modify max_objects_per_thread
-        """
-        rti.Connector.set_max_objects_per_thread(2048)
-
     def test_invalid_xml_path(self):
         """
         This test function ensures that a ValueError is raised if
