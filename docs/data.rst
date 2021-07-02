@@ -138,19 +138,6 @@ To set any numeric type, including enumerations:
     output.instance.set_number("my_double", 2.14)
     output.instance.set_number("my_enum", 2)
 
-.. warning::
-    The range of values for a numeric field is determined by the type
-    used to define that field in the configuration file. However, ``set_number`` and
-    ``get_number`` can't handle 64-bit integers (*int64* and *uint64*)
-    whose absolute values are larger than 2^53. This is a *Connector* limitation
-    due to the use of *double* as an intermediate representation.
-
-    When ``set_number`` or ``get_number`` detect this situation, they will raise
-    an :class:`Error`. ``get_dictionary`` and ``set_dictionary`` do not have this
-    limitation and can handle any 64-bit integer.
-    An ``Instance``'s ``__setitem__`` method doesn't have
-    this limitation either, but ``SampleIterator``'s ``__getitem__`` does.
-
 To set booleans:
 
 .. testcode::
@@ -208,6 +195,29 @@ with numeric fields, returning the number as a string. For example:
     If a field ``my_string``, defined as a string in the configuration file,
     contains a value that can be interpreted as a number, ``sample["my_string"]``
     returns a number, not a string.
+
+Accessing 64-bit integers
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Internally, Connector relies on a framework that only contains a single number
+type that is IEEE-754 floating-point number. Due to this, not all 64-bit integers
+can be represented with exact precision. If your type contains uint64 or int64 members,
+and you expect them to be larger than ``2^53`` then you must take the following
+into account.
+
+64-bit values larger than 2^53 can be set via:
+ - The type-agnostic setter, ``__setitem__`` if they are supplied as strings, e.g., ``the_output.instance["my_uint64"] = "18446744073709551615"``
+ - The set_string setter, e.g., ``the_output.instance.set_string("my_uint64", "18446744073709551615")``
+ - Via a dictionary, e.g., ``the_output.instance.set_dictionary({"my_uint64": "18446744073709551615"})``
+
+64-bit values larger than 2^53 can be retrieved via:
+ - The type-agnostic getter, ``__getitem__``. The value will be an instance of ``int``. ``sample["my_int64"] # e.g., 9223372036854775807``
+ - The ``get_string`` method.
+   The value will be returned as a string, e.g., ``sample.get_string("my_int64") # "9223372036854775807"``
+
+.. warning::
+
+  If get_number or set_number are used to set a value larger than 2^53 they will
+  raise an ``Error``.
 
 Accessing structs
 ^^^^^^^^^^^^^^^^^
