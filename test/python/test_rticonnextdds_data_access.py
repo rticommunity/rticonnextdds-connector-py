@@ -97,7 +97,8 @@ class TestDataAccess:
   def test_numbers_as_strings(self, populated_input):
     sample = populated_input.samples[0]
     assert sample.get_string("my_long") == "10"
-    assert sample.get_string("my_double") == "3.3"
+    assert sample.get_string("my_double") == "3.2999999999999998"
+    assert float(sample.get_string("my_double")) == 3.3
 
   def test_get_boolean(self, populated_input):
     sample = populated_input.samples[0]
@@ -755,3 +756,38 @@ class TestDataAccess:
     test_output.instance.set_dictionary({"my_enum":"GREEN"})
     sample = send_data(test_output, test_input)
     assert sample["my_enum"] == 1
+
+  def test_64_bit_int_communication_with_get_set_string(self, test_output, test_input):
+    test_output.instance.set_string("my_uint64", "18446744073709551615")
+    test_output.instance.set_string("my_int64", "9223372036854775807")
+    sample = send_data(test_output, test_input)
+    assert sample.get_string("my_uint64") == "18446744073709551615"
+    assert isinstance(sample.get_string("my_uint64"), str)
+    assert sample.get_string("my_int64") == "9223372036854775807"
+    assert isinstance(sample.get_string("my_int64"), str)
+
+  def test_large_integers_are_returned_as_numbers_by_getitem(self, test_output, test_input):
+    test_output.instance.set_dictionary({"my_uint64": "18446744073709551615", "my_int64": "9223372036854775807"})
+    sample = send_data(test_output, test_input)
+    assert isinstance(sample["my_uint64"], int)
+    assert isinstance(sample["my_int64"], int)
+    assert sample["my_uint64"] == 18446744073709551615
+    assert sample["my_int64"] == 9223372036854775807
+
+  def test_smaller_integers_are_returned_as_numbers_by_getitem(self, test_output, test_input):
+    test_output.instance.set_dictionary({"my_uint64": "1234", "my_int64": "1234"})
+    sample = send_data(test_output, test_input)
+    # They will be floats since they have come via Lua
+    assert isinstance(sample["my_uint64"], float)
+    assert isinstance(sample["my_int64"], float)
+    assert sample["my_uint64"] == 1234
+    assert sample["my_int64"] == 1234
+
+  def test_large_integer_type_agnostic_methods(self, test_output, test_input):
+    test_output.instance["my_uint64"] = "18446744073709551615"
+    test_output.instance["my_int64"] = "9223372036854775807"
+    sample = send_data(test_output, test_input)
+    assert isinstance(sample["my_uint64"], int)
+    assert isinstance(sample["my_int64"], int)
+    assert sample["my_uint64"] == 18446744073709551615
+    assert sample["my_int64"] == 9223372036854775807

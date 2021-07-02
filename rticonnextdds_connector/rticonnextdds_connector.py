@@ -354,13 +354,21 @@ class _ConnectorBinding:
             #  - A json string; we parse it and convert it to a dictionary
             #  - An integer (larger than what number_value can represent precisely)
             #    the same json parser returns the integer
+            # However, if we detect that the string is in fact completely numeric
+            # (only contains numeric values) we will not parse it, as this will
+            # end up converting ints to floats (json). This would be avoidable
+            # if we subclassed JSONEncoder, but that could effect user's
+            # applications.
             python_string = _move_native_string(string_value)
+            # if not python_string.isnumeric():
             try:
                 return json.loads(python_string)
             except ValueError:
                 # This is the best way we have to detect that this is not a json
                 # string or an integer
                 return python_string
+            # else:
+            #     return python_string
         else:
             # This shouldn't happen
             raise Error("Unexpected type returned by " + getter_function.__name__)
