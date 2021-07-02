@@ -198,25 +198,25 @@ with numeric fields, returning the number as a string. For example:
 
 Accessing 64-bit integers
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-Internally, Connector relies on a framework that only contains a single number
-type that is IEEE-754 floating-point number. Due to this, not all 64-bit integers
+Internally, *Connector* relies on a framework that only contains a single number
+type, which is an IEEE-754 floating-point number. As a result, not all 64-bit integers
 can be represented with exact precision. If your type contains uint64 or int64 members,
-and you expect them to be larger than ``2^53`` then you must take the following
+and you expect them to be larger than ``2^53``, then you must take the following
 into account.
 
 64-bit values larger than 2^53 can be set via:
- - The type-agnostic setter, ``__setitem__`` if they are supplied as strings, e.g., ``the_output.instance["my_uint64"] = "18446744073709551615"``
- - The set_string setter, e.g., ``the_output.instance.set_string("my_uint64", "18446744073709551615")``
- - Via a dictionary, e.g., ``the_output.instance.set_dictionary({"my_uint64": "18446744073709551615"})``
+ - The type-agnostic setter, ``__setitem__``, if they are supplied as strings, e.g., ``the_output.instance["my_uint64"] = "18446744073709551615"``.
+ - The set_string setter, e.g., ``the_output.instance.set_string("my_uint64", "18446744073709551615")``.
+ - Via a dictionary, e.g., ``the_output.instance.set_dictionary({"my_uint64": "18446744073709551615"})``.
 
 64-bit values larger than 2^53 can be retrieved via:
- - The type-agnostic getter, ``__getitem__``. The value will be an instance of ``int``. ``sample["my_int64"] # e.g., 9223372036854775807``
+ - The type-agnostic getter, ``__getitem__``. The value will be an instance of ``int``, e.g., ``sample["my_int64"] # e.g., 9223372036854775807``.
  - The ``get_string`` method.
-   The value will be returned as a string, e.g., ``sample.get_string("my_int64") # "9223372036854775807"``
+   The value will be returned as a string, e.g., ``sample.get_string("my_int64") # "9223372036854775807"``.
 
 .. warning::
 
-  If get_number or set_number are used to set a value larger than 2^53 they will
+  If get_number or set_number is used to set a value larger than 2^53, that value will
   raise an ``Error``.
 
 Accessing structs
