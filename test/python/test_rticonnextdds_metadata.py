@@ -91,7 +91,6 @@ class TestMetadata:
     assert sample.info["sample_identity"] == expected_id
 
   def test_bad_guid(self, one_use_output):
-
     not_an_array = {"writer_guid": 3, "sequence_number": 10}
     with pytest.raises(rti.Error, match=r".*error parsing GUID.*") as excinfo:
       one_use_output.write(identity=not_an_array)
@@ -127,7 +126,6 @@ class TestMetadata:
       one_use_output.write(action="bad")
 
   def test_request_reply(self, requester, replier):
-
     request_id = {"writer_guid": [3]*16, "sequence_number": 10}
     requester.writer.instance['x'] = 10
     requester.writer.instance['y'] = 20

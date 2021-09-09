@@ -201,23 +201,32 @@ Accessing 64-bit integers
 Internally, Connector relies on a framework that only contains a single number
 type that is IEEE-754 floating-point number. Due to this, not all 64-bit integers
 can be represented with exact precision. If your type contains uint64 or int64 members,
-and you expect them to be larger than ``2^53`` then you must take the following
-into account.
+and you expect them to be larger than ``2^53`` (or smaller than ``-2^53``) then
+you must take the following into account.
 
-64-bit values larger than 2^53 can be set via:
- - The type-agnostic setter, ``__setitem__`` if they are supplied as strings, e.g., ``the_output.instance["my_uint64"] = "18446744073709551615"``
- - The set_string setter, e.g., ``the_output.instance.set_string("my_uint64", "18446744073709551615")``
- - Via a dictionary, e.g., ``the_output.instance.set_dictionary({"my_uint64": "18446744073709551615"})``
+64-bit values with an absolute value greater or equal to 2^53 can be set via:
+ - The type-agnostic setter, ``__setitem__``. The values can be supplied as strings, or as numbers.
+ - The :meth:`Instance.set_string()` method, e.g., ``the_output.instance.set_string("my_uint64", "18446744073709551615")``
+ - The :meth:`Instance.set_dictionary()` method, e.g., ``the_output.instance.set_dictionary({"my_uint64": "18446744073709551615"})``
 
-64-bit values larger than 2^53 can be retrieved via:
- - The type-agnostic getter, ``__getitem__``. The value will be an instance of ``int``. ``sample["my_int64"] # e.g., 9223372036854775807``
- - The ``get_string`` method.
+64-bit values with an absolute value greater than 2^53 can be retrieved via:
+ - The type-agnostic getter, ``__getitem__``. The value will be an instance of ``int`` if larger than 2^53, otherwise a ``float``. e.g., ``sample["my_int64"] # 9223372036854775807``
+ - The :meth:`SampleIterator.get_string()`, method.
    The value will be returned as a string, e.g., ``sample.get_string("my_int64") # "9223372036854775807"``
+ - The :meth:`SampleIterator.get_dictionary()` method, e.g., ``sample.get_dictionary()["my_int64"] # "9223372036854775807"``
 
 .. warning::
 
-  If get_number or set_number are used to set a value larger than 2^53 they will
-  raise an ``Error``.
+  If :meth:`SampleIterator.get_number()` is used to retrieve a value > 2^53 it will raise an ``Error``.
+
+.. warning::
+
+  If :meth:`Instance.set_number()` is used to set a value >= 2^53 it will raise an ``Error``.
+
+.. note::
+
+  The set operations can handle ``abs(value) < 2^53``, whereas the get operation can
+  handle ``abs(value) <= 2^53``.
 
 Accessing structs
 ^^^^^^^^^^^^^^^^^

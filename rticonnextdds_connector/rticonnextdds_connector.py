@@ -928,7 +928,9 @@ class Instance:
             raise AttributeError("field_name cannot be None")
 
         if isinstance(value, Number):
-            if value < connector_binding.max_integer_as_double:
+            # If |value| >= max_integer_as_double set via dictionary, working round
+            # the int-to-double conversion present in set_number
+            if value < connector_binding.max_integer_as_double and value > -connector_binding.max_integer_as_double:
                 self.set_number(field_name, value)
             else:
                 # Work around set_number int-to-double conversion
