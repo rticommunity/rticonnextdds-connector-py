@@ -714,6 +714,9 @@ class SampleIterator:
     def get_number(self, field_name):
         """Gets the value of a numeric field in this sample
 
+        Note that this operation should not be used to retrieve values larger than
+        ``2^53``. See :ref:`Accessing 64-bit integers` for more information.
+
         :param str field_name: The name of the field. See :ref:`Accessing the data`.
         :return: The numeric value for the field ``field_name``.
         """
@@ -948,6 +951,10 @@ class Instance:
 
     def set_number(self, field_name, value):
         """Sets a numeric field
+
+
+        Note that this operation should not be used to set values larger than
+        ``2^53 - 1``. See :ref:`Accessing 64-bit integers` for more information.
 
         :param str field_name: The name of the field. See :ref:`Accessing the data`.
         :param number value: A numeric value or ``None`` to unset an optional member

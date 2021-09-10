@@ -763,7 +763,7 @@ class TestDataAccess:
   #    their supported range. max |value| for set is 2^53 - 1, max |value| for
   #    get is 2^53.
   #  - The type agnostic setter can be used to set values outside of these supported
-  #    ranges if they supplied as a string (SamR What happens if they aren't?)
+  #    ranges if they supplied as a string
   #  - The type agnostic getter can be used to obtain values outside of the
   #    supported range. Result is a float if within range, otherwise an int.
   #  - The get_string and set_string operations can be used on all numbers (regardless

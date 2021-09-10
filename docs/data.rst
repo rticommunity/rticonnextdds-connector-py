@@ -225,8 +225,8 @@ you must take the following into account.
 
 .. note::
 
-  The set operations can handle ``abs(value) < 2^53``, whereas the get operation can
-  handle ``abs(value) <= 2^53``.
+  The :meth:`Instance.set_number()` operation can handle ``abs(value) < 2^53``,
+  whereas :meth:`SampleIterator.get_number()` can handle ``abs(value) <= 2^53``.
 
 Accessing structs
 ^^^^^^^^^^^^^^^^^
