@@ -198,14 +198,14 @@ with numeric fields, returning the number as a string. For example:
 
 Accessing 64-bit integers
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-Internally, Connector relies on a framework that only contains a single number
-type that is IEEE-754 floating-point number. Due to this, not all 64-bit integers
+Internally, *Connector* relies on a framework that only contains a single number
+type, which is an IEEE-754 floating-point number. As a result, not all 64-bit integers
 can be represented with exact precision. If your type contains uint64 or int64 members,
-and you expect them to be larger than ``2^53`` (or smaller than ``-2^53``) then
+and you expect them to be larger than ``2^53`` (or smaller than ``-2^53``), then
 you must take the following into account.
 
 64-bit values with an absolute value greater or equal to 2^53 can be set via:
- - The type-agnostic setter, ``__setitem__``. The values can be supplied as strings, or as numbers.
+ - The type-agnostic setter, ``__setitem__``. The values can be supplied as strings, or as numbers, e.g., ``the_output.instance["my_uint64"] = "18446744073709551615"``.
  - The :meth:`Instance.set_string()` method, e.g., ``the_output.instance.set_string("my_uint64", "18446744073709551615")``
  - The :meth:`Instance.set_dictionary()` method, e.g., ``the_output.instance.set_dictionary({"my_uint64": "18446744073709551615"})``
 
@@ -217,11 +217,11 @@ you must take the following into account.
 
 .. warning::
 
-  If :meth:`SampleIterator.get_number()` is used to retrieve a value > 2^53 it will raise an ``Error``.
+  If :meth:`SampleIterator.get_number()` is used to retrieve a value > 2^53, an ``Error`` will be raised.
 
 .. warning::
 
-  If :meth:`Instance.set_number()` is used to set a value >= 2^53 it will raise an ``Error``.
+  If :meth:`Instance.set_number()` is used to set a value >= 2^53, an ``Error`` will be raised.
 
 .. note::
 
