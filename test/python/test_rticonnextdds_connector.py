@@ -122,7 +122,7 @@ class TestConnector:
         # - the build ID of core.1.0
         # - the build ID of dds_c.1.0
         # - the build ID of lua_binding.1.0
-        assert bool(re.match("RTI Connector for Python, version ([0-9]\\.){2}[0-9]", version_string, re.DOTALL)) == True
+        assert bool(re.match("RTI Connector for Python, version (([0-9]\\.){2}[0-9]|unknown)", version_string, re.DOTALL)) == True
         assert bool(re.match(".*NDDSCORE_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
         assert bool(re.match(".*NDDSC_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
         assert bool(re.match(".*RTICONNECTOR_BUILD_([0-9]\\.){2}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
