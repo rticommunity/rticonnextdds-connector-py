@@ -1387,14 +1387,23 @@ class Connector:
         This method provides the build IDs of the native libraries being used by
         Connector, as well as the version of the Connector API.
 
+        Note that if Connector has not been installed via pip, the version of
+        the Connector API being used will be "unknown". The version of the native
+        libraries will still be returned correctly.
+
         :return: A string containing information about the version of Connector.
         :rtype: string
         """
-        # First, get the version of the Connector API from setup.py
-        setup_py_version = pkg_resources.require("rticonnextdds-connector")[0].version
-        # The version contained in setup.py contains 3 ints, e.g. 1.1.0
-        version_ints = setup_py_version.split(".")
-        api_version = str(version_ints[0]) + "." + str(version_ints[1]) + "." + str(version_ints[2])
+        # First, try to get the version of the Connector API from setup.py
+        # If Connector was git cloned (as opposed to installed via pip) this
+        # will fail and we will print "unknown" for the version
+        try:
+            setup_py_version = pkg_resources.require("rticonnextdds-connector")[0].version
+            # The version contained in setup.py contains 3 ints, e.g. 1.1.0
+            version_ints = setup_py_version.split(".")
+            api_version = str(version_ints[0]) + "." + str(version_ints[1]) + "." + str(version_ints[2])
+        except pkg_resources.DistributionNotFound:
+            api_version = "unknown"
 
         # Now get the build IDs of the native libraries
         native_core_c_versions = ctypes.c_void_p()
