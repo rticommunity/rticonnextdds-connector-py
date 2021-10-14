@@ -84,7 +84,7 @@ It is now possible to load additional Connext DDS libraries at runtime. This mea
 that Connext DDS features such as Monitoring and Security Plugins are now supported.
 Refer to :ref:`Loading Connext DDS Add-On Libraries` for more information.
 
-What's Fixed in 1.1.1
+What's Fixed in 1.1.0
 ^^^^^^^^^^^^^^^^^^^^^
 
 Support for loading multiple configuration files
