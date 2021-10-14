@@ -35,12 +35,12 @@ runs on most Windows®, Linux® and macOS® platforms.
 `main Connector
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
-Version 1.1.0
+Version 1.1.1
 ~~~~~~~~~~~~~
 
-*RTI Connector* 1.1.0 is built on `RTI Connext DDS 6.1.0 <https://community.rti.com/documentation/rti-connext-dds-610>`__.
+*RTI Connector* 1.1.1 is built on `RTI Connext DDS 6.1.0 <https://community.rti.com/documentation/rti-connext-dds-610>`__.
 
-What's New in 1.1.0
+What's New in 1.1.1
 ^^^^^^^^^^^^^^^^^^^
 
 Support added for ARMv8 architectures
@@ -84,7 +84,7 @@ It is now possible to load additional Connext DDS libraries at runtime. This mea
 that Connext DDS features such as Monitoring and Security Plugins are now supported.
 Refer to :ref:`Loading Connext DDS Add-On Libraries` for more information.
 
-What's Fixed in 1.1.0
+What's Fixed in 1.1.1
 ^^^^^^^^^^^^^^^^^^^^^
 
 Support for loading multiple configuration files
