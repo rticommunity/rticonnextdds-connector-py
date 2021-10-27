@@ -3,10 +3,10 @@
 .. _section-release-notes:
 
 Release Notes
-=============
+*************
 
 Supported Platforms
-~~~~~~~~~~~~~~~~~~~
+===================
 
 *RTI Connector* works with Python® 2.x and 3.x. It uses a native C library that
 runs on most Windows®, Linux® and macOS® platforms.
@@ -23,7 +23,7 @@ runs on most Windows®, Linux® and macOS® platforms.
   * Wind River® Linux 8 (Arm v7) (Custom-supported platform)
     
 **macOS**  
-  * macOS 10.13-10.15 (x64)
+  * macOS 10.13-10.15, 11 (x64)
     
 **Windows**    
   * Windows 8 (x64)
@@ -35,16 +35,32 @@ runs on most Windows®, Linux® and macOS® platforms.
 `main Connector
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
-Version 1.1.0
-~~~~~~~~~~~~~
+What's New in 1.2.0
+===================
 
-*RTI Connector* 1.1.0 is built on `RTI Connext DDS 6.1.0 <https://community.rti.com/documentation/rti-connext-dds-610>`__.
+*RTI Connector* 1.2.0 is built on `RTI Connext DDS 6.1.1 <https://community.rti.com/documentation/rti-connext-dds-611>`__.
+
+Support for macOS 11 (Big Sur) Systems on x64 CPUs
+--------------------------------------------------
+.. PLATFORMS-2289 
+
+This release has validated that the libraries for architecture 
+x64Darwin17clang9.0 can also be used on macOS 11 (Big Sur) systems with x64
+CPUs. For details on using this architecture, see 
+`the Platform Notes 
+<https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/platform_notes/index.htm#platform_notes/Mac_OS_Platforms.htm>`__.
+
+
+Previous Release
+================
 
 What's New in 1.1.0
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
-Support added for ARMv8 architectures
-"""""""""""""""""""""""""""""""""""""
+*RTI Connector* 1.1.0 was built on `RTI Connext DDS 6.1.0 <https://community.rti.com/documentation/rti-connext-dds-610>`__.
+
+Support added for Arm v8 architectures
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. CON-174 
 
 Connector for Python now runs on ARMv8 architectures. Native libraries
@@ -52,7 +68,7 @@ built for ARMv8 Ubuntu 16.04 are now shipped alongside Connector. These librarie
 have been tested on ARMv8 Ubuntu 16.04 and ARMv8 Ubuntu 18.04.
 
 Sample state, instance state, and view state can now be obtained in Connector
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. CON-177
 
 The SampleInfo class in *Connector* has been extended to provide access to the
@@ -62,7 +78,7 @@ the keys to the dictionary, in *Connector* for JavaScript they are the keys to t
 JSON Object).
 
 Support for accessing the key values of disposed instances
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. CON-188
 
@@ -76,7 +92,7 @@ sample as an object). When the instance state is NOT_ALIVE_DISPOSED, only the
 key values in the sample should be accessed.
 
 Support for Security, Monitoring and other Connext DDS add-on libraries
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. CON-221
 
@@ -85,10 +101,10 @@ that Connext DDS features such as Monitoring and Security Plugins are now suppor
 Refer to :ref:`Loading Connext DDS Add-On Libraries` for more information.
 
 What's Fixed in 1.1.0
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 Support for loading multiple configuration files
-""""""""""""""""""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 A *Connector* object now supports loading multiple files. This allows separating
 the definition of types, QoS profiles, and *DomainParticipants* into different
@@ -101,7 +117,7 @@ files:
 [RTI Issue ID CON-209]
 
 Some larger integer values may have been corrupted by Connector's internal JSON parser
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The internal JSON parser used in *Connector* failed to identify integer numbers
 from double-precision floating-point numbers for certain values.
@@ -112,7 +128,7 @@ become corrupted. This problem has been resolved.
 [RTI Issue ID CON-170]
 
 Creating two instances of Connector resulted in a license error
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Under some circumstances, it was not possible to create two *Connector* objects.
 The creation of the second *Connector* object failed due to a license error.
@@ -122,7 +138,7 @@ This issue has been fixed.
 [RTI Issue ID CON-163]
 
 Creating a Connector instance with a participant_qos tag in the XML may have resulted in a license error
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In some cases, if the XML configuration file of *Connector* contained a
 `<participant_qos>` tag within the definition of the *DomainParticipant*,
@@ -131,8 +147,8 @@ This problem has been resolved.
 
 [RTI Issue ID CON-214]
 
-Version 1.0.0
-~~~~~~~~~~~~~
+What's New in 1.0.0
+-------------------
 
 1.0.0 is the first official release of *RTI Connector for Python* as well as
 `RTI Connector for JavaScript <https://community.rti.com/static/documentation/connector/1.0.0/api/javascript/index.html>`__.
@@ -141,4 +157,4 @@ If you had access to previous experimental releases, this release makes the prod
 more robust, modifies most of APIs and adds new functionality. However the old 
 APIs have been preserved for backward compatibility as much as possible.
 
-*RTI Connector* 1.0.0 is built on `RTI Connext DDS 6.0.1 <https://community.rti.com/documentation/rti-connext-dds-601>`__.
+*RTI Connector* 1.0.0 was built on `RTI Connext DDS 6.0.1 <https://community.rti.com/documentation/rti-connext-dds-601>`__.
