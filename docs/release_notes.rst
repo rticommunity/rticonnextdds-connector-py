@@ -40,15 +40,11 @@ What's New in 1.2.0
 
 *RTI Connector* 1.2.0 is built on `RTI Connext DDS 6.1.1 <https://community.rti.com/documentation/rti-connext-dds-611>`__.
 
-Support for macOS 11 (Big Sur) Systems on x64 CPUs
---------------------------------------------------
+Support for macOS 11 (Big Sur) Systems
+--------------------------------------
 .. PLATFORMS-2289 
 
-This release has validated that the libraries for architecture 
-x64Darwin17clang9.0 can also be used on macOS 11 (Big Sur) systems with x64
-CPUs. For details on using this architecture, see 
-`the Platform Notes 
-<https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/platform_notes/index.htm#platform_notes/Mac_OS_Platforms.htm>`__.
+This release has validated that *Connector* can be used on macOS 11 (Big Sur) systems.
 
 
 Previous Release
