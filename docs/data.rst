@@ -221,13 +221,13 @@ you must take the following into account.
 
 .. warning::
 
-  On Windows, the string representations of Not a Number and infinity (e.g.,
-  ``'NaN'``, ``'Infinity'``) are not valid values for a Number. They are valid
-  inputs on other architectures.
+  If :meth:`Instance.set_number()` is used to set a value >= 2^53, an ``Error`` will be raised.
 
 .. warning::
 
-  If :meth:`Instance.set_number()` is used to set a value >= 2^53, an ``Error`` will be raised.
+  On Windows, the string representations of Not a Number and infinity (e.g.,
+  ``'NaN'``, ``'Infinity'``) are not valid values for a Number. They are valid
+  inputs on other architectures.
 
 .. note::
 
