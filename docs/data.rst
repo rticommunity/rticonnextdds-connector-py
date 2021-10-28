@@ -223,6 +223,12 @@ you must take the following into account.
 
   If :meth:`Instance.set_number()` is used to set a value >= 2^53, an ``Error`` will be raised.
 
+.. warning::
+
+  On Windows, the string representations of Not a Number and infinity (e.g.,
+  ``'NaN'``, ``'Infinity'``) are not valid values for a Number. They are valid
+  inputs on other architectures.
+
 .. note::
 
   The :meth:`Instance.set_number()` operation can handle ``abs(value) < 2^53``,
