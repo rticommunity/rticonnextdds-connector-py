@@ -227,7 +227,7 @@ you must take the following into account.
 
   On Windows systems, the string representations of Not a Number and infinity (e.g.,
   ``'NaN'``, ``'Infinity'``) are not valid values for a Number. They are valid
-  inputs on non-Windows systems.
+  inputs on other systems.
 
 .. note::
 
