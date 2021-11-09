@@ -23,7 +23,7 @@ runs on most Windows®, Linux® and macOS® platforms.
   * Wind River® Linux 8 (Arm v7) (Custom-supported platform)
     
 **macOS**  
-  * macOS 10.13-10.15 (x64)
+  * macOS 10.13-10.15, 11 (x64)
     
 **Windows**    
   * Windows 8 (x64)
@@ -35,13 +35,24 @@ runs on most Windows®, Linux® and macOS® platforms.
 `main Connector
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
-Version 1.1.0
-~~~~~~~~~~~~~
 
-*RTI Connector* 1.1.0 is built on `RTI Connext DDS 6.1.0 <https://community.rti.com/documentation/rti-connext-dds-610>`__.
+What's New in 1.2.0
+~~~~~~~~~~~~~~~~~~~
+
+*RTI Connector* 1.2.0 is built on `RTI Connext DDS 6.1.1 <https://community.rti.com/documentation/rti-connext-dds-611>`__.
+
+New Platforms
+^^^^^^^^^^^^^
+
+RTI has validated that *Connector* can be used on macOS 11 (Big Sur) systems.
+
+Previous Releases
+~~~~~~~~~~~~~~~~~
 
 What's New in 1.1.0
 ^^^^^^^^^^^^^^^^^^^
+
+*RTI Connector* 1.1.0 is built on `RTI Connext DDS 6.1.0 <https://community.rti.com/documentation/rti-connext-dds-610>`__.
 
 Support added for ARMv8 architectures
 """""""""""""""""""""""""""""""""""""
