@@ -9,7 +9,7 @@ Copyrights and License
 © 2021 Real-Time Innovations, Inc. |br|
 All rights reserved.  |br|
 Printed in U.S.A. First printing.  |br|
-April 2021. |br|
+December 2021. |br|
 
 
 .. rubric:: License
