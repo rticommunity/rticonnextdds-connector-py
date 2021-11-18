@@ -196,6 +196,9 @@ with numeric fields, returning the number as a string. For example:
     contains a value that can be interpreted as a number, ``sample["my_string"]``
     returns a number, not a string.
 
+
+.. _section-access-64-bit-integers:
+
 Accessing 64-bit integers
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 Internally, *Connector* relies on a framework that only contains a single number
