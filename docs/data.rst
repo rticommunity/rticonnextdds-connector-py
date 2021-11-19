@@ -434,9 +434,9 @@ To clear a member, set it to ``None`` explicitly::
     output.instance.set_dictionary({'my_double': 3.3, 'my_long': 4, 'my_optional_long': None})
 
 
-For more information about optional members in DDS, see the *Getting Started Guide
-Addendum for Extensible Types*, 
-`Optional Members <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/Optional_Members.htm>`__.
+For more information about optional members in DDS, see  
+`Optional Members <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/Optional_Members.htm>`__
+in the *Extensible Types Guide*.
 
 Accessing unions
 ^^^^^^^^^^^^^^^^
