@@ -69,6 +69,7 @@ def setup(app):
 #
 html_theme_options = {
     "collapse_navigation" : False
+    "canonical_url" : "https://community.rti.com/static/documentation/connector/current/api/python/"
 }
 
 # The name of an image file (relative to this directory) to place at the top
