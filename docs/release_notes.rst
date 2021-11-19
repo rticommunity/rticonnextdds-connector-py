@@ -51,8 +51,8 @@ New API makes it easier to query what version of Connector is being used
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. CON-92 
 
-A new API has been added that provides the caller with the version of *Connector*
-and the version of the native libraries being used.
+A new API, :meth:`rticonnextdds_connector.Connector.get_version`, has been added that provides the caller
+with the version of *Connector* and the version of the native libraries being used.
 
 
 What's Fixed in 1.2.0
@@ -70,6 +70,10 @@ Support added for handling large 64-bit integers
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Support has been improved for both getting and setting large (greater than 2^53)
 64-bit values. See :ref:`section-access-64-bit-integers` for more information.
+
+Note that on Windows systems, the string representations of Not a Number and infinity
+(e.g., ``'NaN'``, ``'Infinity'``) are not valid values for a Number. They are valid
+inputs on other systems.
 
 [RTI Issue ID CON-190]
 
