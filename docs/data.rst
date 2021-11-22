@@ -196,6 +196,9 @@ with numeric fields, returning the number as a string. For example:
     contains a value that can be interpreted as a number, ``sample["my_string"]``
     returns a number, not a string.
 
+
+.. _section-access-64-bit-integers:
+
 Accessing 64-bit integers
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 Internally, *Connector* relies on a framework that only contains a single number
@@ -222,12 +225,6 @@ you must take the following into account.
 .. warning::
 
   If :meth:`Instance.set_number()` is used to set a value >= 2^53, an ``Error`` will be raised.
-
-.. warning::
-
-  On Windows systems, the string representations of Not a Number and infinity (e.g.,
-  ``'NaN'``, ``'Infinity'``) are not valid values for a Number. They are valid
-  inputs on other systems.
 
 .. note::
 
