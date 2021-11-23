@@ -68,7 +68,7 @@ def setup(app):
 # documentation.
 #
 html_theme_options = {
-    "collapse_navigation" : False
+    "collapse_navigation" : False,
     "canonical_url" : "https://community.rti.com/static/documentation/connector/current/api/python/"
 }
 
