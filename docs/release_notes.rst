@@ -14,19 +14,17 @@ runs on most Windows®, Linux® and macOS® platforms.
 *Connector* has been tested with Python 2.6+ and 3.6.8+, and on the following systems:
      
 **Linux**
-  * CentOS™ 6.0, 6.2-6.4, 7.0 (x64)
-  * Red Hat® Enterprise Linux 6.0-6.5, 6.7, 6.8, 7, 7.3, 7.5, 7.6, 8  (x64)
+  * CentOS™ 7.0 (x64)
+  * Red Hat® Enterprise Linux 7, 7.3, 7.5, 7.6, 8  (x64)
   * SUSE® Linux Enterprise Server 12 SP2  (x64)
-  * Ubuntu® 14.04, 16.04, 18.04, 20.04 LTS (x64)
-  * Ubuntu 16.04, 18.04 LTS (64-bit Arm® v8)
+  * Ubuntu® 14.04, 18.04, 20.04 LTS (x64)
+  * Ubuntu 18.04 LTS (64-bit Arm® v8)
   * Ubuntu 18.04 LTS (32-bit Arm v7)
-  * Wind River® Linux 8 (Arm v7) (Custom-supported platform)
     
 **macOS**  
   * macOS 10.13-10.15, 11 (x64)
     
 **Windows**    
-  * Windows 8 (x64)
   * Windows 10 (x64)
   * Windows Server 2012 R2 (x64)
   * Windows Server 2016 (x64)
@@ -44,7 +42,8 @@ What's New in 1.2.0
 New Platforms
 ^^^^^^^^^^^^^
 
-RTI has validated that *Connector* can be used on macOS 11 (Big Sur) systems.
+RTI has validated that *Connector* can be used on macOS 11 (Big Sur) systems
+on x64 CPUs.
 
 
 New API makes it easier to query what version of Connector is being used
