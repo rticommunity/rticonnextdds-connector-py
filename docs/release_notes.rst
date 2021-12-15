@@ -11,23 +11,24 @@ Supported Platforms
 *RTI Connector* works with Python® 2.x and 3.x. It uses a native C library that
 runs on most Windows®, Linux® and macOS® platforms.
 
-*Connector* has been tested with Python 2.6+ and 3.6.8+, and on the following systems:
-     
+*Connector* has been tested with Python 2.6+ and 3.6.8+, on the following systems:
+
 **Linux**
   * CentOS™ 7.0 (x64)
-  * Red Hat® Enterprise Linux 7, 7.3, 7.5, 7.6, 8  (x64)
-  * SUSE® Linux Enterprise Server 12 SP2  (x64)
-  * Ubuntu® 14.04, 18.04, 20.04 LTS (x64)
-  * Ubuntu 18.04 LTS (64-bit Arm® v8)
-  * Ubuntu 18.04 LTS (32-bit Arm v7)
-    
-**macOS**  
-  * macOS 10.13-10.15, 11 (x64)
-    
-**Windows**    
+  * Red Hat® Enterprise Linux 7, 7.3, 7.5, 7.6, 8 (x64)
+  * SUSE® Linux Enterprise Server 12 SP2 (x64)
+  * Ubuntu® 18.04 (x64, Arm v7, Arm v8)
+  * Ubuntu 20.04 LTS (x64)
+
+**macOS**
+  * macOS 10.13-10.15 (x64)
+  * macOS 11 (x64 and Arm v8 tested via x64 libraries)
+
+**Windows**
   * Windows 10 (x64)
   * Windows Server 2012 R2 (x64)
   * Windows Server 2016 (x64)
+
 
 *Connector* is supported in other languages in addition to Python, see the 
 `main Connector
@@ -42,8 +43,8 @@ What's New in 1.2.0
 New Platforms
 ^^^^^^^^^^^^^
 
-RTI has validated that *Connector* can be used on macOS 11 (Big Sur) systems
-on x64 CPUs.
+*Connector* has been validated on macOS 11 (Big Sur) systems on x64 and Arm v8 
+CPUs (via x64 libraries).
 
 
 New API makes it easier to query what version of Connector is being used
@@ -77,7 +78,7 @@ Deleting same Connector object twice may have resulted in segmentation fault
 A segmentation fault may have occurred when the same *Connector* object was
 deleted twice. This issue has been resolved.
 
-[RTI Issue ID CON-209]
+[RTI Issue ID CON-200]
 
 
 Support added for handling large 64-bit integers
