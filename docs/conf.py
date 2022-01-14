@@ -22,8 +22,8 @@ copyright = '2019, Real-Time Innovations, Inc'
 author = 'Real-Time Innovations, Inc.'
 
 # The full version, including alpha/beta/rc tags
-version = '1.0.1-rc1'
-release = '1.0.1-rc1'
+version = '1.0.1'
+release = '1.0.1'
 
 master_doc = 'index'
 
