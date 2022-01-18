@@ -5,6 +5,12 @@
 Release Notes
 =============
 
+Version 1.0.1
+-------------
+
+RTI Connector 1.0.1 is built on RTI Connext DDS 6.0.1.25, which fixes several bugs in the Core Libraries. For details, contact support@rti.com.
+
+
 Version 1.0.0
 -------------
 
