@@ -6,10 +6,10 @@
 Copyrights and License
 **********************
 
-© 2021 Real-Time Innovations, Inc. |br|
+© 2022 Real-Time Innovations, Inc. |br|
 All rights reserved.  |br|
 Printed in U.S.A. First printing.  |br|
-December 2021. |br|
+February 2022. |br|
 
 
 .. rubric:: License
@@ -56,13 +56,15 @@ Phone: (408) 990-7444 |br|
 Email: support@rti.com |br|
 Website: https://support.rti.com/ |br|
 
-© 2021 RTI
+© 2022 RTI
 
 .. rubric:: External Third-Party Software Used in Connector
 
 **Lua**
   * The source code of this software is used to build the native libraries
     provided by *RTI Connector*.
+
+  * Version 5.2.
 
   * License (https://www.lua.org/license.html):
     Copyright © 1994–2021 Lua.org, PUC-Rio.
