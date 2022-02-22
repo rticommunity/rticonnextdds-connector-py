@@ -93,6 +93,13 @@ inputs on other systems.
 [RTI Issue ID CON-190]
 
 
+Vulnerability Assessments
+-------------------------
+Internally, *Connector* relies on Lua. RTI has assessed the current version of 
+Lua used by *Connector*, version 5.2, and found that *Connector* is not currently 
+affected by any of the publicly disclosed vulnerabilities in Lua 5.2.
+
+
 Previous Releases
 -----------------
 
