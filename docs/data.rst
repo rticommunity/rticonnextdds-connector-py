@@ -138,19 +138,6 @@ To set any numeric type, including enumerations:
     output.instance.set_number("my_double", 2.14)
     output.instance.set_number("my_enum", 2)
 
-.. warning::
-    The range of values for a numeric field is determined by the type
-    used to define that field in the configuration file. However, ``set_number`` and
-    ``get_number`` can't handle 64-bit integers (*int64* and *uint64*)
-    whose absolute values are larger than 2^53. This is a *Connector* limitation
-    due to the use of *double* as an intermediate representation.
-
-    When ``set_number`` or ``get_number`` detect this situation, they will raise
-    an :class:`Error`. ``get_dictionary`` and ``set_dictionary`` do not have this
-    limitation and can handle any 64-bit integer.
-    An ``Instance``'s ``__setitem__`` method doesn't have
-    this limitation either, but ``SampleIterator``'s ``__getitem__`` does.
-
 To set booleans:
 
 .. testcode::
@@ -208,6 +195,41 @@ with numeric fields, returning the number as a string. For example:
     If a field ``my_string``, defined as a string in the configuration file,
     contains a value that can be interpreted as a number, ``sample["my_string"]``
     returns a number, not a string.
+
+
+.. _section-access-64-bit-integers:
+
+Accessing 64-bit integers
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Internally, *Connector* relies on a framework that only contains a single number
+type, which is an IEEE-754 floating-point number. As a result, not all 64-bit integers
+can be represented with exact precision. If your type contains uint64 or int64 members,
+and you expect them to be larger than ``2^53`` (or smaller than ``-2^53``), then
+you must take the following into account.
+
+64-bit values with an absolute value greater or equal to 2^53 can be set via:
+ - The type-agnostic setter, ``__setitem__``. The values can be supplied as strings, or as numbers, e.g., ``the_output.instance["my_uint64"] = "18446744073709551615"``.
+ - The :meth:`Instance.set_string()` method, e.g., ``the_output.instance.set_string("my_uint64", "18446744073709551615")``
+ - The :meth:`Instance.set_dictionary()` method, e.g., ``the_output.instance.set_dictionary({"my_uint64": "18446744073709551615"})``
+
+64-bit values with an absolute value greater than 2^53 can be retrieved via:
+ - The type-agnostic getter, ``__getitem__``. The value will be an instance of ``int`` if larger than 2^53, otherwise a ``float``. e.g., ``sample["my_int64"] # 9223372036854775807``
+ - The :meth:`SampleIterator.get_string()`, method.
+   The value will be returned as a string, e.g., ``sample.get_string("my_int64") # "9223372036854775807"``
+ - The :meth:`SampleIterator.get_dictionary()` method, e.g., ``sample.get_dictionary()["my_int64"] # "9223372036854775807"``
+
+.. warning::
+
+  If :meth:`SampleIterator.get_number()` is used to retrieve a value > 2^53, an ``Error`` will be raised.
+
+.. warning::
+
+  If :meth:`Instance.set_number()` is used to set a value >= 2^53, an ``Error`` will be raised.
+
+.. note::
+
+  The :meth:`Instance.set_number()` operation can handle ``abs(value) < 2^53``,
+  whereas :meth:`SampleIterator.get_number()` can handle ``abs(value) <= 2^53``.
 
 Accessing structs
 ^^^^^^^^^^^^^^^^^
@@ -409,9 +431,9 @@ To clear a member, set it to ``None`` explicitly::
     output.instance.set_dictionary({'my_double': 3.3, 'my_long': 4, 'my_optional_long': None})
 
 
-For more information about optional members in DDS, see the *Getting Started Guide
-Addendum for Extensible Types*, 
-`Optional Members <https://community.rti.com/static/documentation/connext-dds/current/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/Optional_Members.htm>`__.
+For more information about optional members in DDS, see  
+`Optional Members <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/Optional_Members.htm>`__
+in the *Extensible Types Guide*.
 
 Accessing unions
 ^^^^^^^^^^^^^^^^

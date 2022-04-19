@@ -18,12 +18,12 @@ sys.path.insert(0, os.path.abspath('../rticonnextdds_connector'))
 # -- Project information -----------------------------------------------------
 
 project = 'RTI Connector for Python'
-copyright = '2021, Real-Time Innovations, Inc'
+copyright = '2022, Real-Time Innovations, Inc'
 author = 'Real-Time Innovations, Inc.'
 
 # The full version, including alpha/beta/rc tags
-version = '1.1.1'
-release = '1.1.1'
+version = '1.2.0'
+release = '1.2.0'
 
 master_doc = 'index'
 
@@ -68,7 +68,8 @@ def setup(app):
 # documentation.
 #
 html_theme_options = {
-    "collapse_navigation" : False
+    "collapse_navigation" : False,
+    "canonical_url" : "https://community.rti.com/static/documentation/connector/current/api/python/"
 }
 
 # The name of an image file (relative to this directory) to place at the top

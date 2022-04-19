@@ -97,7 +97,8 @@ class TestDataAccess:
   def test_numbers_as_strings(self, populated_input):
     sample = populated_input.samples[0]
     assert sample.get_string("my_long") == "10"
-    assert sample.get_string("my_double") == "3.3"
+    assert sample.get_string("my_double") == "3.2999999999999998"
+    assert float(sample.get_string("my_double")) == 3.3
 
   def test_get_boolean(self, populated_input):
     sample = populated_input.samples[0]
@@ -757,3 +758,115 @@ class TestDataAccess:
     test_output.instance.set_dictionary({"my_enum":"GREEN"})
     sample = send_data(test_output, test_input)
     assert sample["my_enum"] == 1
+
+  # The following tests verify that 64-bit numbers behave as expected in Connector
+  # (XML types uint64 and int64). The expected behavior is:
+  #  - The get_number and set_number operatoins raise an error if number is out
+  #    their supported range. max |value| for set is 2^53 - 1, max |value| for
+  #    get is 2^53.
+  #  - The type agnostic setter can be used to set values outside of these supported
+  #    ranges if they supplied as a string
+  #  - The type agnostic getter can be used to obtain values outside of the
+  #    supported range. Result is a float if within range, otherwise an int.
+  #  - The get_string and set_string operations can be used on all numbers (regardless
+  #    of size)
+  #  - The get_dictionary and set_dictionary can be used on all numbers (regardless
+  #    of size)
+  # The reason for these limitations is due to the fact that the version of Lua
+  # used in the native libraries only uses doubles.
+
+  def test_setting_out_of_range_64_bit_values(self, test_output):
+    # For uint64, check >= 2^53
+    with pytest.raises(rti.Error, match=r".*value of my_uint64 is too large.*") as execinfo:
+      test_output.instance.set_number("my_uint64", 2**53)
+    # For int64, check >= 2^53 and <= -2^53
+    with pytest.raises(rti.Error, match=r".*value of my_int64 is too large.*") as execinfo:
+      test_output.instance.set_number("my_int64", 2**53)
+    with pytest.raises(rti.Error, match=r".*value of my_int64 is too large.*") as execinfo:
+      test_output.instance.set_number("my_int64", -2**53)
+    # Also check that it IS possible to set the maximum
+    test_output.instance.set_number("my_uint64", 2**53 - 1)
+    test_output.instance.set_number("my_int64", 2**53 - 1)
+    test_output.instance.set_number("my_int64", (-2**53) + 1)
+
+  def test_getting_out_of_range_64_bit_values(self, test_output, test_input):
+    # Set the values via a dictionary (set_string, and __setitem__ would also work)
+    test_output.instance.set_dictionary({"my_uint64": 2**53 + 1, "my_int64": 2**53 + 1})
+    sample = send_data(test_output, test_input)
+    with pytest.raises(rti.Error, match=r".*value of my_int64 is too large.*") as execinfo:
+      sample.get_number("my_int64")
+    with pytest.raises(rti.Error, match=r".*value of my_uint64 is too large.*") as execinfo:
+      sample.get_number("my_uint64")
+    # Also check value < -2^53
+    test_output.instance.set_dictionary({"my_int64": -2**53 - 1})
+    sample = send_data(test_output, test_input)
+    with pytest.raises(rti.Error, match=r".*value of my_int64 is too large.*") as execinfo:
+      sample.get_number("my_int64")
+
+    # Check that the maximum values can be retrieved (2^53)
+    test_output.instance.set_dictionary({"my_uint64": 2**53, "my_int64": -2**53})
+    sample = send_data(test_output, test_input)
+    assert sample.get_number("my_uint64") == 2**53
+    assert sample.get_number("my_int64") == -2**53
+
+  def test_64_bit_int_communication_with_get_set_string(self, test_output, test_input):
+    # Check that the set_string and get_string operations work with large numbers
+    large_numeric_value = 2**53
+    large_negative_numeric_value = -2**53
+    test_output.instance.set_string("my_uint64", str(large_numeric_value))
+    test_output.instance.set_string("my_int64", str(large_negative_numeric_value))
+    sample = send_data(test_output, test_input)
+    assert sample.get_string("my_uint64") == str(large_numeric_value)
+    assert isinstance(sample.get_string("my_uint64"), str)
+    assert int(sample.get_string("my_uint64")) == large_numeric_value
+    assert sample.get_string("my_int64") == str(large_negative_numeric_value)
+    assert int(sample.get_string("my_int64")) == large_negative_numeric_value
+    assert isinstance(sample.get_string("my_int64"), str)
+
+  def test_large_integers_are_returned_as_int_getitem(self, test_output, test_input):
+    # Check that the type-agnostic getter can be used to obtain values outside of
+    # get_number's range. If they are outside of this range they will be instance
+    # of int.
+    test_output.instance.set_dictionary({"my_uint64": str(2**53+1), "my_int64": str(-2**53-1)})
+    sample = send_data(test_output, test_input)
+    assert isinstance(sample["my_uint64"], int)
+    assert isinstance(sample["my_int64"], int)
+    assert sample["my_uint64"] == 2**53+1
+    assert sample["my_int64"] == -2**53-1
+
+  def test_smaller_integers_are_returned_as_float_by_getitem(self, test_output, test_input):
+    # Check that the type-agnostic getter can be used to obtain values inside of
+    # get_number's range. If they are inside of this range they will be instance
+    # of float.
+    test_output.instance.set_dictionary({"my_uint64": str(2**53), "my_int64": str(-2**53)})
+    sample = send_data(test_output, test_input)
+    # They will be floats since they have come via Lua
+    assert isinstance(sample["my_uint64"], float)
+    assert isinstance(sample["my_int64"], float)
+    assert sample["my_uint64"] == 2**53
+    assert sample["my_int64"] == -2**53
+
+  def test_large_integer_type_agnostic_setter(self, test_output, test_input):
+    # Check that the type-agnostic setter can be used to set numbers as strings,
+    # also the values can be supplied as numbers.
+    test_output.instance["my_uint64"] = str(2**53)
+    test_output.instance["my_int64"] = str(-2**53)
+    sample = send_data(test_output, test_input)
+    assert sample["my_uint64"] == 2**53
+    assert sample["my_int64"] == -2**53
+    # Check the same but supplying them as numbers (internally they get set via
+    # dictionary in this case)
+    test_output.instance["my_uint64"] = 2**53
+    test_output.instance["my_int64"] = -2**53
+    sample = send_data(test_output, test_input)
+    assert sample["my_uint64"] == 2**53
+    assert sample["my_int64"] == -2**53
+
+  def test_large_integer_communication_with_dictionaries(self, test_output, test_input):
+    # When dictionaries are used to set / get the sample there are no restrictions
+    # on the size of the integers.
+    dict_send = {"my_uint64": 2**53, "my_int64": -2**53}
+    test_output.instance.set_dictionary(dict_send)
+    dict_receive = send_data(test_output, test_input).get_dictionary()
+    assert dict_receive["my_uint64"] == dict_send["my_uint64"]
+    assert dict_receive["my_int64"] == dict_send["my_int64"]

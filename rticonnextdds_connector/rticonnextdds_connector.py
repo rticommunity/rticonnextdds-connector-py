@@ -21,6 +21,7 @@ import os
 import sys
 import platform
 import json
+import pkg_resources
 from contextlib import contextmanager
 from numbers import Number
 from ctypes import * # pylint: disable=unused-wildcard-import, wildcard-import, ungrouped-imports
@@ -173,7 +174,7 @@ class _ConnectorBinding:
         self.new.argtypes = [ctypes.c_char_p, ctypes.c_char_p, ctypes.c_void_p]
 
         self.delete = self.library.RTI_Connector_delete
-        self.delete.restype = ctypes.c_void_p
+        self.delete.restype = None
         self.delete.argtypes = [ctypes.c_void_p]
 
         self.get_writer = self.library.RTI_Connector_get_datawriter
@@ -322,6 +323,10 @@ class _ConnectorBinding:
         self._create_test_scenario.restype = ctypes.c_int
         self._create_test_scenario.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_void_p]
 
+        self.get_build_versions = self.library.RTI_Connector_get_build_versions
+        self.get_build_versions.restype = ctypes.c_int
+        self.get_build_versions.argtypes = [POINTER(ctypes.c_void_p), POINTER(ctypes.c_void_p)]
+
     @staticmethod
     def get_any_value(getter_function, connector, input_name, index, field_name):
         "Calls one of the get_any functions and translates the result from ctypes to python"
@@ -372,7 +377,6 @@ class _ConnectorOptions(ctypes.Structure):
 #
 # Public API
 #
-
 class Samples:
     """Provides access to the data samples read by an Input (:attr:`Input.samples`)
 
@@ -714,6 +718,9 @@ class SampleIterator:
     def get_number(self, field_name):
         """Gets the value of a numeric field in this sample
 
+        Note that this operation should not be used to retrieve values larger than
+        ``2^53``. See :ref:`Accessing 64-bit integers` for more information.
+
         :param str field_name: The name of the field. See :ref:`Accessing the data`.
         :return: The numeric value for the field ``field_name``.
         """
@@ -928,7 +935,9 @@ class Instance:
             raise AttributeError("field_name cannot be None")
 
         if isinstance(value, Number):
-            if value < connector_binding.max_integer_as_double:
+            # If |value| >= max_integer_as_double set via dictionary, working round
+            # the int-to-double conversion present in set_number
+            if value < connector_binding.max_integer_as_double and value > -connector_binding.max_integer_as_double:
                 self.set_number(field_name, value)
             else:
                 # Work around set_number int-to-double conversion
@@ -946,6 +955,10 @@ class Instance:
 
     def set_number(self, field_name, value):
         """Sets a numeric field
+
+
+        Note that this operation should not be used to set values larger than
+        ``2^53 - 1``. See :ref:`Accessing 64-bit integers` for more information.
 
         :param str field_name: The name of the field. See :ref:`Accessing the data`.
         :param number value: A numeric value or ``None`` to unset an optional member
@@ -1255,8 +1268,8 @@ class Connector:
 
     def close(self):
         """Frees all the resources created by this Connector instance"""
-
         connector_binding.delete(self.native)
+        self.native = 0
 
     # Deprecated: use close()
     # pylint: disable=missing-docstring
@@ -1365,6 +1378,48 @@ class Connector:
         :param number value: The value for *max_objects_per_thread*
         """
         _check_retcode(connector_binding.set_max_objects_per_thread(value))
+
+    @staticmethod
+    def get_version():
+        """
+        Returns the version of Connector.
+
+        This method provides the build IDs of the native libraries being used by
+        Connector, as well as the version of the Connector API.
+
+        Note that if Connector has not been installed via pip, the version of
+        the Connector API being used will be "unknown". The version of the native
+        libraries will still be returned correctly.
+
+        :return: A string containing information about the version of Connector.
+        :rtype: string
+        """
+        # First, try to get the version of the Connector API from setup.py
+        # If Connector was git cloned (as opposed to installed via pip) this
+        # will fail and we will print "unknown" for the version
+        try:
+            setup_py_version = pkg_resources.require("rticonnextdds-connector")[0].version
+            # The version contained in setup.py contains 3 ints, e.g. 1.1.0
+            version_ints = setup_py_version.split(".")
+            api_version = str(version_ints[0]) + "." + str(version_ints[1]) + "." + str(version_ints[2])
+        except pkg_resources.DistributionNotFound:
+            api_version = "unknown"
+
+        # Now get the build IDs of the native libraries
+        native_core_c_versions = ctypes.c_void_p()
+        native_connector_version = ctypes.c_void_p()
+        _check_retcode(connector_binding.get_build_versions(
+            ctypes.byref(native_core_c_versions),
+            ctypes.byref(native_connector_version)))
+
+        # Return a string containing all the above information
+        version_string = "RTI Connector for Python, version " + api_version
+        version_string += "\n"
+        version_string += fromcstring(cast(native_core_c_versions, c_char_p).value)
+        version_string += "\n"
+        version_string += fromcstring(cast(native_connector_version, c_char_p).value)
+
+        return version_string
 
 @contextmanager
 def open_connector(config_name, url):
