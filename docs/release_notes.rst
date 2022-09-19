@@ -38,6 +38,15 @@ repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 What's New in 1.2.0
 -------------------
 
+.. note::
+
+    With the introduction of the RTI Connext Python API in *RTI Connext* 7.0.0,  
+    *Connector for Python* is deprecated and will be removed in a 
+    future release, once the Connext Python API is fully supported. You are 
+    encouraged to try the 
+    `Connext Python API <https://community.rti.com/static/documentation/connext-dds/7.0.0/doc/api/connext_dds/api_python/index.html>`__ 
+    (experimental in 7.0.0).    
+
 *Connector* 1.2.0 is built on `RTI Connext DDS 6.1.1 <https://community.rti.com/documentation/rti-connext-dds-611>`__.
 
 New Platforms
