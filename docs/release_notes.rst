@@ -38,7 +38,7 @@ Native Windows libraries updated to Visual Studio 2015
 .. CON-276
 
 Previously, the native libraries shipped with Connector were built using Visual
-Studio 2015 (and accompanied by Microsoft's mscvr120 redistributable). These
+Studio 2013 (and accompanied by Microsoft's mscvr120 redistributable). These
 libraries are now built using Visual Studio 2015. The redistributable that is
 shipped has been updated accordingly.
 
