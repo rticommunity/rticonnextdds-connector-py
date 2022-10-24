@@ -26,13 +26,21 @@ runs on most Windows®, Linux® and macOS® platforms.
 
 **Windows**
   * Windows 10 (x64)
-  * Windows Server 2012 R2 (x64)
   * Windows Server 2016 (x64)
-
 
 *Connector* is supported in other languages in addition to Python, see the 
 `main Connector
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
+
+
+Native Windows libraries updated to Visual Studio 2015
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. CON-276
+
+Previously, the native libraries shipped with Connector were built using Visual
+Studio 2015 (and accompanied by Microsoft's mscvr120 redistributable). These
+libraries are now built using Visual Studio 2015. The redistributable that is
+shipped has been updated accordingly.
 
 
 What's New in 1.2.0
