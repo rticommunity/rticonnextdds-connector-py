@@ -139,7 +139,7 @@ class _ConnectorBinding:
             directory = "win-x64"
             libname = "rtiddsconnector"
             post = "dll"
-            additional_lib = "msvcr120"
+            additional_lib = "vcruntime140.dll"
             is_windows = True
         else:
             raise RuntimeError("This platform ({0}) is not supported".format(osname))
