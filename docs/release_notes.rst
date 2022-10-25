@@ -18,14 +18,14 @@ runs on most Windows®, Linux® and macOS® platforms.
   * Red Hat® Enterprise Linux 7, 7.3, 7.5, 7.6, 8 (x64)
   * SUSE® Linux Enterprise Server 12 SP2 (x64)
   * Ubuntu® 18.04 (x64, Arm v7, Arm v8)
-  * Ubuntu 20.04 LTS (x64)
+  * Ubuntu 20.04, 22.04 LTS (x64)
 
 **macOS**
-  * macOS 10.13-10.15 (x64)
+  * macOS 10.13-10.15, 12 (x64)
   * macOS 11 (x64 and Arm v8 tested via x64 libraries)
 
 **Windows**
-  * Windows 10 (x64)
+  * Windows 10, 11 (x64)
   * Windows Server 2016 (x64)
 
 *Connector* is supported in other languages in addition to Python, see the 
