@@ -33,8 +33,16 @@ runs on most Windows®, Linux® and macOS® platforms.
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
 
+Version 1.2.2
+-----------------
+
+What's New in 1.2.2
+^^^^^^^^^^^^^^^^^^^
+
+*Connector* 1.2.2 is built on `RTI Connext DDS 6.1.2 <https://community.rti.com/documentation/rti-connext-dds-612>`__.
+
 Native Windows libraries updated to Visual Studio 2015
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+""""""""""""""""""""""""""""""""""""""""""""""""""""""
 .. CON-276
 
 Previously, the native libraries shipped with Connector were built using Visual
@@ -43,20 +51,33 @@ libraries are now built using Visual Studio 2015. The redistributable that is
 shipped has been updated accordingly.
 
 
+Vulnerability Assessments
+-------------------------
+Internally, *Connector* relies on Lua. RTI has assessed the current version of 
+Lua used by *Connector*, version 5.2, and found that *Connector* is not currently 
+affected by any of the publicly disclosed vulnerabilities in Lua 5.2.
+
+
+Previous Releases
+-----------------
+
+Version 1.2.0
+^^^^^^^^^^^^^
+
 What's New in 1.2.0
--------------------
+"""""""""""""""""""
 
 *Connector* 1.2.0 is built on `RTI Connext DDS 6.1.1 <https://community.rti.com/documentation/rti-connext-dds-611>`__.
 
 New Platforms
-^^^^^^^^^^^^^
++++++++++++++
 
 *Connector* has been validated on macOS 11 (Big Sur) systems on x64 and Arm v8 
 CPUs (via x64 libraries).
 
 
 New API makes it easier to query what version of Connector is being used
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .. CON-92 
 
 A new API, :meth:`rticonnextdds_connector.Connector.get_version`, has been added that provides the caller
@@ -64,10 +85,10 @@ with the version of *Connector* and the version of the native libraries being us
 
 
 What's Fixed in 1.2.0
----------------------
+"""""""""""""""""""""
 
 Error logged when accessing string longer than 128 bytes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Previously, on an input, when accessing a string longer than 128 bytes, the
 following error was printed:
 
@@ -82,7 +103,7 @@ the string. The message is no longer printed.
 
 
 Deleting same Connector object twice may have resulted in segmentation fault
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 A segmentation fault may have occurred when the same *Connector* object was
 deleted twice. This issue has been resolved.
 
@@ -90,7 +111,7 @@ deleted twice. This issue has been resolved.
 
 
 Support added for handling large 64-bit integers
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+++++++++++++++++++++++++++++++++++++++++++++++++
 Support has been improved for both getting and setting large (greater than 2^53)
 64-bit values. See :ref:`section-access-64-bit-integers` for more information.
 
@@ -99,17 +120,6 @@ Note that on Windows systems, the string representations of Not a Number and inf
 inputs on other systems.
 
 [RTI Issue ID CON-190]
-
-
-Vulnerability Assessments
--------------------------
-Internally, *Connector* relies on Lua. RTI has assessed the current version of 
-Lua used by *Connector*, version 5.2, and found that *Connector* is not currently 
-affected by any of the publicly disclosed vulnerabilities in Lua 5.2.
-
-
-Previous Releases
------------------
 
 Version 1.1.1
 ^^^^^^^^^^^^^
