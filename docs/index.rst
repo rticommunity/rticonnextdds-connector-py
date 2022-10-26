@@ -20,6 +20,15 @@ You can learn how to use *RTI Connector* by reading the following sections, whic
 include examples and detailed API reference. You can also find a specific type
 or function in the :ref:`genindex`.
 
+.. note::
+
+   With the introduction of the RTI Connext Python API in *RTI Connext* 
+   7.0.0, *Connector for Python* is deprecated and will be removed in a 
+   future release, once the Connext Python API is fully supported. You are 
+   encouraged to try the 
+   `Connext Python API <https://community.rti.com/static/documentation/connext-dds/7.0.0/doc/api/connext_dds/api_python/index.html>`__ (experimental in 7.0.0).
+
+
 Table of Contents
 =================
 
