@@ -23,7 +23,7 @@ author = 'Real-Time Innovations, Inc.'
 
 # The full version, including alpha/beta/rc tags
 version = '1.2.0'
-release = '1.2.0'
+release = '1.2.2'
 
 master_doc = 'index'
 
