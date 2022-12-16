@@ -131,7 +131,7 @@ See :meth:`SampleIterator.info` for the list of available meta-data fields.
 
 *Connext DDS* can produce samples with invalid data, which contain meta-data only.
 For more information about this, see `Valid Data Flag 
-<https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/AccessingManagingInstances.htm#Valid>`__
+<https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/AccessingManagingInstances.htm#Valid>`__
 in the *RTI Connext DDS Core Libraries User's Manual*.
 These samples indicate a change in the instance state. Samples with invalid data
 still provide the following information:

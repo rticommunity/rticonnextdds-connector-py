@@ -22,7 +22,7 @@ To create a new :class:`Connector`, pass an XML file and a configuration name:
    connector = rti.Connector("MyParticipantLibrary::MyParticipant", "ShapeExample.xml");
 
 The XML file defines your types, QoS profiles, and DDS Entities. *Connector*
-uses the XML schema of `RTI's XML-Based Application Creation <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/xml_application_creation/index.htm#xml_based_app_creation_guide/UnderstandingXMLBased/XMLTagsConfigEntities.htm>`__.
+uses the XML schema of `RTI's XML-Based Application Creation <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/xml_application_creation/index.htm#xml_based_app_creation_guide/UnderstandingXMLBased/XMLTagsConfigEntities.htm>`__.
 
 The previous code loads the ``<domain_participant>`` named *MyParticipant* in 
 the ``<domain_participant_library>`` named *MyParticipantLibrary*, which is defined in the
@@ -40,7 +40,7 @@ When you create a :class:`Connector`, the DDS *DomainParticipant* that you selec
 and all its contained entities (*Topics*, *Subscribers*, *DataReaders*,
 *Publishers*, *DataWriters*) are created.
 
-For more information about the DDS entities, see `Core Concepts <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartCoreConcepts.htm>`__
+For more information about the DDS entities, see `Core Concepts <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartCoreConcepts.htm>`__
 in the *RTI Connext DDS Core Libraries User's Manual*.
 
 .. note::

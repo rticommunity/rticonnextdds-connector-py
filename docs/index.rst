@@ -50,5 +50,5 @@ Table of Contents
 * :ref:`search`
 
 To learn more about *RTI Connext DDS*, see the 
-`RTI Connext DDS Getting Started Guide <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/getting_started_guide/index.html>`__. 
+`RTI Connext DDS Getting Started Guide <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/getting_started_guide/index.html>`__. 
 More documentation is available in the `RTI Community Portal <https://community.rti.com/documentation>`__.

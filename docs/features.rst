@@ -20,7 +20,7 @@ General features
    * - Feature
      - Level of support
      - Notes
-   * - `Quality of Service (QoS) <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/qos_reference/RTI_ConnextDDS_CoreLibraries_QoS_Reference_Guide.pdf>`__
+   * - `Quality of Service (QoS) <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/qos_reference/RTI_ConnextDDS_CoreLibraries_QoS_Reference_Guide.pdf>`__
      - Partial
      - Most QoS policies are supported because they can be configured in XML, but those that are
        designed to be mutable can't be changed in *Connector*. QoS policies that require
@@ -50,19 +50,19 @@ General features
           order to enable an `Input` only when :meth:`Connector.get_input` is called.
         * Property - Properties can be set in XML, but they can't be looked up in *Connector*
         
-        `Topic Qos <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Setting_Topic_QosPolicies.htm>`__ is not supported in *Connector*. Use DataReader QoS and DataWriter QoS directly.
-   * - `Entity Statuses <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Statuses.htm>`__
+        `Topic Qos <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Setting_Topic_QosPolicies.htm>`__ is not supported in *Connector*. Use DataReader QoS and DataWriter QoS directly.
+   * - `Entity Statuses <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Statuses.htm>`__
      - Partial
      - Only :meth:`Input.wait` (data available), :meth:`Input.wait_for_publications`, and :meth:`Output.wait_for_subscriptions` are supported.
-   * - `Managing Data Instances <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Managing_Data_Instances__Working_with_Ke.htm>`__
+   * - `Managing Data Instances <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Managing_Data_Instances__Working_with_Ke.htm>`__
      - Partial
      - On an ``Output``, it is possible to dispose or unregister an instance (see :meth:`Output.write`). Instances are automatically registered when first written. On an ``Input`` the instance state can be obtained, alongside the key fields of a disposed instance (see :ref:`Accessing key values of disposed samples`). Instance handles are not exposed.
-   * - `Application Acknowledgment <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Application_Acknowledgment.htm>`__
+   * - `Application Acknowledgment <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Application_Acknowledgment.htm>`__
      - Partial
      - *DDS_APPLICATION_AUTO_ACKNOWLEDGMENT_MODE* is supported. If enabled, when a call to :meth:`Input.take` or :meth:`Input.read` is followed by another call, the second one automatically acknowledges the samples read in the first one.
 
        *DDS_APPLICATION_EXPLICIT_ACKNOWLEDGMENT_MODE* is not supported.
-   * - `Request-Reply <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartRequestReplyPattern.htm>`__
+   * - `Request-Reply <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartRequestReplyPattern.htm>`__
      - Partial
      - The correlation between two samples can be established at the application level:
 
@@ -70,21 +70,21 @@ General features
             * The *Replier* application receives the *request* sample, obtains the ``identity`` (A),  from ":attr:`SampleIterator.info` and writes a new sample with ``related_sample_identity=A`` (the *reply* sample)
             * The *Requester* application receives the *reply* sample, and correlates the ``related_sample_identity`` from :attr:`SampleIterator.info` with the ``identity`` it used in the first step.
 
-   * - `Topic Queries <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/TopicQueries.htm>`__
+   * - `Topic Queries <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/TopicQueries.htm>`__
      - Partial
      - ``Input`` doesn't have the API to create a *TopicQuery*, but in the configuration file a *data_writer* can enable support for *TopicQuery* so other *Connext DDS Subscribers* can query the *Connector Publisher*.
-   * - `Zero Copy Transfer Over Shared Memory <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/SendingLDZeroCopy.htm>`__
+   * - `Zero Copy Transfer Over Shared Memory <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/SendingLDZeroCopy.htm>`__
      - Not supported
      - Only available in C and C++.
-   * - `Built-in Topics <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/builtintopics.htm>`__
+   * - `Built-in Topics <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/builtintopics.htm>`__
      - Not supported
      - API not available.
-   * - `Transport Plugins <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/transports.htm>`__
+   * - `Transport Plugins <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/transports.htm>`__
      - Partial
      - The built-in transports can be configured in XML.
    * - Add-on Libraries
-       (such as `Monitoring <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartMonitoringLib.htm>`__, 
-       `Security Plugins <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_secure/getting_started_guide/index.html>`__ )
+       (such as `Monitoring <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartMonitoringLib.htm>`__, 
+       `Security Plugins <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_secure/getting_started_guide/index.html>`__ )
      - Supported
      - See :ref:`Loading Connext DDS Add-On Libraries`.
 
@@ -98,19 +98,19 @@ Features related to sending data
    * - Feature
      - Level of support
      - Notes
-   * - `Waiting for Acknowledgments <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/WaitingForAcksDataWriter.htm>`__
+   * - `Waiting for Acknowledgments <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/WaitingForAcksDataWriter.htm>`__
      - Supported
      - See :meth:`Output.wait`.
-   * - `Coherent Sets <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/WritingCoherentSetsSample.htm>`__
+   * - `Coherent Sets <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/WritingCoherentSetsSample.htm>`__
      - Not supported
      - API not available.
-   * - `Flow Controllers <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/FlowControllers__DDS_Extension_.htm>`__
+   * - `Flow Controllers <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/FlowControllers__DDS_Extension_.htm>`__
      - Partial
      - Most functionality is available via XML QoS configuration.
-   * - `Asserting Liveliness Manually <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Asserting_Liveliness.htm>`__
+   * - `Asserting Liveliness Manually <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Asserting_Liveliness.htm>`__
      - Not supported
      - API not available.
-   * - `Collaborative DataWriters <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Config_Collaborative_DWs.htm>`__
+   * - `Collaborative DataWriters <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Config_Collaborative_DWs.htm>`__
      - Limited
      - The virtual GUID can be set per writer in XML, but not per sample.
 
@@ -124,19 +124,19 @@ Features related to receiving data
    * - Feature
      - Level of support
      - Notes
-   * - `Content-Filtered Topics <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/ContentFilteredTopics.htm>`__
+   * - `Content-Filtered Topics <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/ContentFilteredTopics.htm>`__
      - Partial
-     - `Configurable in XML <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/xml_application_creation/index.htm#xml_based_app_creation_guide/UnderstandingXMLBased/CreatingContentFilters.htm>`__  but it can't be modified after creation
-   * - `Sample Info <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/The_SampleInfo_Structure.htm>`__
+     - `Configurable in XML <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/xml_application_creation/index.htm#xml_based_app_creation_guide/UnderstandingXMLBased/CreatingContentFilters.htm>`__  but it can't be modified after creation
+   * - `Sample Info <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/The_SampleInfo_Structure.htm>`__
      - Partial
      - See :attr:`SampleIterator.info`
-   * - `Query Conditions <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/ReadConditions_and_QueryConditions.htm>`__
+   * - `Query Conditions <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/ReadConditions_and_QueryConditions.htm>`__
      - Not supported
      - API not available
-   * - `Group-Ordered Access <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/BeginEndGroupOrderedAccess.htm#>`__
+   * - `Group-Ordered Access <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/BeginEndGroupOrderedAccess.htm#>`__
      - Not supported
      - API not available
-   * - `Waiting for Historical Data <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Waiting_for_Historical_Data.htm>`__
+   * - `Waiting for Historical Data <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Waiting_for_Historical_Data.htm>`__
      - Not supported
      - API not available
 
@@ -150,17 +150,17 @@ Features related to the type system
    * - Feature
      - Level of support
      - Notes
-   * - `DDS type system <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Introduction_to_the_Type_System.htm>`__
+   * - `DDS type system <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Introduction_to_the_Type_System.htm>`__
      - Supported
      - *Connector* can use any DDS type. Types are defined in XML.
-   * - `Type extensibility <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/Type_Safety_and_System_Evolution.htm>`__
+   * - `Type extensibility <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/Type_Safety_and_System_Evolution.htm>`__
      - Supported
      - *Connector* supports type extensibility, including mutable types in the XML definition of types. It also supports type-consistency enforcement  
        and sample-assignability enforcement; these checks are performed by the *RTI Connext DDS* Core.
-   * - `Optional members <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/Optional_Members.htm>`__
+   * - `Optional members <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/Optional_Members.htm>`__
      - Supported
      - See :ref:`Accessing optional members`.
-   * - `Default values <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/DefaultValue.htm>`__
+   * - `Default values <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/extensible_types_guide/index.htm#extensible_types/DefaultValue.htm>`__
      - Supported
      -  For example, to declare a default value for a member::
 
@@ -174,7 +174,7 @@ Features related to the type system
         ``Input`` from a *Publisher* whose type is compatible, but doesn't have the
         field *my_int*, the value you receive will be 20.
 
-   * - `Unbounded data <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Sequences.htm>`__
+   * - `Unbounded data <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/Sequences.htm>`__
      - Supported
      -  To declare an unbounded sequence or string, set its max length to *-1*::
 
@@ -221,7 +221,7 @@ Features related to the type system
              </property>
             <datareader_qos>
 
-   * - `FlatData Language Binding <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/SendingLDFlatData.htm>`__
+   * - `FlatData Language Binding <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/SendingLDFlatData.htm>`__
      - Not supported
      - However, an ``Input`` can receive data published by other *Connext DDS* applications that use FlatData.
 
@@ -230,8 +230,8 @@ Loading Connext DDS Add-On Libraries
 
 *Connector* supports features that require the loading of additional *Connext DDS*
 libraries, such as
-`Monitoring <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartMonitoringLib.htm>`__
-and `Security Plugins <https://community.rti.com/static/documentation/connext-dds/6.1.1/doc/manuals/connext_dds_secure/getting_started_guide/index.html>`__.
+`Monitoring <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_professional/users_manual/index.htm#users_manual/PartMonitoringLib.htm>`__
+and `Security Plugins <https://community.rti.com/static/documentation/connext-dds/6.1.2/doc/manuals/connext_dds_secure/getting_started_guide/index.html>`__.
 
 The Monitoring and Security plugins are configured in XML, as described in the previous
 links.
