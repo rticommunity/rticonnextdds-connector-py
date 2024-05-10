@@ -33,13 +33,13 @@ runs on most Windows®, Linux® and macOS® platforms.
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
 
-Version 1.2.2
+Version 1.2.3
 -----------------
 
-What's New in 1.2.2
+What's New in 1.2.3
 ^^^^^^^^^^^^^^^^^^^
 
-*Connector* 1.2.2 is built on `RTI Connext DDS 6.1.2 <https://community.rti.com/documentation/rti-connext-dds-612>`__.
+*Connector* 1.2.3 is built on `RTI Connext DDS 6.1.2 <https://community.rti.com/documentation/rti-connext-dds-612>`__.
 
 Native Windows libraries updated to Visual Studio 2015
 """"""""""""""""""""""""""""""""""""""""""""""""""""""
