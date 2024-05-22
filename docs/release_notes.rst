@@ -38,7 +38,7 @@ Version 1.2.3
 What's New in 1.2.3
 ^^^^^^^^^^^^^^^^^^^
 
-*Connector* 1.2.3 is built on `RTI Connext DDS 6.1.2 <https://community.rti.com/documentation/rti-connext-dds-612>`__.
+*Connector* 1.2.3 is built on `RTI Connext DDS 6.1.2.17 <https://community.rti.com/documentation/rti-connext-dds-612>`__.
 
 Version 1.2.2
 -----------------
