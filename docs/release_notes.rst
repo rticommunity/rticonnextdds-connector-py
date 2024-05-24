@@ -34,6 +34,11 @@ repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
 Version 1.2.3
 -------------
+*Connector* 1.2.3 is built on *RTI Connext DDS* 6.1.2.17, which fixes several
+bugs in the Core Libraries. If you want more details on the bugs fixed in 6.1.0.3,
+contact support@rti.com. These bugs are also fixed in
+`RTI Connext DDS 6.1.1 <https://community.rti.com/documentation/rti-connext-dds-611>`__,
+upon which *RTI Connector* 1.2.0 is built.
 
 What's New in 1.2.3
 ^^^^^^^^^^^^^^^^^^^
@@ -59,13 +64,6 @@ Previously, the native libraries shipped with Connector were built using Visual
 Studio 2013 (and accompanied by Microsoft's mscvr120 redistributable). These
 libraries are now built using Visual Studio 2015. The redistributable that is
 shipped has been updated accordingly.
-
-Vulnerability Assessment
-""""""""""""""""""""""""
-
-Internally, *Connector* relies on Lua. RTI has assessed the current version of 
-Lua used by *Connector*, version 5.2, and found that *Connector* is not currently 
-affected by any of the publicly disclosed vulnerabilities in Lua 5.2.
 
 Version 1.2.0
 ^^^^^^^^^^^^^
@@ -242,3 +240,10 @@ more robust, modifies most of APIs and adds new functionality. However the old
 APIs have been preserved for backward compatibility as much as possible.
 
 *RTI Connector* 1.0.0 is built on `RTI Connext DDS 6.0.1 <https://community.rti.com/documentation/rti-connext-dds-601>`__.
+
+Vulnerability Assessment
+------------------------
+
+Internally, *Connector* relies on Lua. RTI has assessed the current version of 
+Lua used by *Connector*, version 5.2, and found that *Connector* is not currently 
+affected by any of the publicly disclosed vulnerabilities in Lua 5.2.
