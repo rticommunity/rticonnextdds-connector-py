@@ -34,16 +34,10 @@ repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
 Version 1.2.3
 -------------
-*Connector* 1.2.3 is built on *RTI Connext DDS* 6.1.2.17, which fixes several
-bugs in the Core Libraries. If you want more details on the bugs fixed in 6.1.0.3,
-contact support@rti.com. These bugs are also fixed in
-`RTI Connext DDS 6.1.1 <https://community.rti.com/documentation/rti-connext-dds-611>`__,
-upon which *RTI Connector* 1.2.0 is built.
-
-What's New in 1.2.3
-^^^^^^^^^^^^^^^^^^^
 
 *Connector* 1.2.3 is built on *RTI Connext DDS* 6.1.2.17. 
+For details on what's new and fixed in 6.1.2.17, contact support@rti.com. 
+There are no changes to Connector itself. 
 
 Previous Releases
 -----------------
