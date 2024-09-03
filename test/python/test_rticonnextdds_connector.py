@@ -124,11 +124,10 @@ class TestConnector:
         # - the build ID of lua_binding.1.0
         # Each build ID can be of the form X.X.X[.X], where the last integer
         # is not always present
-        version_regex = "([0-9]\\.){2,3}[0-9]{0,2}_[0-9]{8}T[0-9]{6}Z"
         assert bool(re.match("RTI Connector for Python, version (([0-9]\\.){2}[0-9]|unknown)", version_string, re.DOTALL)) == True
-        assert bool(re.match(".*NDDSCORE_BUILD_" + version_regex, version_string, re.DOTALL)) == True
-        assert bool(re.match(".*NDDSC_BUILD_" + version_regex, version_string, re.DOTALL)) == True
-        assert bool(re.match(".*RTICONNECTOR_BUILD_" + version_regex, version_string, re.DOTALL)) == True
+        assert bool(re.match(".*NDDSCORE_BUILD_([0-9]\\.){2,3}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
+        assert bool(re.match(".*NDDSC_BUILD_([0-9]\\.){2,3}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
+        assert bool(re.match(".*RTICONNECTOR_BUILD_([0-9]\\.){2,3}[0-9]_[0-9]{8}T[0-9]{6}Z", version_string, re.DOTALL)) == True
 
     def test_setting_max_objects_per_thread(self):
         """

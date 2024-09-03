@@ -10,10 +10,11 @@ distributed networking databus.
 publish and subscribe to the *RTI Connext DDS databus* in Python and other
 languages.
 
-**Note**: With the introduction of the RTI Connext Python API in Connext 7.3.0 LTS,
-*Connector for Python* is deprecated for Connext DDS 6.1.2 users,
-and removed in Connext 7.3.0. To learn more about the Connext Python API, see
-[this documentation](https://community.rti.com/static/documentation/connext-dds/current/doc/api/connext_dds/api_python/index.html).
+**Note**: With the introduction of the RTI Connext Python API in *RTI Connext* 
+7.0.0, *Connector for Python* is deprecated and will be removed in a 
+future release, once the Connext Python API is fully supported. You are 
+encouraged to try the 
+[Connext Python API](https://community.rti.com/static/documentation/connext-dds/7.0.0/doc/api/connext_dds/api_python/index.html) (experimental in 7.0.0).  
 
 ## Documentation
 
