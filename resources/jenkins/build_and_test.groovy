@@ -42,6 +42,15 @@ pipeline {
     }
 
     stages {
+        stage('Download dependencies') {
+            steps {
+                downloadAndExtract(
+                    installDirectory: "rticonnextdds-connector/",
+                    flavour: 'connectorlibs'
+                )
+            }
+        }
+
         stage('Test') {
             steps {
                 sh "pip install tox"

@@ -9,6 +9,7 @@ ARG USER_NAME=jenkins
 ARG USER_UID
 
 RUN adduser $USER_NAME -u $USER_UID
+RUN /opt/python/cp36-cp36m/bin/pip install cmake==3.12.0
 
 ENV PATH=/home/jenkins/.local/bin:$PATH
 ENV PATH=/opt/python/cp27-cp27m/bin:$PATH
