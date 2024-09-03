@@ -71,12 +71,12 @@ pipeline {
                 sh 'python setup.py sdist'
                 sh 'python setup.py bdist_wheel'
 
-                withCredentials ([
-                    usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'TWINE_USERNAME', passwordVariable: 'TWINE_PASSWORD'),
-                    string(credentialsId: 'pypi-server', variable: 'TWINE_REPOSITORY_URL')
-                ]) {
-                    sh 'twine upload dist/*'
-                }
+                // withCredentials ([
+                //     usernamePassword(credentialsId: 'pypi-credentials', usernameVariable: 'TWINE_USERNAME', passwordVariable: 'TWINE_PASSWORD'),
+                //     string(credentialsId: 'pypi-server', variable: 'TWINE_REPOSITORY_URL')
+                // ]) {
+                //     sh 'twine upload dist/*'
+                // }
             }
         }
     }
