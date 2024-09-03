@@ -42,7 +42,7 @@ pipeline {
     }
 
     stages {
-        stage('Build & Test') {
+        stage('Test') {
             steps {
                 sh "pip install tox"
                 sh "tox"
