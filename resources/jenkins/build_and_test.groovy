@@ -47,6 +47,12 @@ pipeline {
                 sh "pip install tox"
                 sh "tox"
             }
+
+            post {
+                always {
+                    junit(testResults: 'tests-py*.xml')
+                }
+            }
         }
 
         stage('Publish') {

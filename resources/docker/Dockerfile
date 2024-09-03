@@ -12,5 +12,4 @@ RUN adduser $USER_NAME -u $USER_UID
 
 ENV PATH=/home/jenkins/.local/bin:$PATH
 ENV PATH=/opt/python/cp27-cp27m/bin:$PATH
-ENV PATH=/opt/python/cp35-cp35m/bin:$PATH
 ENV PATH=/opt/python/cp36-cp36m/bin:$PATH
