@@ -14,4 +14,3 @@ RUN /opt/python/cp36-cp36m/bin/pip install cmake==3.12.0
 ENV PATH=/home/jenkins/.local/bin:$PATH
 ENV PATH=/opt/python/cp27-cp27m/bin:$PATH
 ENV PATH=/opt/python/cp36-cp36m/bin:$PATH
-ENV PATH=/opt/python/cp38-cp38/bin:$PATH
