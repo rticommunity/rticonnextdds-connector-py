@@ -12,8 +12,9 @@
 
 pipeline {
     agent {
-        docker {
-            image 'python:3.6'
+        dockerfile {
+            additionalBuildArgs  "--build-arg USER_UID=789"
+            dir 'resources/docker'
             label 'docker'
         }
     }
