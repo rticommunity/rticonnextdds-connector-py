@@ -42,11 +42,21 @@ pipeline {
     }
 
     stages {
+        stage('Download dependencies') {
+            steps {
+                downloadAndExtract(
+                    installDirectory: "rticonnextdds-connector/",
+                    flavour: 'connectorlibs'
+                )
+
+                sh 'pip install --upgrade pip'
+                sh 'pip install -r docs/requirements.txt --no-cache-dir'
+            }
+        }
+
         stage('Build doc') {
             steps {
                 dir('docs') {
-                    sh 'pip install --upgrade pip'
-                    sh 'pip install -r requirements.txt --no-cache-dir'
                     sh 'make html'
                 }
             }
