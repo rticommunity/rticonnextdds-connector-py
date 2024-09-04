@@ -47,7 +47,7 @@ pipeline {
                 dir('docs') {
                     sh 'pip install --upgrade pip'
                     sh 'pip install -r requirements.txt --no-cache-dir'
-                    sh 'make docs html'
+                    sh 'make html'
                 }
             }
 
