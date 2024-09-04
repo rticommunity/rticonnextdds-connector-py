@@ -249,6 +249,28 @@ class TestDataAccess:
     test_input.return_samples()
     assert test_input.samples.length == 1
 
+  def test_return_samples_in_wait(self, test_output, test_input):
+    test_output.instance.set_number("my_long", 33)
+
+    # Initial set-up
+    test_output.write() # Write1
+    test_input.take()
+    assert test_input.samples.length == 1 # Write1
+
+    # Wait without returning samples
+    test_output.write() # Write2
+    test_input.wait(5000, return_samples=False)
+    assert test_input.samples.length == 1 # Write1 was not returned
+    test_input.take()
+    assert test_input.samples.length == 1 # Write2
+
+    # Wait with returning samples
+    test_output.write() # Write3
+    test_input.wait(5000, return_samples=True)
+    assert test_input.samples.length == 0 # Write2 was returned
+    test_input.take()
+    assert test_input.samples.length == 1 # Write3
+
   def test_reset_optional_number(self, test_output, test_input):
     test_output.instance.set_number("my_optional_long", 33)
     test_output.instance.set_number("my_optional_long", None)
