@@ -67,6 +67,11 @@ pipeline {
         }
 
         stage('Publish') {
+            when {
+                beforeAgent true
+                tag pattern: /v\d+\.\d+\.\d+-dev/, comparator: "REGEXP"
+            }
+
             steps {
                 sh 'python setup.py sdist'
                 sh 'python setup.py bdist_wheel'
