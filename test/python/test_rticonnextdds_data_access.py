@@ -240,6 +240,15 @@ class TestDataAccess:
     dictionary = sample.get_dictionary()
     assert not "my_optional_point" in dictionary
 
+  def test_return_samples(self, test_output, test_input):
+    test_output.instance.set_number("my_long", 33)
+    test_output.write()
+    wait_for_data(test_input)
+    assert test_input.samples.length == 1
+    assert test_input.samples[0].get_number("my_long") == 33
+    test_input.return_samples()
+    assert test_input.samples.length == 1
+
   def test_reset_optional_number(self, test_output, test_input):
     test_output.instance.set_number("my_optional_long", 33)
     test_output.instance.set_number("my_optional_long", None)
