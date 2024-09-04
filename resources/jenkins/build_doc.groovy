@@ -12,8 +12,9 @@
 
 pipeline {
     agent {
-        docker {
-            image 'python:3.8'
+        dockerfile {
+            additionalBuildArgs  "--build-arg USER_UID=789"
+            dir 'resources/docker'
             label 'docker'
         }
     }
@@ -44,6 +45,7 @@ pipeline {
         stage('Build doc') {
             steps {
                 dir('docs') {
+                    sh 'pip install --upgrade pip'
                     sh 'pip install -r requirements.txt --no-cache-dir'
                     sh 'make docs html'
                 }
