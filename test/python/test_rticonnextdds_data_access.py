@@ -254,11 +254,13 @@ class TestDataAccess:
 
     # Initial set-up
     test_output.write() # Write1
+    time.sleep(.5)
     test_input.take()
     assert test_input.samples.length == 1 # Write1
 
     # Wait without returning samples
     test_output.write() # Write2
+    time.sleep(.5)
     test_input.wait(5000, return_samples=False)
     assert test_input.samples.length == 1 # Write1 was not returned
     test_input.take()
@@ -266,6 +268,7 @@ class TestDataAccess:
 
     # Wait with returning samples
     test_output.write() # Write3
+    time.sleep(.5)
     test_input.wait(5000, return_samples=True)
     assert test_input.samples.length == 0 # Write2 was returned
     test_input.take()
