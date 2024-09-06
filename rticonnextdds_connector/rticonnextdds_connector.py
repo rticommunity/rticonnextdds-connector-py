@@ -859,7 +859,7 @@ class Input:
         If the operation times out, it raises :class:`TimeoutError`.
 
         :param number timeout: The maximum time to wait in milliseconds. By default, infinite.
-        :param bool return_samples: Whether to return outstanding loans before waiting. By default, ``False``.
+        :param bool return_samples: Whether to return samples before waiting. By default and for backwards compatibility, ``False``. It is recommended to set it to ``True`` for most scenarios.
         """
         if timeout is None:
             timeout = -1

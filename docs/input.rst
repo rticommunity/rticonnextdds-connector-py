@@ -145,22 +145,19 @@ still provide the following information:
 Returning data and meta-data samples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The methods :meth:`Input.take()` and :meth:`Input.read()` modify the internal state
-of the :class:`Input` object, changing the available samples in the :attr:`Input.samples`.
+The methods :meth:`Input.take()` and :meth:`Input.read()` makes data accesible
+through the :meth:`Input.samples` collection. This data is available until the
+next call to :meth:`Input.take()` or :meth:`Input.read()`.
 
-This data is available until the next call to :meth:`Input.take()` or :meth:`Input.read()`,
-but it is also possible to return the samples of the :class:`Input` object with
-:meth:`Input.return_loan()`:
+In some situations, data may need to be returned sooner so that new data can be
+received. To do that, you can call explicitly call :meth:`Input.return_samples()`:
 
 .. testcode::
 
-   input.return_loan()
+   input.return_samples()
 
-This is useful when you need to explicitly release resources associated with the
-:class:`Input` object.
-
-Additionally, it is also possible to return the samples of a specific :class:`Input`
-when calling :meth:`Input.wait()` with the ``return_samples`` parameter set to ``True``:
+Additionally, it is also possible to return samples when calling
+:meth:`Input.wait()` with the ``return_samples`` parameter set to ``True``:
 
 .. testcode::
 
