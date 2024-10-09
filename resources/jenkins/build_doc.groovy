@@ -45,7 +45,7 @@ pipeline {
         stage('Download dependencies') {
             steps {
                 downloadAndExtract(
-                    installDirectory: "rticonnextdds-connector/",
+                    installDirectory: ".",
                     flavour: 'connectorlibs'
                 )
 
