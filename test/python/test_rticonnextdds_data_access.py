@@ -247,7 +247,7 @@ class TestDataAccess:
     assert test_input.samples.length == 1
     assert test_input.samples[0].get_number("my_long") == 33
     test_input.return_samples()
-    assert test_input.samples.length == 1
+    assert test_input.samples.length == 0
 
   def test_return_samples_in_wait(self, test_output, test_input):
     test_output.instance.set_number("my_long", 33)
