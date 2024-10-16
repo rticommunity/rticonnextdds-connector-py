@@ -6,10 +6,10 @@
 Copyrights and License
 **********************
 
-© 2022 Real-Time Innovations, Inc. |br|
+© 2024 Real-Time Innovations, Inc. |br|
 All rights reserved.  |br|
 Printed in U.S.A. First printing.  |br|
-February 2022. |br|
+October 2024. |br|
 
 
 .. rubric:: License
@@ -56,7 +56,6 @@ Phone: (408) 990-7444 |br|
 Email: support@rti.com |br|
 Website: https://support.rti.com/ |br|
 
-© 2022 RTI
 
 .. rubric:: External Third-Party Software Used in Connector
 
