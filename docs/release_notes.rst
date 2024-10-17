@@ -33,8 +33,8 @@ runs on most Windows®, Linux® and macOS® platforms.
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
 
-Verion 1.2.4
-------------
+Version 1.2.4
+-------------
 *Connector* 1.2.4 is built on *RTI Connext DDS* 6.1.2.21. 
 For details on what's new and fixed in 6.1.2.21, contact support@rti.com. 
 

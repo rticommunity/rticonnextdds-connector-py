@@ -66,7 +66,7 @@ Website: https://support.rti.com/ |br|
   * Version 5.2.
 
   * License (https://www.lua.org/license.html):
-    Copyright © 1994–2021 Lua.org, PUC-Rio.
+    Copyright © 1994-2021 Lua.org, PUC-Rio.
 
     Permission is hereby granted, free of charge, to any person obtaining a 
     copy of this software and associated documentation files (the "Software"), 
@@ -87,12 +87,12 @@ Website: https://support.rti.com/ |br|
     THE SOFTWARE.
 
 **json-parser**
-  * The source code of this software (from https://github.com/udp/json-parser) 
+  * The source code of this software (from https://github.com/json-parser/json-parser) 
     is used to build the native libraries provided by *RTI Connector*.
 
   * License:
 
-    Copyright (C) 2012, 2013, 2014 James McLaughlin et al.  All rights reserved.
+    Copyright (C) 2012-2021 the json-parser authors.  All rights reserved.
     https://github.com/udp/json-parser
 
     Redistribution and use in source and binary forms, with or without
