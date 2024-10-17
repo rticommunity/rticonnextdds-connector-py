@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('../rticonnextdds_connector'))
 # -- Project information -----------------------------------------------------
 
 project = 'RTI Connector for Python'
-copyright = '2022, Real-Time Innovations, Inc'
+copyright = '2024, Real-Time Innovations, Inc'
 author = 'Real-Time Innovations, Inc.'
 
 # The full version, including alpha/beta/rc tags
