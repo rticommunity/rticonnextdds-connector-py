@@ -141,7 +141,27 @@ still provide the following information:
   ``'NOT_ALIVE_DISPOSED'``), the sample data contains the value of the key that
   has been disposed. You can access the key fields only. See
   :ref:`Accessing key values of disposed samples`.
-  
+
+Returning data and meta-data samples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The methods :meth:`Input.take()` and :meth:`Input.read()` make data accesible
+through the :meth:`Input.samples` collection. This data is available until the
+next call to :meth:`Input.take()` or :meth:`Input.read()`.
+
+In some situations, data may need to be returned sooner so that new data can be
+received. To do that, you can explicitly call :meth:`Input.return_samples()`:
+
+.. testcode::
+
+   input.return_samples()
+
+It is also possible to return samples when calling
+:meth:`Input.wait()` with the ``return_samples`` parameter set to ``True``:
+
+.. testcode::
+
+   input.wait(return_samples=True)
 
 Matching with a publication
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

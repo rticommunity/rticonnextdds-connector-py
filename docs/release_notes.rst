@@ -32,15 +32,42 @@ runs on most Windows®, Linux® and macOS® platforms.
 `main Connector
 repository <https://github.com/rticommunity/rticonnextdds-connector>`__.
 
-Version 1.2.3
--------------
 
+Version 1.2.4
+-------------
+*Connector* 1.2.4 is built on *RTI Connext DDS* 6.1.2.21. 
+For details on what's new and fixed in 6.1.2.21, contact support@rti.com. 
+
+What's Fixed in 1.2.4
+^^^^^^^^^^^^^^^^^^^^^
+
+Wait operation on Input may have led to deadlock
+""""""""""""""""""""""""""""""""""""""""""""""""
+Using the ``wait`` operation of an ``Input`` after doing ``read`` or ``take``
+could have led to a deadlock scenario. This only happened if ``read`` or
+``take`` returned the the maximum amount of samples that an ``Input`` can hold.
+
+To remedy this, a new ``return_samples`` operation has been added to Inputs.
+Additionally, the ``wait`` operation can take a ``return_samples=True`` keyword
+argument to trigger the functionality. This behavior is not enabled by default,
+to be backwards compatible.
+
+.. code:: python
+
+   my_input.wait(return_samples=True)
+
+[RTI Issue ID CON-314]
+
+
+Previous Releases
+-----------------
+
+Version 1.2.3
+^^^^^^^^^^^^^
 *Connector* 1.2.3 is built on *RTI Connext DDS* 6.1.2.17. 
 For details on what's new and fixed in 6.1.2.17, contact support@rti.com. 
 There are no changes to Connector itself. 
 
-Previous Releases
------------------
 
 Version 1.2.2
 ^^^^^^^^^^^^^

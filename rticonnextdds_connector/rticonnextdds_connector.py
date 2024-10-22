@@ -221,6 +221,10 @@ class _ConnectorBinding:
         self.take.restype = ctypes.c_int
         self.take.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
 
+        self.return_samples = self.library.RTI_Connector_return_loan
+        self.return_samples.restype = ctypes.c_int
+        self.return_samples.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+
         self.wait = self.library.RTI_Connector_wait_for_data
         self.wait.restype = ctypes.c_int
         self.wait.argtypes = [ctypes.c_void_p, ctypes.c_int]
@@ -824,6 +828,17 @@ class Input:
 
         _check_retcode(connector_binding.take(self.connector.native, tocstring(self.name)))
 
+    def return_samples(self):
+        """Returns any samples held by this Input
+
+        After calling this method, the samples are no longer accessible from :attr:`samples`
+
+        """
+
+        _check_retcode(
+            connector_binding.return_samples(self.connector.native, tocstring(self.name))
+        )
+
     @property
     def samples(self):
         """Allows iterating over the samples read by this input
@@ -836,7 +851,7 @@ class Input:
 
         return self._samples
 
-    def wait(self, timeout=None):
+    def wait(self, timeout=None, return_samples=False):
         """Wait for this input to receive data.
 
         This method waits for the specified timeout for data to be received by
@@ -844,9 +859,12 @@ class Input:
         If the operation times out, it raises :class:`TimeoutError`.
 
         :param number timeout: The maximum time to wait in milliseconds. By default, infinite.
+        :param bool return_samples: Whether to return samples before waiting. By default and for backwards compatibility, ``False``. It is recommended to set it to ``True`` for most scenarios.
         """
         if timeout is None:
             timeout = -1
+        if return_samples:
+            self.return_samples()
         retcode = connector_binding.wait_for_data(self.native, timeout)
         _check_retcode(retcode)
 
