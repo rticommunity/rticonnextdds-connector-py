@@ -10,6 +10,8 @@ ARG USER_UID
 
 RUN adduser $USER_NAME -u $USER_UID
 
+RUN pip install cmake==3.12.0
+
 RUN mkdir -p /tmp/awscli/ \
     && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscli/awscliv2.zip" \
     && unzip /tmp/awscli/awscliv2.zip -d /tmp/awscli \
