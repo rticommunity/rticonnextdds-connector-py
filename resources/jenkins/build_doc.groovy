@@ -15,7 +15,7 @@ pipeline {
         dockerfile {
             additionalBuildArgs  "--build-arg USER_UID=789"
             dir 'resources/docker'
-            filename 'Dockerfile.doc'
+            filename 'documentation.Dockerfile'
             label 'docker'
         }
     }
