@@ -7,12 +7,25 @@ Getting Started
 Installing RTI Connector for Python
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are two ways to obtain *RTI Connector* for Python. You can install it with
-*pip*:
+There are two ways to obtain *RTI Connector* for Python: with
+*pip* or by cloning the repository.
+
+**To install Connector with pip:**
 
 .. code:: bash
 
    $ pip install rticonnextdds_connector
+
+The above command installs the latest version of *Connext* by default. To
+install a specific version, use this command:
+
+.. code-block:: console
+
+   $ pip install rticonnextdds_connector==<version>
+
+where ``<version>`` is any valid *Connext* version in the
+`Release history <https://pypi.org/project/rti.connext/#history>`__
+at pypi.org.
 
 And then run your *Connector* applications:
 
@@ -20,8 +33,8 @@ And then run your *Connector* applications:
 
     $ python my_connector_app.py
 
-You can also clone the repository and run the examples directly without installing
-*Connector*:
+**To clone the repository and run the examples directly without installing
+Connector:**
 
 .. code:: bash
 
